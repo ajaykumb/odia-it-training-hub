@@ -1,4 +1,3 @@
-
 {
   "name": "odia-it-training-hub",
   "version": "1.0.0",
@@ -9,13 +8,9 @@
     "start": "next start"
   },
   "dependencies": {
-    "next": "latest",
-    "react": "latest",
-    "react-dom": "latest"
-  },
-  "devDependencies": {
-    "autoprefixer": "latest",
-    "postcss": "latest",
-    "tailwindcss": "latest"
+    "next": "14.2.5",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "tailwindcss": "4.0.0"
   }
 }
