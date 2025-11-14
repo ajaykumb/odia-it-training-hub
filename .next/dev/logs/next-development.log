@@ -1,0 +1,26 @@
+[00:00:01.733] Server  LOG      ✓ Ready in 1286ms
+[00:00:18.753] Server  WARN    Image with src "/images/banner.jpg" has legacy prop "layout". Did you forget to run the codemod?
+Read more: https://nextjs.org/docs/messages/next-image-upgrade-to-13
+[00:00:18.753] Server  WARN    Image with src "/images/banner.jpg" has legacy prop "objectFit". Did you forget to run the codemod?
+Read more: https://nextjs.org/docs/messages/next-image-upgrade-to-13
+[00:00:19.481] Browser WARN    Image with src "/images/banner.jpg" has legacy prop "layout". Did you forget to run the codemod?
+Read more: https://nextjs.org/docs/messages/next-image-upgrade-to-13
+[00:00:19.481] Browser WARN    Image with src "/images/banner.jpg" has legacy prop "objectFit". Did you forget to run the codemod?
+Read more: https://nextjs.org/docs/messages/next-image-upgrade-to-13
+[00:00:19.975] Browser WARN    Image with src "/images/banner.jpg" has "fill" and parent element with invalid "position". Provided "static" should be one of absolute,fixed,relative.
+[00:03:32.083] Browser WARN    Image with src "/images/banner.jpg" has legacy prop "layout". Did you forget to run the codemod?
+Read more: https://nextjs.org/docs/messages/next-image-upgrade-to-13
+[00:03:32.083] Browser WARN    Image with src "/images/banner.jpg" has legacy prop "objectFit". Did you forget to run the codemod?
+Read more: https://nextjs.org/docs/messages/next-image-upgrade-to-13
+[00:03:32.083] Browser WARN    Image with src "/images/banner.jpg" has "fill" and parent element with invalid "position". Provided "static" should be one of absolute,fixed,relative.
+[00:05:32.286] Server  LOG      ✓ Compiled in 47ms
+[00:05:37.994] Server  LOG      ✓ Compiled in 21ms
+[00:05:51.830] Server  WARN    Image with src "/images/banner.jpg" has legacy prop "layout". Did you forget to run the codemod?
+Read more: https://nextjs.org/docs/messages/next-image-upgrade-to-13
+[00:05:51.832] Server  WARN    Image with src "/images/banner.jpg" has legacy prop "objectFit". Did you forget to run the codemod?
+Read more: https://nextjs.org/docs/messages/next-image-upgrade-to-13
+[00:05:52.335] Browser WARN    Image with src "/images/banner.jpg" has legacy prop "layout". Did you forget to run the codemod?
+Read more: https://nextjs.org/docs/messages/next-image-upgrade-to-13
+[00:05:52.335] Browser WARN    Image with src "/images/banner.jpg" has legacy prop "objectFit". Did you forget to run the codemod?
+Read more: https://nextjs.org/docs/messages/next-image-upgrade-to-13
+[00:05:52.335] Browser WARN    Image with src "/images/banner.jpg" has "fill" and parent element with invalid "position". Provided "static" should be one of absolute,fixed,relative.

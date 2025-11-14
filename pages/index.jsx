@@ -51,7 +51,7 @@ export default function Home() {
       <section id="contact" className="max-w-5xl mx-auto p-6 text-center">
         <h3 className="text-2xl font-semibold text-blue-700 mb-2">📞 Contact Us</h3>
         <p>Email: <a href="mailto:odiaittraininghub@gmail.com" className="text-blue-600">odiaittraininghub@gmail.com</a></p>
-        <p>Phone: +91 12345 67890</p>
+        <p>Phone: +91 9437401378</p>
         <p>Location: Bhubaneswar, Odisha</p>
       </section>
 
