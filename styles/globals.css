@@ -1,10 +1,1 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-/* Add your custom styles below */
-body {
-  background-color: #f9fafb;
-  color: #1f2937;
-  font-family: sans-serif;
-}
+@import "tailwindcss";
