@@ -1,5 +1,3 @@
-import Image from "next/image";
-
 export default function Home() {
   return (
     <main className="bg-gray-50 text-gray-800 min-h-screen">
@@ -9,48 +7,20 @@ export default function Home() {
         <h1 className="text-xl md:text-2xl font-bold text-blue-700">
           Odia IT Training Hub
         </h1>
-
-        {/* Small logo in corner */}
-        <Image
-          src="/images/logo.jpg"
-          alt="Odia IT Training Hub Logo"
-          width={40}
-          height={40}
-          className="rounded-full"
-        />
       </header>
 
-      {/* BANNER WITH SMALL ICON IN CORNER */}
-      <section className="relative w-full h-[350px] flex items-center justify-center bg-black">
-        <Image
-          src="/images/banner.jpg"
-          alt="Training Banner"
-          layout="fill"
-          objectFit="cover"
-          className="opacity-70"
-        />
-
+      {/* BANNER WITHOUT IMAGE */}
+      <section className="relative w-full h-[200px] flex items-center justify-center bg-blue-900">
         {/* Overlay Title */}
         <h2 className="absolute text-white text-3xl md:text-5xl font-bold text-center px-4">
           Learn IT in Odia — Hands-on Training for Bright Careers
         </h2>
-
-        {/* Small corner image */}
-        <div className="absolute top-4 right-4">
-          <Image
-            src="/images/logo.jpg"
-            alt="Small Corner Logo"
-            width={50}
-            height={50}
-            className="rounded-full shadow-md"
-          />
-        </div>
       </section>
 
       {/* ABOUT SECTION */}
-      <section className="max-w-5xl mx-auto p-6 flex flex-col md:flex-row gap-6">
+      <section className="max-w-5xl mx-auto p-6 flex flex-col gap-6">
 
-        {/* TEXT FIRST */}
+        {/* TEXT ONLY */}
         <div className="flex-1">
           <h3 className="text-2xl font-semibold text-blue-700 mb-4">
             🎓 About Odia IT Training Hub
@@ -69,17 +39,6 @@ export default function Home() {
             <li>Daily Interview Questions & Doubt-Clearing Sessions</li>
             <li>Tools: Splunk, Dynatrace, ServiceNow</li>
           </ul>
-        </div>
-
-        {/* SMALL SIDE IMAGE */}
-        <div className="w-[120px] mx-auto md:mx-0">
-          <Image
-            src="/images/about.jpg"
-            alt="About Training"
-            width={120}
-            height={120}
-            className="rounded-lg shadow-md"
-          />
         </div>
       </section>
 
