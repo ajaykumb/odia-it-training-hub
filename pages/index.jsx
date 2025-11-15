@@ -58,12 +58,20 @@ export default function Home() {
       </section>
 
       {/* Placement Section */}
-      <section className="py-16 bg-blue-600 text-white text-center">
-        <h3 className="text-3xl font-bold mb-4">100% Job Placement Commitment</h3>
-        <p className="max-w-3xl mx-auto text-lg leading-7">
-          We ensure every student becomes job-ready with real-time projects, interview preparation, resume building, and lifetime placement support.
-        </p>
-      </section>
+<section className="py-16 bg-blue-600 text-white text-center">
+  <h3 className="text-3xl font-bold mb-4">100% Job Placement Commitment</h3>
+  <p className="max-w-3xl mx-auto text-lg leading-7 mb-6">
+    We ensure every student becomes job-ready with real-time projects, interview preparation, resume building, and lifetime placement support.
+  </p>
+
+  <a
+    href="/success"
+    className="bg-yellow-400 text-blue-900 px-6 py-3 rounded-lg font-semibold hover:bg-yellow-300 transition"
+  >
+    View Successful Candidates →
+  </a>
+</section>
+
 
       {/* Contact Section */}
 <section id="contact" className="py-16 bg-white">
