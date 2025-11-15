@@ -20,7 +20,7 @@ export default async function handler(req, res) {
 
     const mailOptions = {
       from: process.env.MAIL_USER,
-      to: "odiaittraininghub@gmail.com",
+      to: "trainingaj.group@gmail.com",
       subject: "New Candidate Interested - Odia IT Training Hub",
       text: `
 A new candidate submitted interest.
