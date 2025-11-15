@@ -182,11 +182,11 @@ export default function Home() {
               🚀 Learn. Build. Deploy. Grow your career with the right skills.
             </p>
             <a
-              href="tel:7978082355"
+              href="tel:9437401378"
               className="inline-flex items-center bg-red-500 text-white px-8 py-4 rounded-full font-black text-xl md:text-2xl shadow-neon hover:bg-red-600 transition-all transform hover:scale-105 animate-pulse-fast"
             >
               <PhoneIcon className="w-7 h-7 mr-3 animate-wiggle" />
-              Call to Enroll: 7978082355
+              Call to Enroll: 9437401378
             </a>
           </div>
         </div>
