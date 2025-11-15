@@ -470,13 +470,16 @@ __turbopack_context__.s([
     ()=>Home
 ]);
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/react/jsx-dev-runtime.js [client] (ecmascript)");
-var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$heroicons$2f$react$2f$24$2f$solid$2f$esm$2f$BoltIcon$2e$js__$5b$client$5d$__$28$ecmascript$29$__$3c$export__default__as__BoltIcon$3e$__ = __turbopack_context__.i("[project]/node_modules/@heroicons/react/24/solid/esm/BoltIcon.js [client] (ecmascript) <export default as BoltIcon>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$heroicons$2f$react$2f$24$2f$solid$2f$esm$2f$BoltIcon$2e$js__$5b$client$5d$__$28$ecmascript$29$__$3c$export__default__as__BoltIcon$3e$__ = __turbopack_context__.i("[project]/node_modules/@heroicons/react/24/solid/esm/BoltIcon.js [client] (ecmascript) <export default as BoltIcon>"); // Added StarIcon, LightBulbIcon, PhoneIcon for flashier design
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$heroicons$2f$react$2f$24$2f$solid$2f$esm$2f$AcademicCapIcon$2e$js__$5b$client$5d$__$28$ecmascript$29$__$3c$export__default__as__AcademicCapIcon$3e$__ = __turbopack_context__.i("[project]/node_modules/@heroicons/react/24/solid/esm/AcademicCapIcon.js [client] (ecmascript) <export default as AcademicCapIcon>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$heroicons$2f$react$2f$24$2f$solid$2f$esm$2f$MapPinIcon$2e$js__$5b$client$5d$__$28$ecmascript$29$__$3c$export__default__as__MapPinIcon$3e$__ = __turbopack_context__.i("[project]/node_modules/@heroicons/react/24/solid/esm/MapPinIcon.js [client] (ecmascript) <export default as MapPinIcon>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$heroicons$2f$react$2f$24$2f$solid$2f$esm$2f$GlobeAltIcon$2e$js__$5b$client$5d$__$28$ecmascript$29$__$3c$export__default__as__GlobeAltIcon$3e$__ = __turbopack_context__.i("[project]/node_modules/@heroicons/react/24/solid/esm/GlobeAltIcon.js [client] (ecmascript) <export default as GlobeAltIcon>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$heroicons$2f$react$2f$24$2f$solid$2f$esm$2f$UsersIcon$2e$js__$5b$client$5d$__$28$ecmascript$29$__$3c$export__default__as__UsersIcon$3e$__ = __turbopack_context__.i("[project]/node_modules/@heroicons/react/24/solid/esm/UsersIcon.js [client] (ecmascript) <export default as UsersIcon>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$heroicons$2f$react$2f$24$2f$solid$2f$esm$2f$CheckCircleIcon$2e$js__$5b$client$5d$__$28$ecmascript$29$__$3c$export__default__as__CheckCircleIcon$3e$__ = __turbopack_context__.i("[project]/node_modules/@heroicons/react/24/solid/esm/CheckCircleIcon.js [client] (ecmascript) <export default as CheckCircleIcon>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$heroicons$2f$react$2f$24$2f$solid$2f$esm$2f$ArrowRightIcon$2e$js__$5b$client$5d$__$28$ecmascript$29$__$3c$export__default__as__ArrowRightIcon$3e$__ = __turbopack_context__.i("[project]/node_modules/@heroicons/react/24/solid/esm/ArrowRightIcon.js [client] (ecmascript) <export default as ArrowRightIcon>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$heroicons$2f$react$2f$24$2f$solid$2f$esm$2f$StarIcon$2e$js__$5b$client$5d$__$28$ecmascript$29$__$3c$export__default__as__StarIcon$3e$__ = __turbopack_context__.i("[project]/node_modules/@heroicons/react/24/solid/esm/StarIcon.js [client] (ecmascript) <export default as StarIcon>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$heroicons$2f$react$2f$24$2f$solid$2f$esm$2f$LightBulbIcon$2e$js__$5b$client$5d$__$28$ecmascript$29$__$3c$export__default__as__LightBulbIcon$3e$__ = __turbopack_context__.i("[project]/node_modules/@heroicons/react/24/solid/esm/LightBulbIcon.js [client] (ecmascript) <export default as LightBulbIcon>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$heroicons$2f$react$2f$24$2f$solid$2f$esm$2f$PhoneIcon$2e$js__$5b$client$5d$__$28$ecmascript$29$__$3c$export__default__as__PhoneIcon$3e$__ = __turbopack_context__.i("[project]/node_modules/@heroicons/react/24/solid/esm/PhoneIcon.js [client] (ecmascript) <export default as PhoneIcon>");
 ;
 ;
 function Home() {
@@ -569,13 +572,13 @@ function Home() {
                 body: JSON.stringify(data)
             });
             if (res.ok) {
-                alert("Success! Your details have been submitted. We'll be in touch soon.");
+                console.log("Success! Your details have been submitted. We'll be in touch soon.");
                 e.target.reset();
             } else {
-                alert("Failed to send. Please ensure all fields are correct and try again.");
+                console.error("Failed to send. Please ensure all fields are correct and try again.");
             }
         } catch (error) {
-            alert("An error occurred. Please check your network connection.");
+            console.error("An error occurred. Please check your network connection.");
         }
     };
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("main", {
@@ -589,7 +592,7 @@ function Home() {
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("a", {
                             href: "#",
                             className: "text-3xl font-extrabold text-yellow-300 hover:text-yellow-400 transition",
-                            children: "Odia IT Hub"
+                            children: "Odia IT Training Hub"
                         }, void 0, false, {
                             fileName: "[project]/pages/index.jsx",
                             lineNumber: 48,
@@ -617,12 +620,21 @@ function Home() {
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("a", {
+                                    href: "#developer-focus",
+                                    className: "hover:text-red-300 transition",
+                                    children: "New Batch"
+                                }, void 0, false, {
+                                    fileName: "[project]/pages/index.jsx",
+                                    lineNumber: 52,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("a", {
                                     href: "#placement",
                                     className: "hover:text-yellow-300 transition",
                                     children: "Success"
                                 }, void 0, false, {
                                     fileName: "[project]/pages/index.jsx",
-                                    lineNumber: 52,
+                                    lineNumber: 53,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("a", {
@@ -631,7 +643,7 @@ function Home() {
                                     children: "Contact"
                                 }, void 0, false, {
                                     fileName: "[project]/pages/index.jsx",
-                                    lineNumber: 53,
+                                    lineNumber: 54,
                                     columnNumber: 13
                                 }, this)
                             ]
@@ -646,7 +658,7 @@ function Home() {
                             children: "Enroll"
                         }, void 0, false, {
                             fileName: "[project]/pages/index.jsx",
-                            lineNumber: 55,
+                            lineNumber: 56,
                             columnNumber: 11
                         }, this)
                     ]
@@ -667,7 +679,7 @@ function Home() {
                         className: "absolute inset-0 opacity-10"
                     }, void 0, false, {
                         fileName: "[project]/pages/index.jsx",
-                        lineNumber: 61,
+                        lineNumber: 62,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -678,7 +690,7 @@ function Home() {
                                 children: "Your Career Starts Here"
                             }, void 0, false, {
                                 fileName: "[project]/pages/index.jsx",
-                                lineNumber: 66,
+                                lineNumber: 67,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
@@ -690,7 +702,7 @@ function Home() {
                                         children: "Odia"
                                     }, void 0, false, {
                                         fileName: "[project]/pages/index.jsx",
-                                        lineNumber: 68,
+                                        lineNumber: 69,
                                         columnNumber: 25
                                     }, this),
                                     " — ",
@@ -698,14 +710,14 @@ function Home() {
                                         className: "hidden md:block"
                                     }, void 0, false, {
                                         fileName: "[project]/pages/index.jsx",
-                                        lineNumber: 68,
+                                        lineNumber: 69,
                                         columnNumber: 73
                                     }, this),
                                     " Real-Time, Hands-On Training"
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/pages/index.jsx",
-                                lineNumber: 67,
+                                lineNumber: 68,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -713,7 +725,7 @@ function Home() {
                                 children: "Upskill with practical training designed for freshers & working professionals, delivered in **Odia and English**."
                             }, void 0, false, {
                                 fileName: "[project]/pages/index.jsx",
-                                lineNumber: 70,
+                                lineNumber: 71,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("a", {
@@ -725,25 +737,25 @@ function Home() {
                                         className: "w-5 h-5 inline ml-2"
                                     }, void 0, false, {
                                         fileName: "[project]/pages/index.jsx",
-                                        lineNumber: 77,
+                                        lineNumber: 78,
                                         columnNumber: 29
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/pages/index.jsx",
-                                lineNumber: 73,
+                                lineNumber: 74,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/pages/index.jsx",
-                        lineNumber: 65,
+                        lineNumber: 66,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/pages/index.jsx",
-                lineNumber: 60,
+                lineNumber: 61,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
@@ -757,7 +769,7 @@ function Home() {
                             children: "Our Commitment"
                         }, void 0, false, {
                             fileName: "[project]/pages/index.jsx",
-                            lineNumber: 87,
+                            lineNumber: 88,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -765,7 +777,7 @@ function Home() {
                             children: "We provide practical and customizable IT training sessions, focusing on **job-readiness** with real-time project exposure."
                         }, void 0, false, {
                             fileName: "[project]/pages/index.jsx",
-                            lineNumber: 88,
+                            lineNumber: 89,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -779,29 +791,29 @@ function Home() {
                                             children: "🗣️"
                                         }, void 0, false, {
                                             fileName: "[project]/pages/index.jsx",
-                                            lineNumber: 94,
-                                            columnNumber: 17
+                                            lineNumber: 95,
+                                            columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h4", {
                                             className: "text-xl font-bold mb-2",
                                             children: "Local Language Support"
                                         }, void 0, false, {
                                             fileName: "[project]/pages/index.jsx",
-                                            lineNumber: 95,
-                                            columnNumber: 17
+                                            lineNumber: 96,
+                                            columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                             className: "text-gray-600",
                                             children: "Training available in both Odia and English for complete conceptual clarity."
                                         }, void 0, false, {
                                             fileName: "[project]/pages/index.jsx",
-                                            lineNumber: 96,
-                                            columnNumber: 17
+                                            lineNumber: 97,
+                                            columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/pages/index.jsx",
-                                    lineNumber: 93,
+                                    lineNumber: 94,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -812,29 +824,29 @@ function Home() {
                                             children: "🛠️"
                                         }, void 0, false, {
                                             fileName: "[project]/pages/index.jsx",
-                                            lineNumber: 99,
-                                            columnNumber: 17
+                                            lineNumber: 100,
+                                            columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h4", {
                                             className: "text-xl font-bold mb-2",
                                             children: "100% Practical Training"
                                         }, void 0, false, {
                                             fileName: "[project]/pages/index.jsx",
-                                            lineNumber: 100,
-                                            columnNumber: 17
+                                            lineNumber: 101,
+                                            columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                             className: "text-gray-600",
                                             children: "Focus on real-time projects and industry-standard tools for immediate application."
                                         }, void 0, false, {
                                             fileName: "[project]/pages/index.jsx",
-                                            lineNumber: 101,
-                                            columnNumber: 17
+                                            lineNumber: 102,
+                                            columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/pages/index.jsx",
-                                    lineNumber: 98,
+                                    lineNumber: 99,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -845,46 +857,46 @@ function Home() {
                                             children: "🤝"
                                         }, void 0, false, {
                                             fileName: "[project]/pages/index.jsx",
-                                            lineNumber: 104,
-                                            columnNumber: 17
+                                            lineNumber: 105,
+                                            columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h4", {
                                             className: "text-xl font-bold mb-2",
                                             children: "Lifetime Support"
                                         }, void 0, false, {
                                             fileName: "[project]/pages/index.jsx",
-                                            lineNumber: 105,
-                                            columnNumber: 17
+                                            lineNumber: 106,
+                                            columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                             className: "text-gray-600",
                                             children: "Dedicated career and placement support even after course completion."
                                         }, void 0, false, {
                                             fileName: "[project]/pages/index.jsx",
-                                            lineNumber: 106,
-                                            columnNumber: 17
+                                            lineNumber: 107,
+                                            columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/pages/index.jsx",
-                                    lineNumber: 103,
+                                    lineNumber: 104,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/pages/index.jsx",
-                            lineNumber: 92,
+                            lineNumber: 93,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/pages/index.jsx",
-                    lineNumber: 86,
+                    lineNumber: 87,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/pages/index.jsx",
-                lineNumber: 85,
+                lineNumber: 86,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
@@ -898,7 +910,7 @@ function Home() {
                             children: "Master These In-Demand Technologies"
                         }, void 0, false, {
                             fileName: "[project]/pages/index.jsx",
-                            lineNumber: 117,
+                            lineNumber: 118,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -914,34 +926,319 @@ function Home() {
                                                 children: course.title
                                             }, void 0, false, {
                                                 fileName: "[project]/pages/index.jsx",
-                                                lineNumber: 126,
+                                                lineNumber: 127,
                                                 columnNumber: 19
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/pages/index.jsx",
-                                        lineNumber: 124,
+                                        lineNumber: 125,
                                         columnNumber: 17
                                     }, this)
                                 }, index, false, {
                                     fileName: "[project]/pages/index.jsx",
-                                    lineNumber: 120,
+                                    lineNumber: 121,
                                     columnNumber: 15
                                 }, this))
                         }, void 0, false, {
                             fileName: "[project]/pages/index.jsx",
-                            lineNumber: 118,
+                            lineNumber: 119,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/pages/index.jsx",
-                    lineNumber: 116,
+                    lineNumber: 117,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/pages/index.jsx",
-                lineNumber: 115,
+                lineNumber: 116,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
+                id: "developer-focus",
+                className: "py-20 bg-gradient-to-br from-purple-800 to-indigo-900 text-white shadow-2xl relative overflow-hidden",
+                children: [
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "absolute inset-0 z-0 opacity-10 flex items-center justify-center pointer-events-none",
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$heroicons$2f$react$2f$24$2f$solid$2f$esm$2f$StarIcon$2e$js__$5b$client$5d$__$28$ecmascript$29$__$3c$export__default__as__StarIcon$3e$__["StarIcon"], {
+                                className: "w-72 h-72 text-yellow-300 animate-pulse-slow",
+                                style: {
+                                    animationDelay: '0s'
+                                }
+                            }, void 0, false, {
+                                fileName: "[project]/pages/index.jsx",
+                                lineNumber: 141,
+                                columnNumber: 13
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$heroicons$2f$react$2f$24$2f$solid$2f$esm$2f$StarIcon$2e$js__$5b$client$5d$__$28$ecmascript$29$__$3c$export__default__as__StarIcon$3e$__["StarIcon"], {
+                                className: "w-52 h-52 text-blue-300 animate-pulse-slow ml-20",
+                                style: {
+                                    animationDelay: '1.5s'
+                                }
+                            }, void 0, false, {
+                                fileName: "[project]/pages/index.jsx",
+                                lineNumber: 142,
+                                columnNumber: 13
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/pages/index.jsx",
+                        lineNumber: 140,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "max-w-4xl mx-auto px-6 text-center relative z-10",
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
+                                className: "text-4xl md:text-5xl font-extrabold mb-4 leading-tight text-yellow-300 animate-fade-in-up",
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$heroicons$2f$react$2f$24$2f$solid$2f$esm$2f$LightBulbIcon$2e$js__$5b$client$5d$__$28$ecmascript$29$__$3c$export__default__as__LightBulbIcon$3e$__["LightBulbIcon"], {
+                                        className: "w-10 h-10 inline-block mr-3 text-red-400 animate-bounce-slow"
+                                    }, void 0, false, {
+                                        fileName: "[project]/pages/index.jsx",
+                                        lineNumber: 147,
+                                        columnNumber: 13
+                                    }, this),
+                                    "Software Developers: New Batch Launching Soon!"
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/pages/index.jsx",
+                                lineNumber: 146,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                className: "text-xl md:text-2xl font-semibold text-pink-200 mb-8 animate-fade-in-up",
+                                style: {
+                                    animationDelay: '0.2s'
+                                },
+                                children: "📢 Don't miss out! Spread the word in your network!"
+                            }, void 0, false, {
+                                fileName: "[project]/pages/index.jsx",
+                                lineNumber: 150,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "bg-gradient-to-br from-indigo-700 to-purple-700 p-8 md:p-10 rounded-3xl shadow-glow border-b-8 border-red-500 transform hover:scale-[1.01] transition-all duration-300",
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h4", {
+                                        className: "text-2xl md:text-3xl font-extrabold mb-6 text-yellow-400 animate-fade-in-up",
+                                        style: {
+                                            animationDelay: '0.4s'
+                                        },
+                                        children: "✨ Essential Skills for Next-Gen Software Developers ✨"
+                                    }, void 0, false, {
+                                        fileName: "[project]/pages/index.jsx",
+                                        lineNumber: 155,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                        className: "text-lg md:text-xl mb-8 italic text-purple-200 animate-fade-in-up",
+                                        style: {
+                                            animationDelay: '0.6s'
+                                        },
+                                        children: "Master these core technologies to build, deploy, and excel in real-world IT projects."
+                                    }, void 0, false, {
+                                        fileName: "[project]/pages/index.jsx",
+                                        lineNumber: 158,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-8 text-left mb-10",
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                className: "flex items-start space-x-3 text-lg md:text-xl text-white animate-fade-in-left",
+                                                style: {
+                                                    animationDelay: '0.8s'
+                                                },
+                                                children: [
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$heroicons$2f$react$2f$24$2f$solid$2f$esm$2f$CheckCircleIcon$2e$js__$5b$client$5d$__$28$ecmascript$29$__$3c$export__default__as__CheckCircleIcon$3e$__["CheckCircleIcon"], {
+                                                        className: "w-6 h-6 text-green-400 mt-1 flex-shrink-0"
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/pages/index.jsx",
+                                                        lineNumber: 164,
+                                                        columnNumber: 17
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                        children: [
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
+                                                                children: "Python (Core Concepts)"
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/pages/index.jsx",
+                                                                lineNumber: 165,
+                                                                columnNumber: 20
+                                                            }, this),
+                                                            " — foundation for automation, data, and backend."
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "[project]/pages/index.jsx",
+                                                        lineNumber: 165,
+                                                        columnNumber: 17
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/pages/index.jsx",
+                                                lineNumber: 163,
+                                                columnNumber: 15
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                className: "flex items-start space-x-3 text-lg md:text-xl text-white animate-fade-in-right",
+                                                style: {
+                                                    animationDelay: '1s'
+                                                },
+                                                children: [
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$heroicons$2f$react$2f$24$2f$solid$2f$esm$2f$CheckCircleIcon$2e$js__$5b$client$5d$__$28$ecmascript$29$__$3c$export__default__as__CheckCircleIcon$3e$__["CheckCircleIcon"], {
+                                                        className: "w-6 h-6 text-green-400 mt-1 flex-shrink-0"
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/pages/index.jsx",
+                                                        lineNumber: 168,
+                                                        columnNumber: 17
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                        children: [
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
+                                                                children: "Git & GitHub"
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/pages/index.jsx",
+                                                                lineNumber: 169,
+                                                                columnNumber: 20
+                                                            }, this),
+                                                            " — version control and collaboration essentials."
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "[project]/pages/index.jsx",
+                                                        lineNumber: 169,
+                                                        columnNumber: 17
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/pages/index.jsx",
+                                                lineNumber: 167,
+                                                columnNumber: 15
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                className: "flex items-start space-x-3 text-lg md:text-xl text-white animate-fade-in-left",
+                                                style: {
+                                                    animationDelay: '1.2s'
+                                                },
+                                                children: [
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$heroicons$2f$react$2f$24$2f$solid$2f$esm$2f$CheckCircleIcon$2e$js__$5b$client$5d$__$28$ecmascript$29$__$3c$export__default__as__CheckCircleIcon$3e$__["CheckCircleIcon"], {
+                                                        className: "w-6 h-6 text-green-400 mt-1 flex-shrink-0"
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/pages/index.jsx",
+                                                        lineNumber: 172,
+                                                        columnNumber: 17
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                        children: [
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
+                                                                children: "Docker"
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/pages/index.jsx",
+                                                                lineNumber: 173,
+                                                                columnNumber: 20
+                                                            }, this),
+                                                            " — containerization for real-time deployment and DevOps."
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "[project]/pages/index.jsx",
+                                                        lineNumber: 173,
+                                                        columnNumber: 17
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/pages/index.jsx",
+                                                lineNumber: 171,
+                                                columnNumber: 15
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                className: "flex items-start space-x-3 text-lg md:text-xl text-white animate-fade-in-right",
+                                                style: {
+                                                    animationDelay: '1.4s'
+                                                },
+                                                children: [
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$heroicons$2f$react$2f$24$2f$solid$2f$esm$2f$CheckCircleIcon$2e$js__$5b$client$5d$__$28$ecmascript$29$__$3c$export__default__as__CheckCircleIcon$3e$__["CheckCircleIcon"], {
+                                                        className: "w-6 h-6 text-green-400 mt-1 flex-shrink-0"
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/pages/index.jsx",
+                                                        lineNumber: 176,
+                                                        columnNumber: 17
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                        children: [
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
+                                                                children: "Java (Core & OOP)"
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/pages/index.jsx",
+                                                                lineNumber: 177,
+                                                                columnNumber: 20
+                                                            }, this),
+                                                            " — enterprise application development stronghold."
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "[project]/pages/index.jsx",
+                                                        lineNumber: 177,
+                                                        columnNumber: 17
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/pages/index.jsx",
+                                                lineNumber: 175,
+                                                columnNumber: 15
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/pages/index.jsx",
+                                        lineNumber: 162,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                        className: "text-2xl md:text-3xl font-extrabold text-red-400 mb-6 animate-fade-in-up",
+                                        style: {
+                                            animationDelay: '1.6s'
+                                        },
+                                        children: "🚀 Learn. Build. Deploy. Grow your career with the right skills."
+                                    }, void 0, false, {
+                                        fileName: "[project]/pages/index.jsx",
+                                        lineNumber: 181,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("a", {
+                                        href: "tel:7978082355",
+                                        className: "inline-flex items-center bg-red-500 text-white px-8 py-4 rounded-full font-black text-xl md:text-2xl shadow-neon hover:bg-red-600 transition-all transform hover:scale-105 animate-pulse-fast",
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$heroicons$2f$react$2f$24$2f$solid$2f$esm$2f$PhoneIcon$2e$js__$5b$client$5d$__$28$ecmascript$29$__$3c$export__default__as__PhoneIcon$3e$__["PhoneIcon"], {
+                                                className: "w-7 h-7 mr-3 animate-wiggle"
+                                            }, void 0, false, {
+                                                fileName: "[project]/pages/index.jsx",
+                                                lineNumber: 188,
+                                                columnNumber: 15
+                                            }, this),
+                                            "Call to Enroll: 7978082355"
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/pages/index.jsx",
+                                        lineNumber: 184,
+                                        columnNumber: 13
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/pages/index.jsx",
+                                lineNumber: 154,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/pages/index.jsx",
+                        lineNumber: 145,
+                        columnNumber: 9
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "[project]/pages/index.jsx",
+                lineNumber: 138,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
@@ -955,16 +1252,16 @@ function Home() {
                             children: "Your Success is Our Mission"
                         }, void 0, false, {
                             fileName: "[project]/pages/index.jsx",
-                            lineNumber: 140,
-                            columnNumber: 13
+                            lineNumber: 201,
+                            columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                             className: "text-xl leading-relaxed mb-10",
                             children: "We're not just training, we're building careers. Our rigorous process includes real-time projects, focused interview preparation, and resume building."
                         }, void 0, false, {
                             fileName: "[project]/pages/index.jsx",
-                            lineNumber: 141,
-                            columnNumber: 13
+                            lineNumber: 202,
+                            columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                             className: "mb-12",
@@ -974,22 +1271,22 @@ function Home() {
                                     children: "95%+"
                                 }, void 0, false, {
                                     fileName: "[project]/pages/index.jsx",
-                                    lineNumber: 146,
-                                    columnNumber: 17
+                                    lineNumber: 207,
+                                    columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                     className: "text-xl font-medium mt-2",
                                     children: "Placement Success Rate in the Last 3 Years"
                                 }, void 0, false, {
                                     fileName: "[project]/pages/index.jsx",
-                                    lineNumber: 147,
-                                    columnNumber: 17
+                                    lineNumber: 208,
+                                    columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/pages/index.jsx",
-                            lineNumber: 145,
-                            columnNumber: 13
+                            lineNumber: 206,
+                            columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("a", {
                             href: "/success",
@@ -997,18 +1294,18 @@ function Home() {
                             children: "View Successful Candidates Stories"
                         }, void 0, false, {
                             fileName: "[project]/pages/index.jsx",
-                            lineNumber: 150,
-                            columnNumber: 13
+                            lineNumber: 211,
+                            columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/pages/index.jsx",
-                    lineNumber: 139,
+                    lineNumber: 200,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/pages/index.jsx",
-                lineNumber: 138,
+                lineNumber: 199,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
@@ -1022,7 +1319,7 @@ function Home() {
                             children: "Ready to Start Your IT Career?"
                         }, void 0, false, {
                             fileName: "[project]/pages/index.jsx",
-                            lineNumber: 164,
+                            lineNumber: 225,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1036,8 +1333,8 @@ function Home() {
                                             children: "Connect with Our Team"
                                         }, void 0, false, {
                                             fileName: "[project]/pages/index.jsx",
-                                            lineNumber: 170,
-                                            columnNumber: 17
+                                            lineNumber: 231,
+                                            columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                             className: "space-y-4",
@@ -1050,23 +1347,23 @@ function Home() {
                                                             children: "📧"
                                                         }, void 0, false, {
                                                             fileName: "[project]/pages/index.jsx",
-                                                            lineNumber: 172,
-                                                            columnNumber: 72
+                                                            lineNumber: 233,
+                                                            columnNumber: 68
                                                         }, this),
                                                         " ",
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
-                                                            children: "Email: "
+                                                            children: "Email:  "
                                                         }, void 0, false, {
                                                             fileName: "[project]/pages/index.jsx",
-                                                            lineNumber: 172,
-                                                            columnNumber: 124
+                                                            lineNumber: 233,
+                                                            columnNumber: 120
                                                         }, this),
                                                         " trainingaj.group@gmail.com"
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/pages/index.jsx",
-                                                    lineNumber: 172,
-                                                    columnNumber: 21
+                                                    lineNumber: 233,
+                                                    columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                                     className: "text-lg flex items-center space-x-3",
@@ -1076,23 +1373,23 @@ function Home() {
                                                             children: "📞"
                                                         }, void 0, false, {
                                                             fileName: "[project]/pages/index.jsx",
-                                                            lineNumber: 173,
-                                                            columnNumber: 72
+                                                            lineNumber: 234,
+                                                            columnNumber: 68
                                                         }, this),
                                                         " ",
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
-                                                            children: "Contact: "
+                                                            children: "Contact:  "
                                                         }, void 0, false, {
                                                             fileName: "[project]/pages/index.jsx",
-                                                            lineNumber: 173,
-                                                            columnNumber: 124
+                                                            lineNumber: 234,
+                                                            columnNumber: 120
                                                         }, this),
                                                         " +91 9437401378 / +91 9040833981"
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/pages/index.jsx",
-                                                    lineNumber: 173,
-                                                    columnNumber: 21
+                                                    lineNumber: 234,
+                                                    columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                                     className: "text-lg flex items-center space-x-3",
@@ -1102,29 +1399,29 @@ function Home() {
                                                             children: "📍"
                                                         }, void 0, false, {
                                                             fileName: "[project]/pages/index.jsx",
-                                                            lineNumber: 174,
-                                                            columnNumber: 72
+                                                            lineNumber: 235,
+                                                            columnNumber: 68
                                                         }, this),
                                                         " ",
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
                                                             children: "Locations: "
                                                         }, void 0, false, {
                                                             fileName: "[project]/pages/index.jsx",
-                                                            lineNumber: 174,
-                                                            columnNumber: 124
+                                                            lineNumber: 235,
+                                                            columnNumber: 120
                                                         }, this),
                                                         " Bhubaneswar & Bangalore"
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/pages/index.jsx",
-                                                    lineNumber: 174,
-                                                    columnNumber: 21
+                                                    lineNumber: 235,
+                                                    columnNumber: 17
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/pages/index.jsx",
-                                            lineNumber: 171,
-                                            columnNumber: 17
+                                            lineNumber: 232,
+                                            columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                             className: "mt-8 pt-4 border-t border-blue-200",
@@ -1134,58 +1431,97 @@ function Home() {
                                                     children: "Follow Us"
                                                 }, void 0, false, {
                                                     fileName: "[project]/pages/index.jsx",
-                                                    lineNumber: 178,
-                                                    columnNumber: 21
+                                                    lineNumber: 239,
+                                                    columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                    className: "flex space-x-6 text-2xl",
+                                                    className: "flex space-x-6",
                                                     children: [
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("a", {
                                                             href: "https://www.instagram.com/odiaittraininghub",
-                                                            className: "text-pink-600 hover:text-pink-400 transition",
+                                                            className: "hover:opacity-80 transition",
                                                             "aria-label": "Instagram",
-                                                            children: "📸"
+                                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
+                                                                src: "/images/instagram.ico",
+                                                                alt: "Instagram Logo",
+                                                                className: "w-7 h-7",
+                                                                onError: (e)=>{
+                                                                    e.target.onerror = null; // prevents infinite loop
+                                                                    e.target.src = "https://placehold.co/30x30/d81b60/ffffff?text=I"; // Pink/White for Instagram
+                                                                    e.target.className += " rounded-lg";
+                                                                }
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/pages/index.jsx",
+                                                                lineNumber: 243,
+                                                                columnNumber: 21
+                                                            }, this)
                                                         }, void 0, false, {
                                                             fileName: "[project]/pages/index.jsx",
-                                                            lineNumber: 180,
-                                                            columnNumber: 25
+                                                            lineNumber: 242,
+                                                            columnNumber: 19
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("a", {
                                                             href: "https://wa.me/919437401378",
-                                                            className: "text-green-600 hover:text-green-400 transition",
+                                                            className: "hover:opacity-80 transition",
                                                             "aria-label": "WhatsApp",
-                                                            children: "🟢"
+                                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
+                                                                src: "/images/whatsapp.ico",
+                                                                alt: "WhatsApp Logo",
+                                                                className: "w-7 h-7",
+                                                                onError: (e)=>{
+                                                                    e.target.onerror = null;
+                                                                    e.target.src = "https://placehold.co/30x30/25d366/ffffff?text=W"; // Green/White for WhatsApp
+                                                                    e.target.className += " rounded-lg";
+                                                                }
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/pages/index.jsx",
+                                                                lineNumber: 255,
+                                                                columnNumber: 21
+                                                            }, this)
                                                         }, void 0, false, {
                                                             fileName: "[project]/pages/index.jsx",
-                                                            lineNumber: 181,
-                                                            columnNumber: 25
+                                                            lineNumber: 254,
+                                                            columnNumber: 19
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("a", {
                                                             href: "https://youtube.com/@odiaittraininghub",
-                                                            className: "text-red-600 hover:text-red-400 transition",
+                                                            className: "hover:opacity-80 transition",
                                                             "aria-label": "YouTube",
-                                                            children: "▶️"
+                                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
+                                                                src: "/images/youtube.ico",
+                                                                alt: "YouTube Logo",
+                                                                className: "w-7 h-7",
+                                                                onError: (e)=>{
+                                                                    e.target.onerror = null;
+                                                                    e.target.src = "https://placehold.co/30x30/ff0000/ffffff?text=Y"; // Red/White for YouTube
+                                                                    e.target.className += " rounded-lg";
+                                                                }
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/pages/index.jsx",
+                                                                lineNumber: 267,
+                                                                columnNumber: 21
+                                                            }, this)
                                                         }, void 0, false, {
                                                             fileName: "[project]/pages/index.jsx",
-                                                            lineNumber: 182,
-                                                            columnNumber: 25
+                                                            lineNumber: 266,
+                                                            columnNumber: 19
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/pages/index.jsx",
-                                                    lineNumber: 179,
-                                                    columnNumber: 21
+                                                    lineNumber: 240,
+                                                    columnNumber: 17
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/pages/index.jsx",
-                                            lineNumber: 177,
-                                            columnNumber: 17
+                                            lineNumber: 238,
+                                            columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/pages/index.jsx",
-                                    lineNumber: 169,
+                                    lineNumber: 230,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1196,7 +1532,7 @@ function Home() {
                                             children: "Submit Your Inquiry"
                                         }, void 0, false, {
                                             fileName: "[project]/pages/index.jsx",
-                                            lineNumber: 189,
+                                            lineNumber: 284,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("form", {
@@ -1211,7 +1547,7 @@ function Home() {
                                                     required: true
                                                 }, void 0, false, {
                                                     fileName: "[project]/pages/index.jsx",
-                                                    lineNumber: 191,
+                                                    lineNumber: 286,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -1222,7 +1558,7 @@ function Home() {
                                                     required: true
                                                 }, void 0, false, {
                                                     fileName: "[project]/pages/index.jsx",
-                                                    lineNumber: 198,
+                                                    lineNumber: 293,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -1233,7 +1569,7 @@ function Home() {
                                                     required: true
                                                 }, void 0, false, {
                                                     fileName: "[project]/pages/index.jsx",
-                                                    lineNumber: 205,
+                                                    lineNumber: 300,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1242,36 +1578,36 @@ function Home() {
                                                     children: "Request a Free Demo Class"
                                                 }, void 0, false, {
                                                     fileName: "[project]/pages/index.jsx",
-                                                    lineNumber: 212,
+                                                    lineNumber: 307,
                                                     columnNumber: 17
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/pages/index.jsx",
-                                            lineNumber: 190,
+                                            lineNumber: 285,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/pages/index.jsx",
-                                    lineNumber: 188,
+                                    lineNumber: 283,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/pages/index.jsx",
-                            lineNumber: 166,
+                            lineNumber: 227,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/pages/index.jsx",
-                    lineNumber: 163,
+                    lineNumber: 224,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/pages/index.jsx",
-                lineNumber: 162,
+                lineNumber: 223,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("footer", {
@@ -1283,26 +1619,26 @@ function Home() {
                             children: "© 2025 Odia IT Training Hub. All rights reserved."
                         }, void 0, false, {
                             fileName: "[project]/pages/index.jsx",
-                            lineNumber: 229,
-                            columnNumber: 13
+                            lineNumber: 324,
+                            columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                             className: "mt-2 text-sm",
                             children: "Empowering the next generation of IT professionals."
                         }, void 0, false, {
                             fileName: "[project]/pages/index.jsx",
-                            lineNumber: 230,
-                            columnNumber: 13
+                            lineNumber: 325,
+                            columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/pages/index.jsx",
-                    lineNumber: 228,
+                    lineNumber: 323,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/pages/index.jsx",
-                lineNumber: 227,
+                lineNumber: 322,
                 columnNumber: 7
             }, this)
         ]

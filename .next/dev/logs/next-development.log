@@ -1,1 +1,111 @@
-[00:00:01.794] Server  LOG      ✓ Ready in 1160ms
+[00:00:01.393] Server  LOG      ✓ Ready in 905ms
+[00:00:01.396] Server  WARN     ⚠ Cross origin request detected from 192.168.0.102 to /_next/* resource. In a future major version of Next.js, you will need to explicitly configure "allowedDevOrigins" in next.config to allow this.
+Read more: https://nextjs.org/docs/app/api-reference/config/next-config-js/allowedDevOrigins
+[00:00:01.409] Browser ERROR   A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+%s%s https://react.dev/link/hydration-mismatch 
+
+  ...
+    <App pageProps={{}} Component={function Home} err={undefined} router={{sdc:{},sbc:{}, ...}}>
+      <Home>
+        <main className="min-h-scre...">
+          <header>
+          <section>
+          <section>
+          <section>
+          <section>
+          <section>
+          <section id="contact" className="py-20 bg-w...">
+            <div className="max-w-6xl ...">
+              <h3>
+              <div className="grid grid-...">
+                <div className="p-8 bg-blu...">
+                  <h4>
+                  <div>
+                  <div className="mt-8 pt-4 ...">
+                    <h5>
+                    <div className="flex space...">
+                      <a href="https://ww..." className="hover:opac..." aria-label="Instagram">
+                        <img
++                         src="../public/images/instagram.ico"
+-                         src="[object Object]"
+                          alt="Instagram Logo"
+                          className="w-7 h-7"
+                          onError={function onError}
+                        >
+                      <a href="https://wa..." className="hover:opac..." aria-label="WhatsApp">
+                        <img
++                         src="../public/images/whatsapp.ico"
+-                         src="../public/images/whatsapp.png"
+                          alt="WhatsApp Logo"
+                          className="w-7 h-7"
+                          onError={function onError}
+                        >
+                      <a href="https://yo..." className="hover:opac..." aria-label="YouTube">
+                        <img
++                         src="../public/images/youtube.ico"
+-                         src="[object Object]"
+                          alt="YouTube Logo"
+                          className="w-7 h-7"
+                          onError={function onError}
+                        >
+                ...
+          ...
+    ...
+
+[00:00:25.097] Server  LOG      ✓ Compiled in 103ms
+[00:00:34.546] Browser ERROR   A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+%s%s https://react.dev/link/hydration-mismatch 
+
+  ...
+    <App pageProps={{}} Component={function Home} err={undefined} router={{sdc:{},sbc:{}, ...}}>
+      <Home>
+        <main className="min-h-scre...">
+          <header>
+          <section>
+          <section>
+          <section>
+          <section>
+          <section>
+          <section id="contact" className="py-20 bg-w...">
+            <div className="max-w-6xl ...">
+              <h3>
+              <div className="grid grid-...">
+                <div className="p-8 bg-blu...">
+                  <h4>
+                  <div>
+                  <div className="mt-8 pt-4 ...">
+                    <h5>
+                    <div className="flex space...">
+                      <a href="https://ww..." className="hover:opac..." aria-label="Instagram">
+                        <img
++                         src="../../public/images/instagram.ico"
+-                         src="../public/images/instagram.ico"
+                          alt="Instagram Logo"
+                          className="w-7 h-7"
+                          onError={function onError}
+                        >
+                      ...
+                ...
+          ...
+    ...
+
+[00:00:49.626] Server  LOG      ✓ Compiled in 120ms
+[00:01:07.126] Server  LOG      ✓ Compiled in 110ms
