@@ -70,9 +70,10 @@ export default function Home() {
   <div className="max-w-6xl mx-auto px-4">
     <h3 className="text-3xl font-bold text-blue-700 mb-6">Contact Us</h3>
 
-    <p className="text-lg mb-2"><strong>Email:</strong> odiaittraininghub@gmail.com</p>
+    <p className="text-lg mb-2"><strong>Email:</strong> trainingaj.group@gmail.com</p>
     <p className="text-lg mb-2"><strong>Phone:</strong> +91 9437401378</p>
-    <p className="text-lg mb-6"><strong>Location:</strong> Bhubaneswar, Odisha</p>
+    <p className="text-lg mb-2"><strong>Phone:</strong> +91 9040833981</p>
+    <p className="text-lg mb-6"><strong>Location:</strong> Bhubaneswar & Bangalore</p>
 
     {/* Social Links */}
     <div className="flex space-x-6 text-xl mb-10">
