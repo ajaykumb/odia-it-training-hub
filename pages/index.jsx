@@ -66,20 +66,84 @@ export default function Home() {
       </section>
 
       {/* Contact Section */}
-      <section id="contact" className="py-16 bg-white">
-        <div className="max-w-6xl mx-auto px-4">
-          <h3 className="text-3xl font-bold text-blue-700 mb-6">Contact Us</h3>
-          <p className="text-lg mb-2"><strong>Email:</strong> odiaittraininghub@gmail.com</p>
-          <p className="text-lg mb-2"><strong>Phone:</strong> +91 9437401378</p>
-          <p className="text-lg mb-6"><strong>Location:</strong> Bhubaneswar, Odisha</p>
+<section id="contact" className="py-16 bg-white">
+  <div className="max-w-6xl mx-auto px-4">
+    <h3 className="text-3xl font-bold text-blue-700 mb-6">Contact Us</h3>
 
-          <div className="flex space-x-6 text-xl">
-            <a href="https://www.instagram.com/odiaittraininghub" className="text-pink-600 font-semibold hover:text-pink-400">Instagram</a>
-            <a href="https://wa.me/919437401378" className="text-green-600 font-semibold hover:text-green-400">WhatsApp</a>
-            <a href="https://youtube.com/@odiaittraininghub" className="text-red-600 font-semibold hover:text-red-400">YouTube</a>
-          </div>
-        </div>
-      </section>
+    <p className="text-lg mb-2"><strong>Email:</strong> odiaittraininghub@gmail.com</p>
+    <p className="text-lg mb-2"><strong>Phone:</strong> +91 9437401378</p>
+    <p className="text-lg mb-6"><strong>Location:</strong> Bhubaneswar, Odisha</p>
+
+    {/* Social Links */}
+    <div className="flex space-x-6 text-xl mb-10">
+      <a href="https://www.instagram.com/odiaittraininghub" className="text-pink-600 font-semibold hover:text-pink-400">Instagram</a>
+      <a href="https://wa.me/919437401378" className="text-green-600 font-semibold hover:text-green-400">WhatsApp</a>
+      <a href="https://youtube.com/@odiaittraininghub" className="text-red-600 font-semibold hover:text-red-400">YouTube</a>
+    </div>
+
+    {/* Contact Form Added Here */}
+    <form
+      className="bg-gray-100 p-6 rounded-xl shadow-md"
+      onSubmit={async (e) => {
+        e.preventDefault();
+
+        const data = {
+          name: e.target.name.value,
+          email: e.target.email.value,
+          phone: e.target.phone.value,
+        };
+
+        const res = await fetch("/api/contact", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        });
+
+        if (res.ok) {
+          alert("Thank you! Your details have been submitted.");
+          e.target.reset();
+        } else {
+          alert("Failed to send. Please try again.");
+        }
+      }}
+    >
+      <h4 className="text-2xl font-bold text-blue-700 mb-4">Submit Your Details</h4>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <input
+          type="text"
+          name="name"
+          placeholder="Your Name"
+          className="p-3 border rounded-lg"
+          required
+        />
+        <input
+          type="email"
+          name="email"
+          placeholder="Your Email"
+          className="p-3 border rounded-lg"
+          required
+        />
+        <input
+          type="text"
+          name="phone"
+          placeholder="Your Phone Number"
+          className="p-3 border rounded-lg"
+          required
+        />
+      </div>
+
+      <button
+        type="submit"
+        className="mt-4 bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-500"
+      >
+        Submit
+      </button>
+    </form>
+
+  </div>
+</section>
+      
 
       {/* Footer */}
       <footer className="bg-gray-800 text-gray-300 text-center py-6 mt-10">
