@@ -47,7 +47,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto flex justify-between items-center px-6">
 <a href="#" className="flex items-center space-x-4 group">
   <img 
-    src="/images/mainlogo.png"   // your actual filename
+    src="/images/logoc.jpeg"   // your actual filename
     alt="Odia IT Training Hub Logo"
     className="w-16 h-16 md:w-20 md:h-20 object-contain"
   />
