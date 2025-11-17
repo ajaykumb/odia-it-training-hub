@@ -45,16 +45,21 @@ export default function Home() {
       {/* 🚀 Header - Sticky and Blurry */}
       <header className="sticky top-0 z-50 bg-blue-700/95 backdrop-blur-sm text-white py-4 shadow-xl">
         <div className="max-w-7xl mx-auto flex justify-between items-center px-6">
-<a href="#" className="flex items-center space-x-4 group">
-  <img 
-    src="/images/logoc.jpeg"   // your actual filename
-    alt="Odia IT Training Hub Logo"
-    className="w-16 h-16 md:w-20 md:h-20 object-contain"
-  />
-  <span className="text-3xl md:text-4xl font-extrabold text-yellow-300 group-hover:text-yellow-400 transition">
+<a href="#" className="flex items-center space-x-6 bg-blue-700 p-4">
+  <div className="bg-blue-600 p-2 rounded-sm">
+    <img 
+      src="/images/logoc.jpeg"
+      alt="Odia IT Training Hub Logo"
+      className="w-24 h-24 md:w-28 md:h-28 object-contain"
+    />
+  </div>
+
+  <span className="text-3xl md:text-5xl font-extrabold tracking-wide text-yellow-300 
+                   group-hover:text-yellow-400 transition">
     ODIA IT TRAINING HUB
   </span>
 </a>
+
 
 
           <nav className="space-x-8 text-lg font-medium hidden md:flex">
