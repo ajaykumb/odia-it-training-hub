@@ -48,9 +48,9 @@ export default function Home() {
           
 <a href="#" className="flex items-center space-x-4 group">
   <img 
-    src="/images/logoc.jpeg"   // your actual filename
+    src="/images/logo.png"   // your actual filename
     alt="Odia IT Training Hub Logo"
-    className="w-16 h-16 md:w-20 md:h-20 object-contain"
+    className="w-12 h-12 md:w-13 md:h-13"
   />
   <span className="text-3xl md:text-4xl font-extrabold text-yellow-300 group-hover:text-yellow-400 transition">
     ODIA IT TRAINING HUB
