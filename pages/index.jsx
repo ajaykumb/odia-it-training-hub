@@ -53,7 +53,7 @@ export default function Home() {
     className="w-12 h-12 md:w-13 md:h-13"
   />
   <span className="text-xl md:text-2xl font-extrabold text-yellow-300 group-hover:text-yellow-400 transition">
-    ODIA IT TRAINING HUB
+    Odia IT Training Hub
   </span>
 </a>
           <nav className="space-x-8 text-lg font-medium hidden md:flex">
