@@ -331,7 +331,7 @@ export default function Home() {
       {/* 📄 Footer */}
       <footer className="bg-gray-900 text-gray-400 text-center py-8">
         <div className="max-w-6xl mx-auto px-6">
-          <p>© 2025 Odia IT Training Hub. All rights reserved.</p>
+          <p>© 2022 Odia IT Training Hub. All rights reserved.</p>
           <p className="mt-2 text-sm">Empowering the next generation of IT professionals.</p>
         </div>
       </footer>
