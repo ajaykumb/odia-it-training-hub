@@ -52,7 +52,7 @@ export default function Home() {
     alt="Odia IT Training Hub Logo"
     className="w-12 h-12 md:w-13 md:h-13"
   />
-  <span className="text-3xl md:text-4xl font-extrabold text-yellow-300 group-hover:text-yellow-400 transition">
+  <span className="text-xl md:text-2xl font-extrabold text-yellow-300 group-hover:text-yellow-400 transition">
     ODIA IT TRAINING HUB
   </span>
 </a>
