@@ -2,12 +2,24 @@ import { BriefcaseIcon, CurrencyDollarIcon, UserGroupIcon, HomeIcon, ArrowLeftIc
 
 export default function Success() {
   const students = [
-    { name: "Abhijit", company: "Clover", package: "8.0 LPA", iconColor: "text-blue-600" },
+    { name: "Abhijit R", company: "Clover Infotech", package: "8.0 LPA", iconColor: "text-blue-600" },
     { name: "Bijay", company: "Infosys", package: "7.5 LPA", iconColor: "text-red-600" },
-    { name: "Yas", company: "ANZ", package: "7.0 LPA", iconColor: "text-indigo-600" },
-    { name: "S Pahi", company: "Indigo", package: "6.0 LPA", iconColor: "text-purple-600" },
-    { name: "Dipti R", company: "Hiiden Company", package: "6.0 LPA", iconColor: "text-cyan-600" },
-    { name: "Satya AXE", company: "Airtel client", package: "6.0 LPA", iconColor: "text-yellow-600" },
+    { name: "Yas K", company: "ANZ", package: "7.0 LPA", iconColor: "text-indigo-600" },
+    { name: "S Pahi", company: "Indigo", package: "4.6 LPA", iconColor: "text-purple-600" },
+    { name: "Dipti R", company: "ESQ,Noida", package: "6.0 LPA", iconColor: "text-cyan-600" },
+    { name: "Satya P", company: "Airtel client", package: "6.0 LPA", iconColor: "text-yellow-600" },
+    { name: "SatyaBrata M", company: "Airtel client", package: "6.5 LPA", iconColor: "text-yellow-600" },
+    { name: "Jyosna B", company: "NuSummit Cybersecurity", package: "5.5 LPA", iconColor: "text-yellow-600" },
+    { name: "Asish M", company: "Aligne tech", package: "6 LPA", iconColor: "text-yellow-600" },
+    { name: "Biswarnajan S", company: "AU Small Finace Bank", package: "6 LPA", iconColor: "text-yellow-600" },
+    { name: "Sitanshu M", company: "Paytm", package: "6 LPA", iconColor: "text-yellow-600" },
+    { name: "Bikash B", company: "MakeMyTrip client", package: "6 LPA", iconColor: "text-yellow-600" },
+    { name: "Jugesh", company: "Diksha", package: "6 LPA", iconColor: "text-yellow-600" },
+    { name: "Sambit Das", company: "Byju's", package: "6 LPA", iconColor: "text-yellow-600" },
+    { name: "Partha S", company: "Diksha", package: "6 LPA", iconColor: "text-yellow-600" },
+    { name: "Chinmaya S", company: "Cognizant", package: "6 LPA", iconColor: "text-yellow-600" },
+    { name: "Pradyumna S", company: "Lemontree", package: "6 LPA", iconColor: "text-yellow-600" },
+    { name: "Gopabandhu N", company: "Addsoft Tech", package: "6 LPA", iconColor: "text-yellow-600" },
   ];
 
   return (
