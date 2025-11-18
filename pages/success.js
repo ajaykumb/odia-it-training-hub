@@ -128,6 +128,16 @@ export default function Success() {
         </a>
       </section>
 
+      {/* Button to navigate to Google Profile page */}
+      <div className="max-w-6xl mx-auto px-6 my-8 text-center">
+        <button
+          onClick={() => router.push('/your-business-google')}
+          className="bg-blue-600 text-white px-6 py-3 rounded-full hover:bg-blue-700 transition"
+        >
+          Visit Our Google Profile
+        </button>
+      </div>
+
       <footer className="bg-gray-800 text-gray-300 text-center py-6">
         © 2022 Odia IT Training Hub. All rights reserved.
       </footer>
