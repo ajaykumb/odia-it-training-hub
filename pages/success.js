@@ -129,7 +129,7 @@ export default function Success() {
       </section>
 
       <footer className="bg-gray-800 text-gray-300 text-center py-6">
-        © 2025 Odia IT Training Hub. All rights reserved.
+        © 2022 Odia IT Training Hub. All rights reserved.
       </footer>
     </main>
   );
