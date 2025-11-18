@@ -11,15 +11,16 @@ export default function Success() {
     { name: "SatyaBrata M", company: "Airtel client", package: "6.5 LPA", iconColor: "text-yellow-600" },
     { name: "Jyosna B", company: "NuSummit Cybersecurity", package: "5.5 LPA", iconColor: "text-yellow-600" },
     { name: "Asish M", company: "Aligne tech", package: "6 LPA", iconColor: "text-yellow-600" },
-    { name: "Biswarnajan S", company: "AU Small Finace Bank", package: "6 LPA", iconColor: "text-yellow-600" },
+    { name: "Biswarnajan S", company: "AU Small Finace Bank", package: "6.4 LPA", iconColor: "text-yellow-600" },
     { name: "Sitanshu M", company: "Paytm", package: "6 LPA", iconColor: "text-yellow-600" },
-    { name: "Bikash B", company: "MakeMyTrip client", package: "6 LPA", iconColor: "text-yellow-600" },
-    { name: "Jugesh", company: "Diksha", package: "6 LPA", iconColor: "text-yellow-600" },
-    { name: "Sambit Das", company: "Byju's", package: "6 LPA", iconColor: "text-yellow-600" },
+    { name: "Bikash B", company: "MakeMyTrip client", package: "5 LPA", iconColor: "text-yellow-600" },
+    { name: "Jugesh", company: "Diksha", package: "7 LPA", iconColor: "text-yellow-600" },
+    { name: "Sambit Das", company: "Byju's", package: "6.5 LPA", iconColor: "text-yellow-600" },
     { name: "Partha S", company: "Diksha", package: "6 LPA", iconColor: "text-yellow-600" },
-    { name: "Chinmaya S", company: "Cognizant", package: "6 LPA", iconColor: "text-yellow-600" },
-    { name: "Pradyumna S", company: "Lemontree", package: "6 LPA", iconColor: "text-yellow-600" },
-    { name: "Gopabandhu N", company: "Addsoft Tech", package: "6 LPA", iconColor: "text-yellow-600" },
+    { name: "Chinmaya S", company: "Cognizant", package: "7 LPA", iconColor: "text-yellow-600" },
+    { name: "Pradyumna S", company: "Lemontree", package: "6.3 LPA", iconColor: "text-yellow-600" },
+    { name: "Gopabandhu N", company: "Addsoft Tech", package: "4.5 LPA", iconColor: "text-yellow-600" },
+    { name: "Satrujit B", company: "Genpact", package: "6 LPA", iconColor: "text-yellow-600" },
   ];
 
   return (
