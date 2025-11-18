@@ -1,7 +1,6 @@
 import { BriefcaseIcon, CurrencyDollarIcon, UserGroupIcon, HomeIcon, ArrowLeftIcon, PhoneIcon } from '@heroicons/react/24/solid';
 
 export default function Success() {
-const router = useRouter();
   const students = [
     { name: "Abhijit R", company: "Clover Infotech", package: "8.0 LPA", iconColor: "text-blue-600" },
     { name: "Bijay", company: "Infosys", package: "7.5 LPA", iconColor: "text-red-600" },
