@@ -1,6 +1,6 @@
 const YourBusinessOnGooglePage = () => {
   return (
-    <>
+    <main className="bg-white">
       {/* Existing Section */}
       <section className="py-12 bg-white border-t border-gray-300">
         <div className="max-w-6xl mx-auto px-6 text-center">
@@ -89,14 +89,13 @@ const YourBusinessOnGooglePage = () => {
         </div>
       </section>
 
-    {/* 📄 Footer */}
+      {/* 📄 Footer */}
       <footer className="bg-gray-900 text-gray-400 text-center py-8 mt-10">
         <div className="max-w-6xl mx-auto px-6">
           <p>© 2022 Odia IT Training Hub. All rights reserved.</p>
           <p className="mt-2 text-sm">Empowering the next generation of IT professionals.</p>
         </div>
       </footer>
-
     </main>
   );
 };
