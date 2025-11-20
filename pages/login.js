@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
-import Link from "next/link";
 
 export default function Login() {
   const router = useRouter();
@@ -28,19 +27,21 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-50 to-blue-100 p-4">
-      <div className="bg-white shadow-xl rounded-2xl p-10 w-full max-w-lg relative">
+    <div
+      className="min-h-screen flex items-center justify-center bg-cover bg-center"
+      style={{ backgroundImage: "url('/images/background.jpg')" }}
+    >
+      <div className="bg-white bg-opacity-90 backdrop-blur-xl shadow-xl rounded-2xl p-10 w-full max-w-md">
 
-        {/* BACK TO MAIN SITE */}
-        <Link href="/" className="text-blue-600 mb-4 inline-block text-sm font-medium hover:underline">
+        {/* Back Link */}
+        <a href="/" className="text-blue-700 text-sm mb-4 inline-block">
           ← Back to Main Site
-        </Link>
+        </a>
 
-        {/* TITLE */}
         <h2 className="text-3xl font-bold text-center mb-2 text-blue-700">
           Odia IT Training Hub
         </h2>
-        <h3 className="text-2xl font-semibold text-center mb-4 text-blue-800">
+        <h3 className="text-xl font-semibold text-center mb-6 text-gray-700">
           Student Login
         </h3>
 
@@ -48,37 +49,39 @@ export default function Login() {
           Access your class notes & study materials
         </p>
 
-        {/* LOGIN FORM */}
         <form onSubmit={handleLogin}>
-          <label className="font-medium text-gray-700">Student ID</label>
+          <label className="text-gray-700 font-medium text-sm">Student ID</label>
           <input
             type="text"
             placeholder="Enter your Student ID"
-            className="w-full p-3 border rounded-lg mb-4"
+            className="w-full p-3 border rounded mb-4"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
           />
 
-          <label className="font-medium text-gray-700">Password</label>
+          <label className="text-gray-700 font-medium text-sm">Password</label>
           <input
             type="password"
             placeholder="Enter your Password"
-            className="w-full p-3 border rounded-lg mb-4"
+            className="w-full p-3 border rounded mb-4"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
 
           {error && <p className="text-red-600 mb-3">{error}</p>}
 
-          <button className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold text-lg hover:bg-blue-700 transition">
+          <button
+            className="w-full bg-blue-600 text-white py-3 rounded hover:bg-blue-700 transition text-lg font-semibold"
+          >
             Login
           </button>
         </form>
 
-        {/* FOOTER */}
+        {/* Footer */}
         <p className="text-center text-gray-500 text-xs mt-6">
           © 2022 Odia IT Training Hub • All Rights Reserved
         </p>
+
       </div>
     </div>
   );
