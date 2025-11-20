@@ -46,7 +46,7 @@ export default function Home() {
       
       {/* 🚀 Header - Sticky and Blurry */}
       <header className="sticky top-0 z-50 bg-blue-700/95 backdrop-blur-sm text-white py-4 shadow-xl">
-        <div className="max-w-7xl mx-auto flex justify-between items-center px-6">
+        <div className="w-full max-w-7xl mx-auto flex justify-between items-center px-4 overflow-x-hidden">
           
 <a href="#" className="flex items-center space-x-4 group">
   <img 
