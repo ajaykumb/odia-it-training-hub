@@ -15,15 +15,13 @@ export default function ClassNotes() {
   const [filter, setFilter] = useState("All");
   const [previewLink, setPreviewLink] = useState(null);
 
-  const API_KEY = "YOUR_GOOGLE_API_KEY"; // Replace with your API key
+  const API_KEY = "YOUR_GOOGLE_API_KEY";
 
-  // Redirect if not logged in
   useEffect(() => {
     const token = localStorage.getItem("studentToken");
     if (!token) router.push("/login");
   }, []);
 
-  // Fetch the class notes
   useEffect(() => {
     async function fetchNotes() {
       const allNotes = [];
@@ -31,24 +29,25 @@ export default function ClassNotes() {
       for (let folder of folders) {
         try {
           const res = await fetch(
-            `https://www.googleapis.com/drive/v3/files?q='${folder.id}'+in+parents&key=${API_KEY}&fields=files(id,name,webViewLink)&pageSize=100`
+            `https://www.googleapis.com/drive/v3/files?q='${folder.id}'+in+parents&key=${API_KEY}&fields=files(id,name,mimeType,createdTime)&pageSize=100`
           );
 
           const data = await res.json();
 
-          if (data.files && data.files.length > 0) {
+          if (data.files) {
             data.files.forEach((file) => {
               allNotes.push({
                 title: file.name,
                 category: folder.category,
                 link: `https://drive.google.com/file/d/${file.id}/view`,
-                new: true,
-                size: "Unknown",
+                preview: `https://drive.google.com/file/d/${file.id}/preview`,
+                thumbnail: `https://drive.google.com/thumbnail?id=${file.id}`,
+                date: new Date(file.createdTime).toLocaleDateString(),
               });
             });
           }
         } catch (err) {
-          console.error("Error fetching folder:", folder.category, err);
+          console.error("Error loading notes:", err);
         }
       }
 
@@ -58,23 +57,11 @@ export default function ClassNotes() {
     fetchNotes();
   }, []);
 
-  // Filter notes
   const filteredNotes = notesList.filter(
     (n) =>
       (filter === "All" || n.category === filter) &&
       n.title.toLowerCase().includes(search.toLowerCase())
   );
-
-  // Utility functions
-  const getThumbnailLink = (url) => {
-    const id = url.match(/[-\w]{25,}/)?.[0];
-    return id ? `https://drive.google.com/thumbnail?id=${id}` : null;
-  };
-
-  const getPreviewLink = (url) => {
-    const id = url.match(/[-\w]{25,}/)?.[0];
-    return id ? `https://drive.google.com/file/d/${id}/preview` : null;
-  };
 
   return (
     <main className="min-h-screen bg-gray-100 p-10 flex flex-col">
@@ -106,33 +93,20 @@ export default function ClassNotes() {
       {/* Notes Grid */}
       <div className="grid md:grid-cols-3 gap-6 flex-1">
         {filteredNotes.map((note, i) => (
-          <div
-            key={i}
-            className="bg-white p-5 rounded-xl shadow hover:shadow-xl transition border"
-          >
+          <div key={i} className="bg-white p-5 rounded-xl shadow border">
             <img
-              src={getThumbnailLink(note.link)}
-              alt="PDF thumbnail"
-              className="w-full h-40 object-cover rounded-md mb-3"
+              src={note.thumbnail}
+              alt="thumbnail"
+              className="w-full h-40 object-cover rounded mb-3"
             />
 
-            <h3 className="text-xl font-semibold flex items-center gap-2">
-              {note.title}
-              {note.new && (
-                <span className="bg-red-500 text-white text-xs px-2 py-1 rounded">
-                  NEW
-                </span>
-              )}
-            </h3>
-
-            <p className="text-gray-600 text-sm mt-1">
-              Category: {note.category}
-            </p>
-            <p className="text-gray-600 text-sm">Size: {note.size}</p>
+            <h3 className="text-xl font-semibold">{note.title}</h3>
+            <p className="text-gray-600 text-sm">Category: {note.category}</p>
+            <p className="text-gray-600 text-sm">Date: {note.date}</p>
 
             <div className="flex gap-3 mt-4">
               <button
-                onClick={() => setPreviewLink(getPreviewLink(note.link))}
+                onClick={() => setPreviewLink(note.preview)}
                 className="bg-blue-600 text-white px-3 py-2 rounded-lg"
               >
                 View
@@ -141,7 +115,6 @@ export default function ClassNotes() {
               <a
                 href={note.link}
                 target="_blank"
-                rel="noopener noreferrer"
                 className="bg-green-600 text-white px-3 py-2 rounded-lg"
               >
                 Download
@@ -162,10 +135,7 @@ export default function ClassNotes() {
               X
             </button>
 
-            <iframe
-              src={previewLink}
-              className="w-full h-[70vh] rounded-lg"
-            ></iframe>
+            <iframe src={previewLink} className="w-full h-[70vh] rounded" />
           </div>
         </div>
       )}
