@@ -2,21 +2,36 @@ const YourBusinessOnGooglePage = () => {
   return (
     <main className="bg-white">
 
+      {/* 🔙 Back to Main Site */}
+      <div className="max-w-6xl mx-auto px-6 py-6">
+        <a
+          href="/"
+          className="flex items-center text-blue-600 hover:text-blue-800 text-lg font-medium"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={2}
+            stroke="currentColor"
+            className="w-5 h-5 mr-2"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M15 19l-7-7 7-7"
+            />
+          </svg>
+          Back to Main Site
+        </a>
+      </div>
+
       {/* Existing Section */}
       <section className="py-12 bg-white border-t border-gray-300">
         <div className="max-w-6xl mx-auto px-6 text-center">
-
           <h2 className="text-3xl font-bold mb-4 text-blue-700">
             Success Stories from Our Learners
           </h2>
-
-          {/* 🔙 Back to Main Site Button */}
-          <a
-            href="/"
-            className="inline-block mb-6 text-blue-600 font-semibold hover:underline"
-          >
-            ← Back to Main Site
-          </a>
 
           <p className="text-lg mb-6 text-gray-700">
             Visit our Google profile and leave a review or read what others are saying.
@@ -30,7 +45,6 @@ const YourBusinessOnGooglePage = () => {
           >
             See Us on Google
           </a>
-
         </div>
       </section>
 
@@ -56,7 +70,7 @@ const YourBusinessOnGooglePage = () => {
               </div>
               <p className="text-gray-700 text-sm leading-relaxed">
                 Excellent IT training institute! The trainers are highly knowledgeable and explain every concept clearly.
-                The sessions are practical and futuristic. Highly recommended for anyone looking to up-skill in IT.
+                The sessions are practical and futuristic. Highly recommended!
               </p>
             </div>
 
@@ -72,9 +86,8 @@ const YourBusinessOnGooglePage = () => {
                 </div>
               </div>
               <p className="text-gray-700 text-sm leading-relaxed">
-                Your way of explaining even complex topics made everything easy to understand.
-                I gained a great deal of knowledge that will benefit me in the future.
-                Thank you for keeping us motivated and inspired.
+                Your way of explaining complex topics made everything easy to understand.
+                I gained valuable knowledge that will help in my career.
               </p>
             </div>
 
@@ -90,8 +103,7 @@ const YourBusinessOnGooglePage = () => {
                 </div>
               </div>
               <p className="text-gray-700 text-sm leading-relaxed">
-                I am deeply grateful for your guidance—you have truly shaped my educational journey.
-                Your clear explanation made every topic easy to understand.
+                I am deeply grateful for your guidance. Your clear explanations made every topic simple.
                 Thank you for supporting us always.
               </p>
             </div>
@@ -100,7 +112,7 @@ const YourBusinessOnGooglePage = () => {
         </div>
       </section>
 
-      {/* 📄 Footer */}
+      {/* Footer */}
       <footer className="bg-gray-900 text-gray-400 text-center py-8 mt-10">
         <div className="max-w-6xl mx-auto px-6">
           <p>© 2022 Odia IT Training Hub. All rights reserved.</p>
