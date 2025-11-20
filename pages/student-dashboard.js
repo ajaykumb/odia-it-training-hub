@@ -24,14 +24,14 @@ export default function StudentDashboard() {
   return (
     <main className="relative min-h-screen">
 
-      {/* 🌊 Full Page Background */}
-      <div className="absolute inset-0 -z-10 bg-gradient-to-br from-blue-400 via-blue-300 to-blue-100">
+      {/* Blue Background */}
+      <div className="absolute inset-0 -z-10 bg-gradient-to-br from-blue-400 via-blue-300 to-blue-100 overflow-hidden">
         <div className="wave wave1"></div>
         <div className="wave wave2"></div>
         <div className="wave wave3"></div>
       </div>
 
-      {/* Layout */}
+      {/* Single Flex Container */}
       <div className="flex min-h-screen flex-col md:flex-row">
 
         {/* Sidebar */}
@@ -45,17 +45,12 @@ export default function StudentDashboard() {
               <HomeIcon className="w-5 h-5" /> Dashboard
             </a>
 
-            <a
-              className="flex items-center gap-3 hover:text-blue-600"
-              href="/class-notes"
-            >
-              <BookOpenIcon className="w-5 h-5" />
-              Class Notes
+            <a className="flex items-center gap-3 hover:text-blue-600" href="/class-notes">
+              <BookOpenIcon className="w-5 h-5" /> Class Notes
             </a>
 
             <a className="flex items-center gap-3 hover:text-blue-600" href="#">
-              <UserIcon className="w-5 h-5" />
-              Profile
+              <UserIcon className="w-5 h-5" /> Profile
             </a>
 
             <button
@@ -70,8 +65,7 @@ export default function StudentDashboard() {
               href="/"
               className="flex items-center gap-3 mt-6 text-blue-600 hover:text-blue-800 font-medium"
             >
-              <ArrowLeftIcon className="w-5 h-5" />
-              Back to Main Site
+              <ArrowLeftIcon className="w-5 h-5" /> Back to Main Site
             </a>
           </nav>
         </aside>
@@ -84,7 +78,7 @@ export default function StudentDashboard() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
 
-            {/* Card 1 */}
+            {/* Card */}
             <div className="bg-white/80 backdrop-blur-md p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all border border-gray-200">
               <h3 className="text-xl font-semibold mb-2 text-gray-900">
                 Class Notes
@@ -100,7 +94,6 @@ export default function StudentDashboard() {
               </a>
             </div>
 
-            {/* Card 2 */}
             <div className="bg-white/80 backdrop-blur-md p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all border border-gray-200">
               <h3 className="text-xl font-semibold mb-2 text-gray-900">
                 Video Lectures
@@ -113,7 +106,6 @@ export default function StudentDashboard() {
               </button>
             </div>
 
-            {/* Card 3 */}
             <div className="bg-white/80 backdrop-blur-md p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all border border-gray-200">
               <h3 className="text-xl font-semibold mb-2 text-gray-900">
                 Assignments
@@ -135,12 +127,12 @@ export default function StudentDashboard() {
         © 2022 Odia IT Training Hub. All rights reserved.
       </footer>
 
-      {/* 🌊 Wave Animation CSS */}
+      {/* Waves */}
       <style jsx>{`
         .wave {
           position: absolute;
           width: 200%;
-          height: 200px;
+          height: 150px;
           left: -50%;
           background: rgba(255, 255, 255, 0.3);
           border-radius: 100%;
@@ -151,12 +143,12 @@ export default function StudentDashboard() {
           animation-duration: 8s;
         }
         .wave2 {
-          bottom: 30px;
+          bottom: 20px;
           opacity: 0.6;
           animation-duration: 12s;
         }
         .wave3 {
-          bottom: 60px;
+          bottom: 40px;
           opacity: 0.4;
           animation-duration: 16s;
         }
@@ -169,7 +161,6 @@ export default function StudentDashboard() {
           }
         }
       `}</style>
-
     </main>
   );
 }
