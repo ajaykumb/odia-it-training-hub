@@ -31,7 +31,7 @@ export default function StudentDashboard() {
         <div className="wave wave3"></div>
       </div>
 
-      <div className="flex flex-1">
+      <div className="flex flex-1 flex-col md:flex-row">
         {/* Sidebar */}
         <aside className="w-64 bg-white/90 backdrop-blur-md border-r border-gray-200 shadow-xl p-6">
           <h2 className="text-2xl font-bold mb-8 text-blue-700">
