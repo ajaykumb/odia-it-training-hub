@@ -74,7 +74,13 @@ export default function Home() {
   </a>
 </nav>
 
-          {/* Enroll button removed */}
+    {/* Mobile Login Button */}
+    <a
+      href="/login"
+      className="md:hidden bg-white text-blue-700 px-4 py-2 rounded-lg font-bold text-sm shadow-md hover:bg-gray-200 transition"
+    >
+      Login
+    </a>
         </div>
       </header>
 
