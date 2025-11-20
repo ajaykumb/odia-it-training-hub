@@ -30,8 +30,11 @@ export default function Login() {
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="bg-white shadow-lg rounded-xl p-8 w-full max-w-md">
         <h2 className="text-2xl font-bold text-center mb-6 text-blue-700">
-          Student Login
+          Odia IT Training Hub Student Login
         </h2>
+            <p className="text-center text-gray-600 mb-8 text-sm">
+          Access your class notes & study materials
+        </p>
 
         <form onSubmit={handleLogin}>
           <input
@@ -58,7 +61,11 @@ export default function Login() {
             Login
           </button>
         </form>
+              {/* Footer Text */}
+        <p className="text-center text-gray-500 text-xs mt-6">
+          © 2022 Odia IT Training Hub • All Rights Reserved
+        </p>
       </div>
-    </div>
+    </main>
   );
 }
