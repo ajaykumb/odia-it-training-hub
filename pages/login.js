@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
+import Link from "next/link";
 
 export default function Login() {
   const router = useRouter();
@@ -27,48 +28,57 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="bg-white shadow-lg rounded-xl p-8 w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-50 to-blue-100 p-4">
+      <div className="bg-white shadow-xl rounded-2xl p-10 w-full max-w-lg relative">
 
-        <h2 className="text-2xl font-bold text-center mb-6 text-blue-700">
-          Odia IT Training Hub Student Login
+        {/* BACK TO MAIN SITE */}
+        <Link href="/" className="text-blue-600 mb-4 inline-block text-sm font-medium hover:underline">
+          ← Back to Main Site
+        </Link>
+
+        {/* TITLE */}
+        <h2 className="text-3xl font-bold text-center mb-2 text-blue-700">
+          Odia IT Training Hub
         </h2>
+        <h3 className="text-2xl font-semibold text-center mb-4 text-blue-800">
+          Student Login
+        </h3>
 
         <p className="text-center text-gray-600 mb-8 text-sm">
           Access your class notes & study materials
         </p>
 
+        {/* LOGIN FORM */}
         <form onSubmit={handleLogin}>
+          <label className="font-medium text-gray-700">Student ID</label>
           <input
             type="text"
-            placeholder="Username"
-            className="w-full p-3 border rounded mb-4"
+            placeholder="Enter your Student ID"
+            className="w-full p-3 border rounded-lg mb-4"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
           />
 
+          <label className="font-medium text-gray-700">Password</label>
           <input
             type="password"
-            placeholder="Password"
-            className="w-full p-3 border rounded mb-4"
+            placeholder="Enter your Password"
+            className="w-full p-3 border rounded-lg mb-4"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
 
           {error && <p className="text-red-600 mb-3">{error}</p>}
 
-          <button
-            className="w-full bg-blue-600 text-white py-3 rounded hover:bg-blue-700 transition"
-          >
+          <button className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold text-lg hover:bg-blue-700 transition">
             Login
           </button>
         </form>
 
-        {/* Footer */}
+        {/* FOOTER */}
         <p className="text-center text-gray-500 text-xs mt-6">
           © 2022 Odia IT Training Hub • All Rights Reserved
         </p>
-
       </div>
     </div>
   );
