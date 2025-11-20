@@ -13,37 +13,52 @@ export default function Notifications() {
   const [notifications, setNotifications] = useState([]);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("All");
-  const API_KEY = "YOUR_GOOGLE_API_KEY"; // Replace with your API key
 
+  const API_KEY = "YOUR_GOOGLE_API_KEY"; // Replace with actual Google API Key
+
+  // Redirect if not logged in
   useEffect(() => {
     const token = localStorage.getItem("studentToken");
     if (!token) router.push("/login");
   }, []);
 
+  // Fetch notifications from Google Drive
   useEffect(() => {
     async function fetchNotifications() {
-      const allNotifications = [];
+      const all = [];
+
       for (let folder of folders) {
-        const res = await fetch(
-          `https://www.googleapis.com/drive/v3/files?q='${folder.id}'+in+parents&key=${API_KEY}&fields=files(id,name,webViewLink)`
-        );
-        const data = await res.json();
-        if (data.files) {
-          data.files.forEach((file) => {
-            allNotifications.push({
-              title: file.name,
-              category: folder.category,
-              link: `https://drive.google.com/file/d/${file.id}/view`,
-              date: new Date().toLocaleDateString(),
+        try {
+          const res = await fetch(
+            `https://www.googleapis.com/drive/v3/files?q='${folder.id}'+in+parents&key=${API_KEY}&fields=files(id,name,createdTime,webViewLink)&pageSize=50`
+          );
+
+          const data = await res.json();
+
+          if (data.files) {
+            data.files.forEach((file) => {
+              all.push({
+                title: file.name,
+                category: folder.category,
+                link: `https://drive.google.com/file/d/${file.id}/view`,
+                date: file.createdTime
+                  ? new Date(file.createdTime).toLocaleDateString()
+                  : new Date().toLocaleDateString(),
+              });
             });
-          });
+          }
+        } catch (err) {
+          console.error(`Error fetching ${folder.category} notifications`, err);
         }
       }
-      setNotifications(allNotifications);
+
+      setNotifications(all);
     }
+
     fetchNotifications();
   }, []);
 
+  // Filter notifications
   const filteredNotifications = notifications.filter(
     (n) =>
       (filter === "All" || n.category === filter) &&
@@ -54,7 +69,7 @@ export default function Notifications() {
     <main className="min-h-screen bg-gray-100 p-10 flex flex-col">
       <h1 className="text-3xl font-bold text-blue-700 mb-6">Notifications</h1>
 
-      {/* Search + Filter */}
+      {/* Search & Filter Section */}
       <div className="flex flex-col md:flex-row md:items-center gap-4 mb-6">
         <input
           type="text"
@@ -63,6 +78,7 @@ export default function Notifications() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
+
         <select
           className="px-4 py-2 border rounded-lg shadow"
           value={filter}
@@ -84,8 +100,13 @@ export default function Notifications() {
             className="bg-white p-5 rounded-xl shadow hover:shadow-xl transition border"
           >
             <h3 className="text-xl font-semibold">{note.title}</h3>
-            <p className="text-gray-600 text-sm mt-1">Category: {note.category}</p>
+
+            <p className="text-gray-600 text-sm mt-1">
+              Category: {note.category}
+            </p>
+
             <p className="text-gray-600 text-sm">Date: {note.date}</p>
+
             <a
               href={note.link}
               target="_blank"
@@ -99,7 +120,7 @@ export default function Notifications() {
       </div>
 
       <footer className="bg-gray-800 text-gray-300 text-center py-6 mt-10">
-        © 2022 Odia IT Training Hub. All rights reserved.
+        © 2025 Odia IT Training Hub. All rights reserved.
       </footer>
     </main>
   );
