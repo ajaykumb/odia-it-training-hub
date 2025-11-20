@@ -9,13 +9,12 @@ const folders = [
 { id: "1s_FpZdXhydo-zlUklhUW5Fpj1xm6kF1s", category: "Project" },
 ];
 
-// Helper to get Google Drive PDF preview
+// Helper functions
 const getPreviewLink = (url) => {
 const id = url.match(/[-\w]{25,}/)?.[0];
 return id ? `https://drive.google.com/file/d/${id}/preview` : null;
 };
 
-// Helper for thumbnail
 const getThumbnailLink = (url) => {
 const id = url.match(/[-\w]{25,}/)?.[0];
 return id ? `https://drive.google.com/thumbnail?id=${id}` : null;
@@ -24,12 +23,11 @@ return id ? `https://drive.google.com/thumbnail?id=${id}` : null;
 export default function ClassNotes() {
 const router = useRouter();
 const [notesList, setNotesList] = useState([]);
-const [notifications, setNotifications] = useState([]);
 const [search, setSearch] = useState("");
 const [filter, setFilter] = useState("All");
 const [previewLink, setPreviewLink] = useState(null);
 
-const API_KEY = "YOUR_GOOGLE_API_KEY"; // <-- Replace with your API key
+const API_KEY = "YOUR_GOOGLE_API_KEY"; // Replace with your API key
 
 // Redirect if not logged in
 useEffect(() => {
@@ -39,7 +37,7 @@ if (!token) router.push("/login");
 
 // Fetch notes from Google Drive folders
 useEffect(() => {
-async function fetchNotes() {
+const fetchNotes = async () => {
 const allNotes = [];
 
 ```
@@ -62,17 +60,7 @@ const allNotes = [];
   }
 
   setNotesList(allNotes);
-
-  // Generate notifications
-  const newNotifications = allNotes.map((note) => ({
-    id: note.link,
-    title: `New PDF: ${note.title}`,
-    message: `${note.category} notes are available.`,
-    time: "Just now",
-    unread: true,
-  }));
-  setNotifications(newNotifications);
-}
+};
 
 fetchNotes();
 ```
@@ -174,7 +162,6 @@ return ( <main className="min-h-screen bg-gray-100 p-10 flex flex-col"> <h1 clas
     </div>
   )}
 
-  {/* Footer */}
   <footer className="bg-gray-800 text-gray-300 text-center py-6 mt-10">
     © 2022 Odia IT Training Hub. All rights reserved.
   </footer>
