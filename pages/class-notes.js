@@ -25,7 +25,8 @@ export default function ClassNotes() {
     {
       title: "Linux Class Notes",
       category: "Linux",
-      link: "https://docs.google.com/document/d/1_LVhfNt6zrA7cH_2bbQQ3YPUyhuxRLr37_IAfLbxE3Y/edit?usp=drive_link",
+      // Convert Google Doc → PDF export
+      link: "https://docs.google.com/document/d/1_LVhfNt6zrA7cH_2bbQQ3YPUyhuxRLr37_IAfLbxE3Y/export?format=pdf",
       new: true,
       size: "2.4 MB",
     },
@@ -39,7 +40,7 @@ export default function ClassNotes() {
     {
       title: "Cyber Security Notes",
       category: "Cyber Security",
-      link: "YOUR_GOOGLE_DRIVE_LINK",
+      link: "YOUR_GOOGLE_DRIVE_PDF_LINK",
       new: true,
       size: "3.1 MB",
     },
@@ -56,7 +57,8 @@ export default function ClassNotes() {
   );
 
   return (
-    <main className="min-h-screen bg-gray-100 p-10">
+    <main className="min-h-screen bg-gray-100 p-10 flex flex-col">
+      
       <h1 className="text-3xl font-bold text-blue-700 mb-6">Class Notes</h1>
 
       {/* Search + Filter */}
@@ -81,7 +83,8 @@ export default function ClassNotes() {
       </div>
 
       {/* Notes List */}
-      <div className="grid md:grid-cols-3 gap-6">
+      <div className="grid md:grid-cols-3 gap-6 flex-1">
+
         {filteredNotes.map((note, i) => (
           <div
             key={i}
@@ -143,6 +146,12 @@ export default function ClassNotes() {
           </div>
         </div>
       )}
+
+      {/* Footer */}
+      <footer className="bg-gray-800 text-gray-300 text-center py-6 mt-10">
+        © 2022 Odia IT Training Hub. All rights reserved.
+      </footer>
+
     </main>
   );
 }
