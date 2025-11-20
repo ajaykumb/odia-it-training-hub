@@ -31,7 +31,7 @@ export default function StudentDashboard() {
         <div className="wave wave3"></div>
       </div>
 
-      {/* Single Flex Container */}
+      {/* Main Layout */}
       <div className="flex min-h-screen flex-col md:flex-row">
 
         {/* Sidebar */}
@@ -67,10 +67,15 @@ export default function StudentDashboard() {
             >
               <ArrowLeftIcon className="w-5 h-5" /> Back to Main Site
             </a>
+
+            {/* Dark Mode Button */}
+            <button className="flex items-center gap-3 mt-6 hover:text-blue-600">
+              🌙 Dark Mode
+            </button>
           </nav>
         </aside>
 
-        {/* Main Content */}
+        {/* Main Content Area */}
         <section className="flex-1 p-6 md:p-12">
           <h1 className="text-4xl font-bold text-white drop-shadow-lg mb-10">
             Welcome to Your Dashboard
@@ -78,7 +83,7 @@ export default function StudentDashboard() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
 
-            {/* Card */}
+            {/* Card 1 */}
             <div className="bg-white/80 backdrop-blur-md p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all border border-gray-200">
               <h3 className="text-xl font-semibold mb-2 text-gray-900">
                 Class Notes
@@ -94,6 +99,7 @@ export default function StudentDashboard() {
               </a>
             </div>
 
+            {/* Card 2 */}
             <div className="bg-white/80 backdrop-blur-md p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all border border-gray-200">
               <h3 className="text-xl font-semibold mb-2 text-gray-900">
                 Video Lectures
@@ -106,6 +112,7 @@ export default function StudentDashboard() {
               </button>
             </div>
 
+            {/* Card 3 */}
             <div className="bg-white/80 backdrop-blur-md p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all border border-gray-200">
               <h3 className="text-xl font-semibold mb-2 text-gray-900">
                 Assignments
