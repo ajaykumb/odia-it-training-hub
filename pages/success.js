@@ -132,7 +132,7 @@ export default function Success() {
           onClick={() => router.push('/business-profile')}
           className="bg-blue-600 text-white px-6 py-3 rounded-full hover:bg-blue-700 transition"
         >
-          Visit Our Google Profile
+          Continue Reading Reviews
         </button>
       </div>
 
