@@ -14,44 +14,58 @@ export default function ClassNotes() {
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("All");
   const [previewLink, setPreviewLink] = useState(null);
+
   const API_KEY = "YOUR_GOOGLE_API_KEY"; // Replace with your API key
 
+  // Redirect if not logged in
   useEffect(() => {
     const token = localStorage.getItem("studentToken");
     if (!token) router.push("/login");
   }, []);
 
+  // Fetch the class notes
   useEffect(() => {
     async function fetchNotes() {
       const allNotes = [];
+
       for (let folder of folders) {
-        const res = await fetch(
-          `https://www.googleapis.com/drive/v3/files?q='${folder.id}'+in+parents&key=${API_KEY}&fields=files(id,name,webViewLink)`
-        );
-        const data = await res.json();
-        if (data.files) {
-          data.files.forEach((file) => {
-            allNotes.push({
-              title: file.name,
-              category: folder.category,
-              link: `https://drive.google.com/file/d/${file.id}/view`,
-              new: true,
-              size: "Unknown",
+        try {
+          const res = await fetch(
+            `https://www.googleapis.com/drive/v3/files?q='${folder.id}'+in+parents&key=${API_KEY}&fields=files(id,name,webViewLink)&pageSize=100`
+          );
+
+          const data = await res.json();
+
+          if (data.files && data.files.length > 0) {
+            data.files.forEach((file) => {
+              allNotes.push({
+                title: file.name,
+                category: folder.category,
+                link: `https://drive.google.com/file/d/${file.id}/view`,
+                new: true,
+                size: "Unknown",
+              });
             });
-          });
+          }
+        } catch (err) {
+          console.error("Error fetching folder:", folder.category, err);
         }
       }
+
       setNotesList(allNotes);
     }
+
     fetchNotes();
   }, []);
 
+  // Filter notes
   const filteredNotes = notesList.filter(
     (n) =>
       (filter === "All" || n.category === filter) &&
       n.title.toLowerCase().includes(search.toLowerCase())
   );
 
+  // Utility functions
   const getThumbnailLink = (url) => {
     const id = url.match(/[-\w]{25,}/)?.[0];
     return id ? `https://drive.google.com/thumbnail?id=${id}` : null;
@@ -75,6 +89,7 @@ export default function ClassNotes() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
+
         <select
           className="px-4 py-2 border rounded-lg shadow"
           value={filter}
@@ -100,6 +115,7 @@ export default function ClassNotes() {
               alt="PDF thumbnail"
               className="w-full h-40 object-cover rounded-md mb-3"
             />
+
             <h3 className="text-xl font-semibold flex items-center gap-2">
               {note.title}
               {note.new && (
@@ -108,8 +124,12 @@ export default function ClassNotes() {
                 </span>
               )}
             </h3>
-            <p className="text-gray-600 text-sm mt-1">Category: {note.category}</p>
+
+            <p className="text-gray-600 text-sm mt-1">
+              Category: {note.category}
+            </p>
             <p className="text-gray-600 text-sm">Size: {note.size}</p>
+
             <div className="flex gap-3 mt-4">
               <button
                 onClick={() => setPreviewLink(getPreviewLink(note.link))}
@@ -117,6 +137,7 @@ export default function ClassNotes() {
               >
                 View
               </button>
+
               <a
                 href={note.link}
                 target="_blank"
@@ -140,6 +161,7 @@ export default function ClassNotes() {
             >
               X
             </button>
+
             <iframe
               src={previewLink}
               className="w-full h-[70vh] rounded-lg"
@@ -149,7 +171,7 @@ export default function ClassNotes() {
       )}
 
       <footer className="bg-gray-800 text-gray-300 text-center py-6 mt-10">
-        © 2022 Odia IT Training Hub. All rights reserved.
+        © 2025 Odia IT Training Hub. All rights reserved.
       </footer>
     </main>
   );
