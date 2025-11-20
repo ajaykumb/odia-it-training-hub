@@ -10,7 +10,7 @@ export default function StudentLogin() {
 
         {/* Title */}
         <h2 className="text-3xl font-bold text-center text-blue-700 mb-2">
-          Student Login
+          Odia IT Training Hub Student Login
         </h2>
         <p className="text-center text-gray-600 mb-8 text-sm">
           Access your class notes & study materials
