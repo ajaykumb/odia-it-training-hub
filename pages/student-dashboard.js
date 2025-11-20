@@ -23,7 +23,6 @@ export default function StudentDashboard() {
 
   return (
     <main className="relative min-h-screen">
-
       {/* Blue Background */}
       <div className="absolute inset-0 -z-10 bg-gradient-to-br from-blue-400 via-blue-300 to-blue-100 overflow-hidden">
         <div className="wave wave1"></div>
@@ -33,7 +32,6 @@ export default function StudentDashboard() {
 
       {/* Main Layout */}
       <div className="flex min-h-screen flex-col md:flex-row">
-
         {/* Sidebar */}
         <aside className="w-full md:w-64 bg-white/90 backdrop-blur-md border-r border-gray-200 shadow-xl p-6">
           <h2 className="text-2xl font-bold mb-8 text-blue-700">
@@ -41,6 +39,7 @@ export default function StudentDashboard() {
           </h2>
 
           <nav className="space-y-4 text-gray-700">
+
             <a className="flex items-center gap-3 hover:text-blue-600" href="#">
               <HomeIcon className="w-5 h-5" /> Dashboard
             </a>
@@ -51,6 +50,11 @@ export default function StudentDashboard() {
 
             <a className="flex items-center gap-3 hover:text-blue-600" href="#">
               <UserIcon className="w-5 h-5" /> Profile
+            </a>
+
+            {/* Notifications */}
+            <a className="flex items-center gap-3 hover:text-blue-600" href="/notifications">
+              🔔 Notifications
             </a>
 
             <button
@@ -68,7 +72,6 @@ export default function StudentDashboard() {
               <ArrowLeftIcon className="w-5 h-5" /> Back to Main Site
             </a>
 
-            {/* Dark Mode Button */}
             <button className="flex items-center gap-3 mt-6 hover:text-blue-600">
               🌙 Dark Mode
             </button>
@@ -82,7 +85,6 @@ export default function StudentDashboard() {
           </h1>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-
             {/* Card 1 */}
             <div className="bg-white/80 backdrop-blur-md p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all border border-gray-200">
               <h3 className="text-xl font-semibold mb-2 text-gray-900">
@@ -124,7 +126,6 @@ export default function StudentDashboard() {
                 Coming Soon
               </button>
             </div>
-
           </div>
         </section>
       </div>
@@ -134,7 +135,7 @@ export default function StudentDashboard() {
         © 2022 Odia IT Training Hub. All rights reserved.
       </footer>
 
-      {/* Waves */}
+      {/* Waves Animation */}
       <style jsx>{`
         .wave {
           position: absolute;
