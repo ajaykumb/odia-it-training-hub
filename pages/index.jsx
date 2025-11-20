@@ -40,7 +40,9 @@ export default function Home() {
 
 
   return (
-    <main className="min-h-screen bg-gray-50 font-sans text-gray-800 tracking-tight">
+    
+    <main className="min-h-screen bg-gray-50 font-sans text-gray-800 tracking-tight overflow-x-hidden">
+
       
       {/* 🚀 Header - Sticky and Blurry */}
       <header className="sticky top-0 z-50 bg-blue-700/95 backdrop-blur-sm text-white py-4 shadow-xl">
