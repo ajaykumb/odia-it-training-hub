@@ -8,23 +8,13 @@ const folders = [
 { id: "1s_FpZdXhydo-zlUklhUW5Fpj1xm6kF1s", category: "Project" },
 ];
 
-const getPreviewLink = (url) => {
-const id = url.match(/[-\w]{25,}/)?.[0];
-return id ? `https://drive.google.com/file/d/${id}/preview` : null;
-};
-
-const getThumbnailLink = (url) => {
-const id = url.match(/[-\w]{25,}/)?.[0];
-return id ? `https://drive.google.com/thumbnail?id=${id}` : null;
-};
-
 export default function ClassNotes() {
 const router = useRouter();
 const [notesList, setNotesList] = useState([]);
 const [search, setSearch] = useState("");
 const [filter, setFilter] = useState("All");
 const [previewLink, setPreviewLink] = useState(null);
-const API_KEY = "YOUR_GOOGLE_API_KEY";
+const API_KEY = "YOUR_GOOGLE_API_KEY"; // Replace with your API key
 
 useEffect(() => {
 const token = localStorage.getItem("studentToken");
@@ -53,11 +43,7 @@ size: "Unknown",
 }
 setNotesList(allNotes);
 }
-
-```
 fetchNotes();
-```
-
 }, []);
 
 const filteredNotes = notesList.filter(
@@ -66,9 +52,20 @@ const filteredNotes = notesList.filter(
 n.title.toLowerCase().includes(search.toLowerCase())
 );
 
+const getThumbnailLink = (url) => {
+const id = url.match(/[-\w]{25,}/)?.[0];
+return id ? `https://drive.google.com/thumbnail?id=${id}` : null;
+};
+
+const getPreviewLink = (url) => {
+const id = url.match(/[-\w]{25,}/)?.[0];
+return id ? `https://drive.google.com/file/d/${id}/preview` : null;
+};
+
 return ( <main className="min-h-screen bg-gray-100 p-10 flex flex-col"> <h1 className="text-3xl font-bold text-blue-700 mb-6">Class Notes</h1>
 
 ```
+  {/* Search + Filter */}
   <div className="flex flex-col md:flex-row md:items-center gap-4 mb-6">
     <input
       type="text"
@@ -79,6 +76,7 @@ return ( <main className="min-h-screen bg-gray-100 p-10 flex flex-col"> <h1 clas
     />
     <select
       className="px-4 py-2 border rounded-lg shadow"
+      value={filter}
       onChange={(e) => setFilter(e.target.value)}
     >
       <option>All</option>
@@ -89,6 +87,7 @@ return ( <main className="min-h-screen bg-gray-100 p-10 flex flex-col"> <h1 clas
     </select>
   </div>
 
+  {/* Notes Grid */}
   <div className="grid md:grid-cols-3 gap-6 flex-1">
     {filteredNotes.map((note, i) => (
       <div
@@ -129,6 +128,7 @@ return ( <main className="min-h-screen bg-gray-100 p-10 flex flex-col"> <h1 clas
     ))}
   </div>
 
+  {/* Preview Modal */}
   {previewLink && (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4">
       <div className="bg-white rounded-xl p-4 w-full max-w-4xl relative">
