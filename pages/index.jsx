@@ -56,13 +56,22 @@ export default function Home() {
     Odia IT Training Hub
   </span>
 </a>
-          <nav className="space-x-8 text-lg font-medium hidden md:flex">
-            <a href="#about" className="hover:text-yellow-300 transition">About</a>
-            <a href="#courses" className="hover:text-yellow-300 transition">Courses</a>
-            <a href="#developer-focus" className="hover:text-red-300 transition">New Batch</a>
-            <a href="#placement" className="hover:text-yellow-300 transition">Success</a>
-            <a href="#contact" className="hover:text-yellow-300 transition">Contact</a>
-          </nav>
+          <nav className="space-x-8 text-lg font-medium hidden md:flex items-center">
+  <a href="#about" className="hover:text-yellow-300 transition">About</a>
+  <a href="#courses" className="hover:text-yellow-300 transition">Courses</a>
+  <a href="#developer-focus" className="hover:text-red-300 transition">New Batch</a>
+  <a href="#placement" className="hover:text-yellow-300 transition">Success</a>
+  <a href="#contact" className="hover:text-yellow-300 transition">Contact</a>
+
+  {/* ⭐ Login Button */}
+  <a
+    href="/login"
+    className="ml-6 bg-white text-blue-700 px-5 py-2 rounded-full font-bold hover:bg-gray-200 transition-all shadow-md"
+  >
+    Login
+  </a>
+</nav>
+
           <a href="#contact" className="md:hidden bg-yellow-400 text-blue-800 px-4 py-2 rounded-lg font-bold text-sm hover:bg-yellow-300 transition">Enroll</a>
         </div>
       </header>
