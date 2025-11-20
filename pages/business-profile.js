@@ -5,7 +5,7 @@ const YourBusinessOnGooglePage = () => {
       <section className="py-12 bg-white border-t border-gray-300">
         <div className="max-w-6xl mx-auto px-6 text-center">
           <h2 className="text-3xl font-bold mb-4 text-blue-700">
-            Our Business on Google
+            Our Student Reviews Page
           </h2>
 
           <p className="text-lg mb-6 text-gray-700">
@@ -88,7 +88,16 @@ const YourBusinessOnGooglePage = () => {
           </div>
         </div>
       </section>
-    </>
+
+    {/* 📄 Footer */}
+      <footer className="bg-gray-900 text-gray-400 text-center py-8 mt-10">
+        <div className="max-w-6xl mx-auto px-6">
+          <p>© 2022 Odia IT Training Hub. All rights reserved.</p>
+          <p className="mt-2 text-sm">Empowering the next generation of IT professionals.</p>
+        </div>
+      </footer>
+
+    </main>
   );
 };
 
