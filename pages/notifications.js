@@ -11,6 +11,8 @@ const folders = [
 export default function Notifications() {
 const router = useRouter();
 const [notifications, setNotifications] = useState([]);
+const [search, setSearch] = useState("");
+const [filter, setFilter] = useState("All");
 const API_KEY = "YOUR_GOOGLE_API_KEY"; // Replace with your API key
 
 useEffect(() => {
@@ -21,63 +23,86 @@ if (!token) router.push("/login");
 useEffect(() => {
 async function fetchNotifications() {
 const allNotifications = [];
-
-```
-  for (let folder of folders) {
-    const res = await fetch(
-      `https://www.googleapis.com/drive/v3/files?q='${folder.id}'+in+parents&key=${API_KEY}&fields=files(id,name,webViewLink)`
-    );
-    const data = await res.json();
-    if (data.files) {
-      data.files.forEach((file) => {
-        allNotifications.push({
-          id: file.id,
-          title: `New PDF: ${file.name}`,
-          message: `${folder.category} notes are available.`,
-          link: `https://drive.google.com/file/d/${file.id}/view`,
-          time: "Just now",
-          unread: true,
-        });
-      });
-    }
-  }
-
-  setNotifications(allNotifications);
+for (let folder of folders) {
+const res = await fetch(
+`https://www.googleapis.com/drive/v3/files?q='${folder.id}'+in+parents&key=${API_KEY}&fields=files(id,name,webViewLink)`
+);
+const data = await res.json();
+if (data.files) {
+data.files.forEach((file) => {
+allNotifications.push({
+title: file.name,
+category: folder.category,
+link: `https://drive.google.com/file/d/${file.id}/view`,
+new: true,
+});
+});
 }
-
+}
+setNotifications(allNotifications);
+}
 fetchNotifications();
-```
-
 }, []);
+
+const filteredNotifications = notifications.filter(
+(n) =>
+(filter === "All" || n.category === filter) &&
+n.title.toLowerCase().includes(search.toLowerCase())
+);
 
 return ( <main className="min-h-screen bg-gray-100 p-10 flex flex-col"> <h1 className="text-3xl font-bold text-blue-700 mb-6">Notifications</h1>
 
 ```
-  {notifications.length === 0 ? (
-    <p className="text-gray-600">No notifications yet.</p>
-  ) : (
-    <ul className="space-y-4">
-      {notifications.map((note) => (
-        <li
-          key={note.id}
-          className={`p-4 border rounded-lg shadow ${
-            note.unread ? "bg-white" : "bg-gray-200"
-          }`}
-        >
-          <h3 className="text-lg font-semibold">{note.title}</h3>
-          <p className="text-gray-600">{note.message}</p>
-          <p className="text-sm text-gray-500">{note.time}</p>
+  {/* Search + Filter */}
+  <div className="flex flex-col md:flex-row md:items-center gap-4 mb-6">
+    <input
+      type="text"
+      placeholder="Search notifications..."
+      className="px-4 py-2 border rounded-lg shadow"
+      value={search}
+      onChange={(e) => setSearch(e.target.value)}
+    />
+    <select
+      className="px-4 py-2 border rounded-lg shadow"
+      value={filter}
+      onChange={(e) => setFilter(e.target.value)}
+    >
+      <option>All</option>
+      <option>Linux</option>
+      <option>SQL</option>
+      <option>PL/SQL</option>
+      <option>Project</option>
+    </select>
+  </div>
+
+  {/* Notifications Grid */}
+  <div className="grid md:grid-cols-3 gap-6 flex-1">
+    {filteredNotifications.map((note, i) => (
+      <div
+        key={i}
+        className="bg-white p-5 rounded-xl shadow hover:shadow-xl transition border"
+      >
+        <h3 className="text-xl font-semibold flex items-center gap-2">
+          {note.title}
+          {note.new && (
+            <span className="bg-red-500 text-white text-xs px-2 py-1 rounded">
+              NEW
+            </span>
+          )}
+        </h3>
+        <p className="text-gray-600 text-sm mt-1">Category: {note.category}</p>
+        <div className="flex gap-3 mt-4">
           <a
             href={note.link}
             target="_blank"
-            className="text-blue-600 mt-2 inline-block"
+            className="bg-green-600 text-white px-3 py-2 rounded-lg"
           >
-            Open
+            View
           </a>
-        </li>
-      ))}
-    </ul>
-  )}
+        </div>
+      </div>
+    ))}
+  </div>
 
   <footer className="bg-gray-800 text-gray-300 text-center py-6 mt-10">
     © 2022 Odia IT Training Hub. All rights reserved.
