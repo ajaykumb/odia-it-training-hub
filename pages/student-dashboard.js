@@ -22,10 +22,18 @@ export default function StudentDashboard() {
   };
 
   return (
-    <main className="min-h-screen flex flex-col bg-gradient-to-br from-gray-100 to-blue-50">
+    <main className="relative min-h-screen flex flex-col">
+
+      {/* 🌊 Blue Wave Background */}
+      <div className="absolute inset-0 -z-10 bg-gradient-to-br from-blue-400 via-blue-300 to-blue-100">
+        <div className="wave wave1"></div>
+        <div className="wave wave2"></div>
+        <div className="wave wave3"></div>
+      </div>
+
       <div className="flex flex-1">
         {/* Sidebar */}
-        <aside className="w-64 bg-white/90 backdrop-blur-md border-r border-gray-200 shadow-lg p-6">
+        <aside className="w-64 bg-white/90 backdrop-blur-md border-r border-gray-200 shadow-xl p-6">
           <h2 className="text-2xl font-bold mb-8 text-blue-700">
             Student Panel
           </h2>
@@ -43,10 +51,7 @@ export default function StudentDashboard() {
               Class Notes
             </a>
 
-            <a
-              className="flex items-center gap-3 hover:text-blue-600"
-              href="#"
-            >
+            <a className="flex items-center gap-3 hover:text-blue-600" href="#">
               <UserIcon className="w-5 h-5" />
               Profile
             </a>
@@ -72,13 +77,14 @@ export default function StudentDashboard() {
 
         {/* Main Content */}
         <section className="flex-1 p-12">
-          <h1 className="text-4xl font-bold text-blue-700 mb-10">
+          <h1 className="text-4xl font-bold text-white drop-shadow-lg mb-10">
             Welcome to Your Dashboard
           </h1>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+
             {/* Card */}
-            <div className="bg-white/80 backdrop-blur-md p-6 rounded-2xl shadow hover:shadow-xl transition-all border border-gray-200">
+            <div className="bg-white/80 backdrop-blur-md p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all border border-gray-200">
               <h3 className="text-xl font-semibold mb-2 text-gray-900">
                 Class Notes
               </h3>
@@ -93,7 +99,7 @@ export default function StudentDashboard() {
               </a>
             </div>
 
-            <div className="bg-white/80 backdrop-blur-md p-6 rounded-2xl shadow hover:shadow-xl transition-all border border-gray-200">
+            <div className="bg-white/80 backdrop-blur-md p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all border border-gray-200">
               <h3 className="text-xl font-semibold mb-2 text-gray-900">
                 Video Lectures
               </h3>
@@ -105,7 +111,7 @@ export default function StudentDashboard() {
               </button>
             </div>
 
-            <div className="bg-white/80 backdrop-blur-md p-6 rounded-2xl shadow hover:shadow-xl transition-all border border-gray-200">
+            <div className="bg-white/80 backdrop-blur-md p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all border border-gray-200">
               <h3 className="text-xl font-semibold mb-2 text-gray-900">
                 Assignments
               </h3>
@@ -116,14 +122,50 @@ export default function StudentDashboard() {
                 Coming Soon
               </button>
             </div>
+
           </div>
         </section>
       </div>
 
       {/* Footer */}
-      <footer className="bg-gray-800 text-gray-300 text-center py-6">
+      <footer className="bg-gray-900 text-gray-300 text-center py-6 mt-auto">
         © 2022 Odia IT Training Hub. All rights reserved.
       </footer>
+
+      {/* 🌊 Wave Animation CSS */}
+      <style jsx>{`
+        .wave {
+          position: absolute;
+          width: 200%;
+          height: 200px;
+          left: -50%;
+          background: rgba(255, 255, 255, 0.3);
+          border-radius: 100%;
+          animation: drift 6s infinite linear;
+        }
+        .wave1 {
+          bottom: 0;
+          animation-duration: 8s;
+        }
+        .wave2 {
+          bottom: 30px;
+          opacity: 0.6;
+          animation-duration: 12s;
+        }
+        .wave3 {
+          bottom: 60px;
+          opacity: 0.4;
+          animation-duration: 16s;
+        }
+        @keyframes drift {
+          from {
+            transform: translateX(0) rotate(0deg);
+          }
+          to {
+            transform: translateX(50px) rotate(360deg);
+          }
+        }
+      `}</style>
     </main>
   );
 }
