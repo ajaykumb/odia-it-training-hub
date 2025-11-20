@@ -1,4 +1,3 @@
-// pages/class-note.js
 import { useEffect, useState } from "react";
 
 const CLIENT_ID = "1003811270380-b81a8a0j5mt6d8264rgqgf7dm561vde9.apps.googleusercontent.com";
