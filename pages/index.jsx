@@ -74,7 +74,7 @@ export default function Home() {
   </a>
 </nav>
 
-          <a href="#contact" className="md:hidden bg-yellow-400 text-blue-800 px-4 py-2 rounded-lg font-bold text-sm hover:bg-yellow-300 transition">Enroll</a>
+          {/* Enroll button removed */}
         </div>
       </header>
 
