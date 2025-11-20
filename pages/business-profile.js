@@ -1,12 +1,22 @@
 const YourBusinessOnGooglePage = () => {
   return (
     <main className="bg-white">
+
       {/* Existing Section */}
       <section className="py-12 bg-white border-t border-gray-300">
         <div className="max-w-6xl mx-auto px-6 text-center">
+
           <h2 className="text-3xl font-bold mb-4 text-blue-700">
             Success Stories from Our Learners
           </h2>
+
+          {/* 🔙 Back to Main Site Button */}
+          <a
+            href="/"
+            className="inline-block mb-6 text-blue-600 font-semibold hover:underline"
+          >
+            ← Back to Main Site
+          </a>
 
           <p className="text-lg mb-6 text-gray-700">
             Visit our Google profile and leave a review or read what others are saying.
@@ -20,6 +30,7 @@ const YourBusinessOnGooglePage = () => {
           >
             See Us on Google
           </a>
+
         </div>
       </section>
 
@@ -96,6 +107,7 @@ const YourBusinessOnGooglePage = () => {
           <p className="mt-2 text-sm">Empowering the next generation of IT professionals.</p>
         </div>
       </footer>
+
     </main>
   );
 };
