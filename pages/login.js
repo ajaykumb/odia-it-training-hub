@@ -29,10 +29,12 @@ export default function Login() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="bg-white shadow-lg rounded-xl p-8 w-full max-w-md">
+
         <h2 className="text-2xl font-bold text-center mb-6 text-blue-700">
           Odia IT Training Hub Student Login
         </h2>
-            <p className="text-center text-gray-600 mb-8 text-sm">
+
+        <p className="text-center text-gray-600 mb-8 text-sm">
           Access your class notes & study materials
         </p>
 
@@ -61,11 +63,13 @@ export default function Login() {
             Login
           </button>
         </form>
-              {/* Footer Text */}
+
+        {/* Footer */}
         <p className="text-center text-gray-500 text-xs mt-6">
           © 2022 Odia IT Training Hub • All Rights Reserved
         </p>
+
       </div>
-    </main>
+    </div>
   );
 }
