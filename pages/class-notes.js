@@ -15,7 +15,7 @@ export default function ClassNotes() {
   const [filter, setFilter] = useState("All");
   const [previewLink, setPreviewLink] = useState(null);
 
-  const API_KEY = "YOUR_GOOGLE_API_KEY"; // <-- Replace with REAL key
+  const API_KEY = "YOUR_GOOGLE_API_KEY"; // Replace with your actual key
 
   // Redirect if not logged in
   useEffect(() => {
@@ -23,22 +23,32 @@ export default function ClassNotes() {
     if (!token) router.push("/login");
   }, []);
 
-  // Fetch notes
+  // Fetch Notes from Drive
   useEffect(() => {
     async function fetchNotes() {
       const allNotes = [];
 
       for (let folder of folders) {
         try {
-          const url = `https://www.googleapis.com/drive/v3/files?q="${folder.id}" in parents and trashed=false&key=${API_KEY}&pageSize=100&fields=files(id,name,createdTime,mimeType)&includeItemsFromAllDrives=true&supportsAllDrives=true`;
+          const url = `https://www.googleapis.com/drive/v3/files?q="${folder.id}" in parents and trashed=false&key=${API_KEY}&fields=files(id,name,createdTime,mimeType)&supportsAllDrives=true&includeItemsFromAllDrives=true&pageSize=100`;
 
           console.log("FETCHING:", folder.category);
-          console.log("API URL:", url);
+          console.log("URL:", url);
 
           const res = await fetch(url);
-          const data = await res.json();
+          const raw = await res.text();
 
-          console.log("FOLDER:", folder.category, "RAW DATA:", data);
+          console.log("RAW RESPONSE:", raw); // Debug log
+
+          let data;
+          try {
+            data = JSON.parse(raw);
+          } catch (err) {
+            console.error("JSON PARSE ERROR:", err);
+            continue;
+          }
+
+          console.log("PARSED:", data);
 
           if (!data.files) continue;
 
@@ -53,7 +63,7 @@ export default function ClassNotes() {
             });
           });
         } catch (err) {
-          console.error("Error loading notes:", err);
+          console.error("FETCH ERROR:", err);
         }
       }
 
@@ -73,20 +83,20 @@ export default function ClassNotes() {
     <main className="min-h-screen bg-gray-100 p-10 flex flex-col">
       <h1 className="text-3xl font-bold text-blue-700 mb-6">Class Notes</h1>
 
-      {/* Search + Filter */}
+      {/* Search and Filter */}
       <div className="flex flex-col md:flex-row md:items-center gap-4 mb-6">
         <input
           type="text"
           placeholder="Search notes..."
-          className="px-4 py-2 border rounded-lg shadow"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
+          className="px-4 py-2 border rounded-lg shadow"
         />
 
         <select
-          className="px-4 py-2 border rounded-lg shadow"
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
+          className="px-4 py-2 border rounded-lg shadow"
         >
           <option>All</option>
           <option>Linux</option>
@@ -123,7 +133,6 @@ export default function ClassNotes() {
               >
                 View
               </button>
-
               <a
                 href={note.link}
                 target="_blank"
