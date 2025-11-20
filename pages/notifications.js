@@ -14,15 +14,13 @@ export default function Notifications() {
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("All");
 
-  const API_KEY = "YOUR_GOOGLE_API_KEY"; // Replace with actual Google API Key
+  const API_KEY = "YOUR_GOOGLE_API_KEY";
 
-  // Redirect if not logged in
   useEffect(() => {
     const token = localStorage.getItem("studentToken");
     if (!token) router.push("/login");
   }, []);
 
-  // Fetch notifications from Google Drive
   useEffect(() => {
     async function fetchNotifications() {
       const all = [];
@@ -30,7 +28,7 @@ export default function Notifications() {
       for (let folder of folders) {
         try {
           const res = await fetch(
-            `https://www.googleapis.com/drive/v3/files?q='${folder.id}'+in+parents&key=${API_KEY}&fields=files(id,name,createdTime,webViewLink)&pageSize=50`
+            `https://www.googleapis.com/drive/v3/files?q='${folder.id}'+in+parents&key=${API_KEY}&fields=files(id,name,createdTime)&pageSize=100`
           );
 
           const data = await res.json();
@@ -41,14 +39,12 @@ export default function Notifications() {
                 title: file.name,
                 category: folder.category,
                 link: `https://drive.google.com/file/d/${file.id}/view`,
-                date: file.createdTime
-                  ? new Date(file.createdTime).toLocaleDateString()
-                  : new Date().toLocaleDateString(),
+                date: new Date(file.createdTime).toLocaleDateString(),
               });
             });
           }
         } catch (err) {
-          console.error(`Error fetching ${folder.category} notifications`, err);
+          console.error("Error fetching notifications:", err);
         }
       }
 
@@ -58,8 +54,7 @@ export default function Notifications() {
     fetchNotifications();
   }, []);
 
-  // Filter notifications
-  const filteredNotifications = notifications.filter(
+  const filtered = notifications.filter(
     (n) =>
       (filter === "All" || n.category === filter) &&
       n.title.toLowerCase().includes(search.toLowerCase())
@@ -69,12 +64,12 @@ export default function Notifications() {
     <main className="min-h-screen bg-gray-100 p-10 flex flex-col">
       <h1 className="text-3xl font-bold text-blue-700 mb-6">Notifications</h1>
 
-      {/* Search & Filter Section */}
-      <div className="flex flex-col md:flex-row md:items-center gap-4 mb-6">
+      {/* Search + Filter */}
+      <div className="flex flex-col md:flex-row gap-4 mb-6">
         <input
           type="text"
-          placeholder="Search notifications..."
           className="px-4 py-2 border rounded-lg shadow"
+          placeholder="Search notifications..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
@@ -92,13 +87,10 @@ export default function Notifications() {
         </select>
       </div>
 
-      {/* Notifications Grid */}
+      {/* Notification Cards */}
       <div className="grid md:grid-cols-3 gap-6 flex-1">
-        {filteredNotifications.map((note, i) => (
-          <div
-            key={i}
-            className="bg-white p-5 rounded-xl shadow hover:shadow-xl transition border"
-          >
+        {filtered.map((note, i) => (
+          <div key={i} className="bg-white p-5 rounded-xl shadow border">
             <h3 className="text-xl font-semibold">{note.title}</h3>
 
             <p className="text-gray-600 text-sm mt-1">
@@ -110,7 +102,6 @@ export default function Notifications() {
             <a
               href={note.link}
               target="_blank"
-              rel="noopener noreferrer"
               className="bg-green-600 text-white px-3 py-2 rounded-lg mt-3 inline-block"
             >
               View
