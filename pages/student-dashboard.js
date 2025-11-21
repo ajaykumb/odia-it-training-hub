@@ -122,9 +122,12 @@ export default function StudentDashboard() {
               <p className="mb-4 text-gray-600">
                 View and submit class assignments.
               </p>
-              <button className="bg-gray-400 text-white px-4 py-2 rounded-lg cursor-not-allowed">
-                Coming Soon
-              </button>
+<a
+  href="/assignments"
+  className="inline-block bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700 transition"
+>
+  View Assignments
+</a>
             </div>
           </div>
         </section>
