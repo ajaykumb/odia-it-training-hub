@@ -1,5 +1,13 @@
 {
   "/": "pages/index.js",
   "/_app": "pages/_app.js",
-  "/_document": "pages/_document.js"
+  "/_document": "pages/_document.js",
+  "/_error": "pages/_error.js",
+  "/admin-dashboard": "pages/admin-dashboard.js",
+  "/admin-login": "pages/admin-login.js",
+  "/class-notes": "pages/class-notes.js",
+  "/login": "pages/login.js",
+  "/pending-approval": "pages/pending-approval.js",
+  "/signup": "pages/signup.js",
+  "/student-dashboard": "pages/student-dashboard.js"
 }
