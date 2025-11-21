@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 
 const CLIENT_ID =
   "1003811270380-b81a8a0j5mt6d8264rgqgf7dm561vde9.apps.googleusercontent.com";
-const REDIRECT_URI = "https://www.odiaittraininghub.in/class-notes";  // FIXED ✅
+
+const REDIRECT_URI = "https://www.odiaittraininghub.in/class-notes"; // Correct
 
 const folders = [
   { id: "1GqgkVbMdi2rFdaPAqqtAWEq7Oe5hodZV", category: "SQL" },
@@ -18,6 +19,7 @@ export default function ClassNote() {
   const [filter, setFilter] = useState("All");
   const [previewLink, setPreviewLink] = useState(null);
 
+  // Extract access token from redirect URL
   useEffect(() => {
     const hash = window.location.hash.slice(1);
     const params = new URLSearchParams(hash);
@@ -33,11 +35,16 @@ export default function ClassNote() {
     }
   }, []);
 
+  // LOGIN FIXED (encoded redirect_uri)
   const handleLogin = () => {
-    const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=token&scope=https://www.googleapis.com/auth/drive.readonly&include_granted_scopes=true`;
+    const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(
+      REDIRECT_URI
+    )}&response_type=token&scope=https://www.googleapis.com/auth/drive.readonly&include_granted_scopes=true`;
+
     window.location.href = authUrl;
   };
 
+  // Fetch notes after login
   useEffect(() => {
     if (!accessToken) return;
 
@@ -53,7 +60,6 @@ export default function ClassNote() {
           });
 
           const data = await res.json();
-
           if (!data.files) continue;
 
           data.files.forEach((file) => {
@@ -83,6 +89,7 @@ export default function ClassNote() {
       n.title.toLowerCase().includes(search.toLowerCase())
   );
 
+  // Login screen
   if (!accessToken)
     return (
       <div className="flex items-center justify-center min-h-screen">
