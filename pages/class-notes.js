@@ -2,7 +2,7 @@ import React, { useEffect, useState, useMemo } from "react";
 
 /**
  * ClassNotesEnhanced.jsx
- * Dark Mode Always Enabled
+ * Dark Mode Always Enabled — NO WAVING / NO ROTATION
  */
 
 const API_KEY = "AIzaSyABWqFjKWGLzeK-RyW_rrsSEdqc_EpAEK0";
@@ -48,7 +48,6 @@ export default function ClassNotesEnhanced() {
   const [sortBy, setSortBy] = useState("newest");
   const [previewFile, setPreviewFile] = useState(null);
 
-  // 🔥 Dark mode always on
   const darkMode = true;
 
   useEffect(() => {
@@ -101,35 +100,11 @@ export default function ClassNotesEnhanced() {
         padding: 20,
         fontFamily: "Inter, system-ui",
         position: "relative",
-        overflow: "hidden",
         background: "#0b1220",
         color: "#e6eef8",
       }}
       data-theme="dark"
     >
-      <style>{`
-        [data-theme="dark"] { background:#0b1220; color:#e6eef8; }
-
-        .wave {
-          position:absolute;
-          width:200%;
-          height:150px;
-          left:-50%;
-          background:rgba(255,255,255,0.3);
-          border-radius:100%;
-          animation:drift 6s infinite linear;
-          z-index:0;
-        }
-        .wave1 { bottom:0; animation-duration:8s; }
-        .wave2 { bottom:20px; opacity:.6; animation-duration:12s; }
-        .wave3 { bottom:40px; opacity:.4; animation-duration:16s; }
-
-        @keyframes drift {
-          from { transform:translateX(0) rotate(0deg); }
-          to { transform:translateX(50px) rotate(360deg); }
-        }
-      `}</style>
-
       {/* TOP BAR */}
       <h2 style={{ fontSize: 22, fontWeight: 700, marginBottom: 15 }}>
         Odia IT Training Hub — Class Notes
@@ -282,11 +257,7 @@ export default function ClassNotesEnhanced() {
         </div>
       )}
 
-      {/* WAVES + FOOTER */}
-      <div className="wave wave1"></div>
-      <div className="wave wave2"></div>
-      <div className="wave wave3"></div>
-
+      {/* FOOTER (NO WAVES) */}
       <footer
         style={{
           background: "#111827",
@@ -295,7 +266,6 @@ export default function ClassNotesEnhanced() {
           padding: "14px 0",
           marginTop: 40,
           position: "relative",
-          zIndex: 10,
         }}
       >
         © 2022 Odia IT Training Hub. All rights reserved.
