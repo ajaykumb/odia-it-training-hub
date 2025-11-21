@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 
-const CLIENT_ID = "1003811270380-b81a8a0j5mt6d8264rgqgf7dm561vde9.apps.googleusercontent.com";
-const REDIRECT_URI = "http://localhost:3000/class-note";
+const CLIENT_ID =
+  "1003811270380-b81a8a0j5mt6d8264rgqgf7dm561vde9.apps.googleusercontent.com";
+const REDIRECT_URI = "https://www.odiaittraininghub.in/class-notes";  // FIXED ✅
 
 const folders = [
   { id: "1GqgkVbMdi2rFdaPAqqtAWEq7Oe5hodZV", category: "SQL" },
@@ -17,7 +18,6 @@ export default function ClassNote() {
   const [filter, setFilter] = useState("All");
   const [previewLink, setPreviewLink] = useState(null);
 
-  // Check OAuth token from URL
   useEffect(() => {
     const hash = window.location.hash.slice(1);
     const params = new URLSearchParams(hash);
@@ -33,13 +33,11 @@ export default function ClassNote() {
     }
   }, []);
 
-  // Google Login
   const handleLogin = () => {
     const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=token&scope=https://www.googleapis.com/auth/drive.readonly&include_granted_scopes=true`;
     window.location.href = authUrl;
   };
 
-  // Fetch files from Google Drive
   useEffect(() => {
     if (!accessToken) return;
 
@@ -55,9 +53,6 @@ export default function ClassNote() {
           });
 
           const data = await res.json();
-
-          console.log("Fetching folder:", folder.category);
-          console.log("Drive response:", data);
 
           if (!data.files) continue;
 
@@ -104,7 +99,6 @@ export default function ClassNote() {
     <main className="min-h-screen bg-gray-100 p-10 flex flex-col">
       <h1 className="text-3xl font-bold text-blue-700 mb-6">Class Notes</h1>
 
-      {/* Search & Filter */}
       <div className="flex flex-col md:flex-row gap-4 mb-6">
         <input
           type="text"
@@ -127,7 +121,6 @@ export default function ClassNote() {
         </select>
       </div>
 
-      {/* Notes */}
       <div className="grid md:grid-cols-3 gap-6 flex-1">
         {filteredNotes.length === 0 && (
           <p className="text-center col-span-3 text-gray-600 text-xl">
@@ -167,7 +160,6 @@ export default function ClassNote() {
         ))}
       </div>
 
-      {/* Preview Modal */}
       {previewLink && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4">
           <div className="bg-white rounded-xl p-4 w-full max-w-4xl relative">
