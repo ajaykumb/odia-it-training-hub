@@ -1,8 +1,9 @@
 import React, { useEffect, useState, useMemo } from "react";
+import { useRouter } from "next/router";
 
 /**
  * ClassNotesEnhanced.jsx
- * Dark Mode Always Enabled — NO WAVING / NO ROTATION
+ * Dark Mode — with Date, File Size & Improved Sorting
  */
 
 const API_KEY = "AIzaSyABWqFjKWGLzeK-RyW_rrsSEdqc_EpAEK0";
@@ -14,7 +15,7 @@ const FOLDERS = [
   { id: "1Nxi5xpfGzmf_rWTibiCtunLjJDvaPw90", name: "Linux/Unix Note" },
 ];
 
-const LOCAL_FALLBACK_IMAGE = "/mnt/data/80e95f7b-41c9-4752-be4d-517be8a2daa8.png";
+const LOCAL_FALLBACK_IMAGE = "/fallback-thumb.png";
 
 function useDebounce(value, delay = 300) {
   const [v, setV] = useState(value);
@@ -25,11 +26,29 @@ function useDebounce(value, delay = 300) {
   return v;
 }
 
+// Format File Size
+function formatSize(bytes) {
+  if (!bytes) return "—";
+  const kb = bytes / 1024;
+  const mb = kb / 1024;
+  if (mb >= 1) return `${mb.toFixed(2)} MB`;
+  return `${kb.toFixed(0)} KB`;
+}
+
+// Format Date
+function formatDate(d) {
+  if (!d) return "—";
+  return new Date(d).toLocaleDateString("en-IN", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+}
+
 function fileTypeIcon(mime) {
   if (!mime) return "📄";
   if (mime.includes("pdf")) return "📄";
-  if (mime.includes("word") || mime.includes("msword") || mime.includes("officedocument"))
-    return "📝";
+  if (mime.includes("word")) return "📝";
   if (mime.includes("image")) return "🖼️";
   if (mime.includes("video")) return "🎬";
   if (mime.includes("spreadsheet")) return "📊";
@@ -37,6 +56,8 @@ function fileTypeIcon(mime) {
 }
 
 export default function ClassNotesEnhanced() {
+  const router = useRouter();
+
   const [activeFolder, setActiveFolder] = useState(FOLDERS[0].id);
   const [files, setFiles] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -48,16 +69,16 @@ export default function ClassNotesEnhanced() {
   const [sortBy, setSortBy] = useState("newest");
   const [previewFile, setPreviewFile] = useState(null);
 
-  const darkMode = true;
-
   useEffect(() => {
     let canceled = false;
+
     async function load() {
       setLoading(true);
       setError(null);
       setFiles([]);
+
       try {
-        const url = `https://www.googleapis.com/drive/v3/files?q='${activeFolder}'+in+parents+and+trashed=false&key=${API_KEY}&fields=files(id,name,mimeType,webViewLink,webContentLink,thumbnailLink,createdTime)&pageSize=500`;
+        const url = `https://www.googleapis.com/drive/v3/files?q='${activeFolder}'+in+parents+and+trashed=false&key=${API_KEY}&fields=files(id,name,mimeType,webViewLink,webContentLink,thumbnailLink,createdTime,size)&pageSize=500`;
 
         const res = await fetch(url);
         if (!res.ok) throw new Error(`Drive API error ${res.status}`);
@@ -72,10 +93,12 @@ export default function ClassNotesEnhanced() {
         if (!canceled) setLoading(false);
       }
     }
+
     load();
     return () => (canceled = true);
   }, [activeFolder]);
 
+  // FILTER + SORT
   const filtered = useMemo(() => {
     const lower = q.trim().toLowerCase();
     let list = files.filter((f) => f.name?.toLowerCase().includes(lower));
@@ -83,7 +106,12 @@ export default function ClassNotesEnhanced() {
     if (sortBy === "name") list.sort((a, b) => a.name.localeCompare(b.name));
     else if (sortBy === "newest")
       list.sort((a, b) => (b.createdTime || "").localeCompare(a.createdTime || ""));
-    else list.sort((a, b) => (a.createdTime || "").localeCompare(b.createdTime || ""));
+    else if (sortBy === "oldest")
+      list.sort((a, b) => (a.createdTime || "").localeCompare(b.createdTime || ""));
+    else if (sortBy === "size-big")
+      list.sort((a, b) => (b.size || 0) - (a.size || 0));
+    else if (sortBy === "size-small")
+      list.sort((a, b) => (a.size || 0) - (b.size || 0));
 
     return list;
   }, [files, q, sortBy]);
@@ -99,18 +127,31 @@ export default function ClassNotesEnhanced() {
       style={{
         padding: 20,
         fontFamily: "Inter, system-ui",
-        position: "relative",
         background: "#0b1220",
         color: "#e6eef8",
       }}
-      data-theme="dark"
     >
-      {/* TOP BAR */}
+      {/* BACK BUTTON */}
+      <button
+        onClick={() => router.back()}
+        style={{
+          marginBottom: 15,
+          padding: "8px 14px",
+          background: "#374151",
+          border: "none",
+          color: "white",
+          borderRadius: 8,
+          cursor: "pointer",
+        }}
+      >
+        ← Back
+      </button>
+
       <h2 style={{ fontSize: 22, fontWeight: 700, marginBottom: 15 }}>
         Odia IT Training Hub — Class Notes
       </h2>
 
-      {/* FOLDER BUTTONS */}
+      {/* FOLDER SWITCH */}
       <div style={{ display: "flex", gap: 10, marginBottom: 20, flexWrap: "wrap" }}>
         {FOLDERS.map((f) => (
           <button
@@ -122,7 +163,6 @@ export default function ClassNotesEnhanced() {
               background: activeFolder === f.id ? "#0d6efd" : "#6c757d",
               color: "white",
               border: "none",
-              cursor: "pointer",
             }}
           >
             {f.name}
@@ -130,8 +170,8 @@ export default function ClassNotesEnhanced() {
         ))}
       </div>
 
-      {/* SEARCH + SORT */}
-      <div style={{ display: "flex", gap: 12, marginBottom: 18 }}>
+      {/* SEARCH & SORT */}
+      <div style={{ display: "flex", gap: 12, marginBottom: 18, flexWrap: "wrap" }}>
         <input
           placeholder="Search..."
           value={search}
@@ -159,6 +199,8 @@ export default function ClassNotesEnhanced() {
           <option value="newest">Newest</option>
           <option value="oldest">Oldest</option>
           <option value="name">Name (A–Z)</option>
+          <option value="size-big">Size: Big → Small</option>
+          <option value="size-small">Size: Small → Big</option>
         </select>
       </div>
 
@@ -172,7 +214,7 @@ export default function ClassNotesEnhanced() {
       >
         {loading
           ? Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} style={{ height: 220, background: "#1f2937", borderRadius: 10 }} />
+              <div key={i} style={{ height: 220, background: "#1f2937", borderRadius: 12 }} />
             ))
           : filtered.map((file) => (
               <div
@@ -180,8 +222,8 @@ export default function ClassNotesEnhanced() {
                 style={{
                   border: "1px solid #1f2937",
                   borderRadius: 12,
-                  overflow: "hidden",
                   background: "#071226",
+                  overflow: "hidden",
                 }}
               >
                 <img
@@ -192,8 +234,17 @@ export default function ClassNotesEnhanced() {
                 />
                 <div style={{ padding: 12 }}>
                   <b>{file.name}</b>
-                  <div style={{ fontSize: 12, opacity: 0.6 }}>
+
+                  <div style={{ fontSize: 12, opacity: 0.7, marginTop: 6 }}>
                     {fileTypeIcon(file.mimeType)} {file.mimeType}
+                  </div>
+
+                  <div style={{ fontSize: 12, opacity: 0.7 }}>
+                    📅 {formatDate(file.createdTime)}
+                  </div>
+
+                  <div style={{ fontSize: 12, opacity: 0.7 }}>
+                    📦 {formatSize(file.size)}
                   </div>
 
                   <button
@@ -241,7 +292,6 @@ export default function ClassNotesEnhanced() {
             alignItems: "center",
             justifyContent: "center",
             zIndex: 100,
-            padding: 20,
           }}
         >
           <div style={{ width: "90%", maxWidth: 900, background: "#fff", borderRadius: 10 }}>
@@ -257,7 +307,6 @@ export default function ClassNotesEnhanced() {
         </div>
       )}
 
-      {/* FOOTER (NO WAVES) */}
       <footer
         style={{
           background: "#111827",
@@ -265,10 +314,10 @@ export default function ClassNotesEnhanced() {
           textAlign: "center",
           padding: "14px 0",
           marginTop: 40,
-          position: "relative",
         }}
       >
         © 2022 Odia IT Training Hub. All rights reserved.
+          Note Shared by Ajay B.
       </footer>
     </div>
   );
