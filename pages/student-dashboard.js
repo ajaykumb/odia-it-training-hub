@@ -81,7 +81,7 @@ export default function StudentDashboard() {
         {/* Main Content Area */}
         <section className="flex-1 p-6 md:p-12">
           <h1 className="text-4xl font-bold text-white drop-shadow-lg mb-10">
-            Welcome to Your Dashboard
+            Welcome to Odia IT Training Hub Dashboard
           </h1>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
