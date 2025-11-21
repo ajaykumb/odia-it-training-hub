@@ -1,21 +1,78 @@
-[00:00:01.396] Server  LOG      ✓ Ready in 890ms
-[00:01:12.893] Server  LOG      ✓ Compiled in 91ms
-[00:01:21.150] Server  LOG      ✓ Compiled in 89ms
-[00:02:49.108] Server  LOG      ✓ Compiled in 101ms
-[00:03:00.017] Server  LOG      ✓ Compiled in 74ms
-[00:03:27.220] Server  LOG      ✓ Compiled in 70ms
-[00:03:57.473] Server  LOG      ✓ Compiled in 95ms
-[00:04:11.899] Server  LOG      ✓ Compiled in 80ms
-[00:04:29.840] Server  LOG      ✓ Compiled in 102ms
-[00:04:50.043] Server  LOG      ✓ Compiled in 62ms
-[00:04:58.940] Server  LOG      ✓ Compiled in 78ms
-[00:05:36.593] Server  LOG      ✓ Compiled in 74ms
-[00:05:45.737] Server  LOG      ✓ Compiled in 77ms
-[00:06:04.627] Server  LOG      ✓ Compiled in 130ms
-[00:06:06.094] Server  LOG      ✓ Compiled in 80ms
-[00:06:21.041] Server  LOG      ✓ Compiled in 61ms
-[00:06:33.253] Server  LOG      ✓ Compiled in 72ms
-[00:07:03.741] Server  LOG      ✓ Compiled in 84ms
-[00:07:11.397] Server  LOG      ✓ Compiled in 70ms
-[00:07:16.556] Server  LOG      ✓ Compiled in 71ms
-[00:07:28.773] Server  LOG      ✓ Compiled in 85ms
+[00:00:01.392] Server  LOG      ✓ Ready in 954ms
+[00:00:52.150] Browser ERROR   Signup error: permission-denied Missing or insufficient permissions.
+[00:01:34.215] Browser ERROR   Login error: permission-denied Missing or insufficient permissions.
+[00:03:17.630] Browser ERROR   Signup error: permission-denied Missing or insufficient permissions.
+[00:04:17.927] Browser ERROR   Signup error: auth/email-already-in-use Firebase: Error (auth/email-already-in-use).
+[00:04:40.336] Browser ERROR   Signup error: permission-denied Missing or insufficient permissions.
+[00:08:33.504] Server  LOG      ✓ Compiled in 84ms
+[00:09:05.007] Browser ERROR   Signup error: permission-denied Missing or insufficient permissions.
+[00:10:44.812] Server  LOG      ✓ Compiled in 88ms
+[00:15:55.672] Browser ERROR   Signup error: permission-denied Missing or insufficient permissions.
+[00:21:24.420] Browser ERROR   Signup error: permission-denied Missing or insufficient permissions.
+[00:30:54.637] Browser ERROR   Login error: auth/invalid-credential Firebase: Error (auth/invalid-credential).
+[00:38:45.138] Server  LOG      ✓ Compiled in 127ms
+[00:38:58.197] Server  LOG      ✓ Compiled in 87ms
+[00:39:33.313] Server  LOG      ✓ Compiled in 82ms
+[00:40:04.186] Server  LOG      ✓ Compiled in 88ms
+[00:44:54.725] Server  LOG      ✓ Compiled in 64ms
+[00:45:12.607] Server  LOG      ✓ Compiled in 66ms
+[00:45:38.225] Server  ERROR   C:\Users\SRJ\Documents\GitHub\odia-it-training-hub\node_modules\next\dist\server\dev\on-demand-entry-handler.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:45:38.230] Server  ERROR   C:\Users\SRJ\Documents\GitHub\odia-it-training-hub\node_modules\next\dist\server\dev\hot-reloader-turbopack.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:45:38.232] Server  ERROR   C:\Users\SRJ\Documents\GitHub\odia-it-training-hub\node_modules\next\dist\trace\trace.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:45:38.234] Server  ERROR   C:\Users\SRJ\Documents\GitHub\odia-it-training-hub\node_modules\next\dist\server\lib\router-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:45:38.236] Server  ERROR   C:\Users\SRJ\Documents\GitHub\odia-it-training-hub\node_modules\next\dist\server\lib\start-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:45:38.241] Server  ERROR   PageNotFoundError: Cannot find module for page: /admin-dashboard
+[00:49:01.194] Server  ERROR   C:\Users\SRJ\Documents\GitHub\odia-it-training-hub\node_modules\next\dist\compiled\next-server\pages-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:49:01.238] Server  ERROR   C:\Users\SRJ\Documents\GitHub\odia-it-training-hub\.next\dev\server\chunks\ssr\node_modules_193e298c._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:49:01.246] Server  ERROR   C:\Users\SRJ\Documents\GitHub\odia-it-training-hub\node_modules\next\dist\server\base-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:49:01.255] Server  ERROR   C:\Users\SRJ\Documents\GitHub\odia-it-training-hub\node_modules\next\dist\server\next-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:49:01.258] Server  ERROR   C:\Users\SRJ\Documents\GitHub\odia-it-training-hub\node_modules\next\dist\server\dev\next-dev-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:49:01.259] Server  ERROR   C:\Users\SRJ\Documents\GitHub\odia-it-training-hub\node_modules\next\dist\trace\trace.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:49:01.260] Server  ERROR   C:\Users\SRJ\Documents\GitHub\odia-it-training-hub\node_modules\next\dist\server\lib\router-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:49:01.261] Server  ERROR   C:\Users\SRJ\Documents\GitHub\odia-it-training-hub\node_modules\next\dist\server\lib\start-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:49:01.262] Server  ERROR    ⨯ Error: The default export is not a React Component in page: "/admin-dashboard"
+[00:49:01.265] Server  ERROR   C:\Users\SRJ\Documents\GitHub\odia-it-training-hub\node_modules\next\dist\compiled\next-server\pages-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:49:01.268] Server  ERROR   C:\Users\SRJ\Documents\GitHub\odia-it-training-hub\.next\dev\server\chunks\ssr\node_modules_193e298c._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:49:01.269] Server  ERROR   C:\Users\SRJ\Documents\GitHub\odia-it-training-hub\node_modules\next\dist\server\base-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:49:01.270] Server  ERROR   C:\Users\SRJ\Documents\GitHub\odia-it-training-hub\node_modules\next\dist\server\next-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:49:01.271] Server  ERROR   C:\Users\SRJ\Documents\GitHub\odia-it-training-hub\node_modules\next\dist\server\dev\next-dev-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:49:01.271] Server  ERROR   C:\Users\SRJ\Documents\GitHub\odia-it-training-hub\node_modules\next\dist\trace\trace.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:49:01.272] Server  ERROR   C:\Users\SRJ\Documents\GitHub\odia-it-training-hub\node_modules\next\dist\server\lib\router-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:49:01.272] Server  ERROR   C:\Users\SRJ\Documents\GitHub\odia-it-training-hub\node_modules\next\dist\server\lib\start-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:49:01.273] Server  ERROR    ⨯ Error: The default export is not a React Component in page: "/admin-dashboard"
+[00:49:01.739] Browser ERROR   uncaughtError: Error: The default export is not a React Component in page: "/admin-dashboard"
+[00:49:04.218] Server  LOG      ✓ Compiled in 123ms
+[00:49:45.294] Browser ERROR   Error fetching pending students: {"code":"permission-denied","name":"FirebaseError"}
+[00:50:27.087] Browser LOG     
+        EMAIL SIMULATION: Sending welcome email to Somya Ranjan Jena (somyaranjan1637@gmail.com).
+        Message: Welcome! You have successfully signed up. Please wait for an administrator to approve your account before logging in.
+    
+[00:50:54.274] Browser LOG     
+        EMAIL SIMULATION: Sending approval confirmation to Somya Ranjan Jena (somyaranjan1637@gmail.com).
+        Message: Congratulations! Your account has been approved. You can now log in to the student dashboard.
+    
+[00:50:54.274] Browser LOG     Student rUMFL6Ga1NYHRtP3bJYObNi4e532 (Somya Ranjan Jena) approved successfully.
+[00:51:43.343] Browser ERROR   Error fetching pending students: {"code":"permission-denied","name":"FirebaseError"}
+[00:51:59.784] Browser LOG     
+        EMAIL SIMULATION: Sending welcome email to Somya Ranjan Jena (somyaranjan1637@gmail.com).
+        Message: Welcome! You have successfully signed up. Please wait for an administrator to approve your account before logging in.
+    
+[00:52:19.357] Browser ERROR   Error fetching pending students: {"code":"permission-denied","name":"FirebaseError"}
+[00:52:23.212] Browser ERROR   Error fetching pending students: {"code":"permission-denied","name":"FirebaseError"}
+[00:52:49.743] Browser ERROR   Error fetching pending students: {"code":"permission-denied","name":"FirebaseError"}
+[00:53:11.084] Browser ERROR   Error fetching pending students: {"code":"permission-denied","name":"FirebaseError"}
+[00:54:07.501] Browser LOG     
+        EMAIL SIMULATION: Sending welcome email to Julious Jena (soumyarangers@gmail.com).
+        Message: Welcome! You have successfully signed up. Please wait for an administrator to approve your account before logging in.
+    
+[00:54:48.173] Browser ERROR   Error fetching pending students: {"code":"permission-denied","name":"FirebaseError"}
+[00:54:55.026] Browser ERROR   Error approving student: {"code":"permission-denied","name":"FirebaseError"}
+[00:54:57.320] Browser ERROR   Error approving student: {"code":"permission-denied","name":"FirebaseError"}
+[00:55:26.992] Browser ERROR   Error approving student: {"code":"permission-denied","name":"FirebaseError"}
+[00:55:37.487] Browser ERROR   Error approving student: {"code":"permission-denied","name":"FirebaseError"}
+[00:57:25.891] Browser ERROR   Error approving student: {"code":"permission-denied","name":"FirebaseError"}
+[01:03:06.290] Server  LOG      ✓ Compiled in 104ms
+[01:03:08.170] Browser ERROR   Error fetching pending students: {"code":"permission-denied","name":"FirebaseError"}
+[01:03:35.420] Browser ERROR   Error fetching pending students: {"code":"permission-denied","name":"FirebaseError"}
+[01:03:40.949] Browser ERROR   Error fetching pending students: {"code":"permission-denied","name":"FirebaseError"}
+[01:03:42.931] Browser ERROR   Error fetching pending students: {"code":"permission-denied","name":"FirebaseError"}

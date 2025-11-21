@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
+    "firebase": "^12.6.0",
     "next": "latest",
     "nodemailer": "^6.9.0",
     "react": "latest",

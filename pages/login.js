@@ -1,28 +1,62 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore"; // Import getDoc
+import { auth, db } from "../utils/firebaseConfig"; 
 
 export default function Login() {
   const router = useRouter();
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState(""); 
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setError("");
+    setLoading(true);
 
-    const res = await fetch("/api/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password }),
-    });
+    try {
+      // 1. Authenticate the user
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
 
-    const data = await res.json();
+      // 2. Fetch user's approval status from Firestore
+      const studentDocRef = doc(db, "students", user.uid);
+      const studentDoc = await getDoc(studentDocRef);
+      
+      if (!studentDoc.exists()) {
+        // This case should ideally not happen if signup succeeded, but is a safe guard
+        throw new Error("User data not found in database."); 
+      }
 
-    if (data.success) {
+      const studentData = studentDoc.data();
+      
+      // 3. Check for approval status
+      if (!studentData.isApproved) {
+        // Redirect to pending page
+        router.push("/pending-approval");
+        return; // Stop execution
+      }
+
+      // 4. Success handling (Approved user)
       localStorage.setItem("studentToken", "VALID_USER");
       router.push("/student-dashboard");
-    } else {
-      setError("Invalid username or password");
+    } catch (err) {
+      console.error("Login error:", err.code, err.message);
+      let errorMessage = "Invalid Student ID or Password.";
+      
+      if (err.message && err.message.includes("User data not found")) {
+         errorMessage = "User data is incomplete. Please contact support.";
+      } else if (err.code === "auth/user-not-found" || err.code === "auth/wrong-password" || err.code === "auth/invalid-credential") {
+        errorMessage = "Invalid Student ID or Password.";
+      } else if (err.code === "auth/invalid-email") {
+        errorMessage = "Please enter a valid email address.";
+      }
+      
+      setError(errorMessage);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -50,13 +84,14 @@ export default function Login() {
         </p>
 
         <form onSubmit={handleLogin}>
-          <label className="text-gray-700 font-medium text-sm">Student ID</label>
+          <label className="text-gray-700 font-medium text-sm">Student ID (Email)</label>
           <input
-            type="text"
-            placeholder="Enter your Student ID"
+            type="email"
+            placeholder="Enter your registered email address"
             className="w-full p-3 border rounded mb-4"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
           />
 
           <label className="text-gray-700 font-medium text-sm">Password</label>
@@ -66,16 +101,28 @@ export default function Login() {
             className="w-full p-3 border rounded mb-4"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            required
           />
 
           {error && <p className="text-red-600 mb-3">{error}</p>}
 
           <button
-            className="w-full bg-blue-600 text-white py-3 rounded hover:bg-blue-700 transition text-lg font-semibold"
+            className={`w-full text-white py-3 rounded transition text-lg font-semibold ${
+                loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
+            }`}
+            disabled={loading}
           >
-            Login
+            {loading ? 'Logging In...' : 'Login'}
           </button>
         </form>
+
+        {/* New Signup Link */}
+        <p className="text-center text-gray-600 mt-4 text-sm">
+            Don't have an account? 
+            <a href="/signup" className="text-blue-700 font-semibold ml-1 hover:underline">
+                Sign Up Now
+            </a>
+        </p>
 
         {/* Footer */}
         <p className="text-center text-gray-500 text-xs mt-6">
