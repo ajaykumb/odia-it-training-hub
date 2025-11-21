@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-const API_KEY = "AIzaSyABWqFjKWGLzeK-RyW_rrsSEcdqc_EpAEK0";
+const API_KEY = "AIzaSyABWqFjKWGLzeK-RyW_rrsSEdqc_EpAEK0";
 
 // Your folder list
 const FOLDERS = [
