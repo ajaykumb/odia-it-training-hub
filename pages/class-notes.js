@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 const CLIENT_ID = "1003811270380-b81a8a0j5mt6d8264rgqgf7dm561vde9.apps.googleusercontent.com";
-const REDIRECT_URI = "http://localhost:3000/class-note"; // update for production
+const REDIRECT_URI = "http://localhost:3000/class-note";
 
 const folders = [
   { id: "1GqgkVbMdi2rFdaPAqqtAWEq7Oe5hodZV", category: "SQL" },
@@ -17,7 +17,7 @@ export default function ClassNote() {
   const [filter, setFilter] = useState("All");
   const [previewLink, setPreviewLink] = useState(null);
 
-  // Check URL for OAuth token
+  // Check OAuth token from URL
   useEffect(() => {
     const hash = window.location.hash.slice(1);
     const params = new URLSearchParams(hash);
@@ -28,32 +28,37 @@ export default function ClassNote() {
       setAccessToken(token);
       window.location.hash = "";
     } else {
-      const savedToken = localStorage.getItem("accessToken");
-      if (savedToken) setAccessToken(savedToken);
+      const saved = localStorage.getItem("accessToken");
+      if (saved) setAccessToken(saved);
     }
   }, []);
 
-  // Trigger Google login
+  // Google Login
   const handleLogin = () => {
     const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=token&scope=https://www.googleapis.com/auth/drive.readonly&include_granted_scopes=true`;
     window.location.href = authUrl;
   };
 
-  // Fetch Drive files
+  // Fetch files from Google Drive
   useEffect(() => {
     if (!accessToken) return;
 
     const fetchNotes = async () => {
       const allNotes = [];
+
       for (const folder of folders) {
         try {
-          const res = await fetch(
-            `https://www.googleapis.com/drive/v3/files?q='${folder.id}'+in+parents and trashed=false&fields=files(id,name,createdTime)&pageSize=100&supportsAllDrives=true&includeItemsFromAllDrives=true`,
-            {
-              headers: { Authorization: `Bearer ${accessToken}` },
-            }
-          );
+          const url = `https://www.googleapis.com/drive/v3/files?q='${folder.id}'+in+parents and trashed=false&fields=files(id,name,createdTime)&pageSize=100&supportsAllDrives=true&includeItemsFromAllDrives=true&corpora=allDrives`;
+
+          const res = await fetch(url, {
+            headers: { Authorization: `Bearer ${accessToken}` },
+          });
+
           const data = await res.json();
+
+          console.log("Fetching folder:", folder.category);
+          console.log("Drive response:", data);
+
           if (!data.files) continue;
 
           data.files.forEach((file) => {
@@ -70,6 +75,7 @@ export default function ClassNote() {
           console.error("Error fetching notes:", err);
         }
       }
+
       setNotesList(allNotes);
     };
 
@@ -98,8 +104,8 @@ export default function ClassNote() {
     <main className="min-h-screen bg-gray-100 p-10 flex flex-col">
       <h1 className="text-3xl font-bold text-blue-700 mb-6">Class Notes</h1>
 
-      {/* Search + Filter */}
-      <div className="flex flex-col md:flex-row md:items-center gap-4 mb-6">
+      {/* Search & Filter */}
+      <div className="flex flex-col md:flex-row gap-4 mb-6">
         <input
           type="text"
           placeholder="Search notes..."
@@ -107,6 +113,7 @@ export default function ClassNote() {
           onChange={(e) => setSearch(e.target.value)}
           className="px-4 py-2 border rounded-lg shadow"
         />
+
         <select
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
@@ -120,13 +127,14 @@ export default function ClassNote() {
         </select>
       </div>
 
-      {/* Notes Grid */}
+      {/* Notes */}
       <div className="grid md:grid-cols-3 gap-6 flex-1">
         {filteredNotes.length === 0 && (
           <p className="text-center col-span-3 text-gray-600 text-xl">
             No notes found.
           </p>
         )}
+
         {filteredNotes.map((note, i) => (
           <div key={i} className="bg-white p-5 rounded-xl shadow border">
             <img
@@ -134,9 +142,11 @@ export default function ClassNote() {
               alt="thumbnail"
               className="w-full h-40 object-cover rounded mb-3"
             />
+
             <h3 className="text-xl font-semibold">{note.title}</h3>
             <p className="text-gray-600 text-sm">Category: {note.category}</p>
             <p className="text-gray-600 text-sm">Date: {note.date}</p>
+
             <div className="flex gap-3 mt-4">
               <button
                 onClick={() => setPreviewLink(note.preview)}
@@ -144,6 +154,7 @@ export default function ClassNote() {
               >
                 View
               </button>
+
               <a
                 href={note.link}
                 target="_blank"
@@ -166,6 +177,7 @@ export default function ClassNote() {
             >
               X
             </button>
+
             <iframe src={previewLink} className="w-full h-[70vh] rounded" />
           </div>
         </div>
