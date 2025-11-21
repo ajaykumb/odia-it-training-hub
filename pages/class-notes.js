@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useMemo } from "react";
 
 /**
- * ClassNotesEnhanced.jsx — Updated with FOOTER + WAVES ANIMATION
+ * ClassNotesEnhanced.jsx
  */
 
 const API_KEY = "AIzaSyABWqFjKWGLzeK-RyW_rrsSEdqc_EpAEK0";
@@ -50,7 +50,7 @@ export default function ClassNotesEnhanced() {
   const [darkMode, setDarkMode] = useState(() => {
     try {
       return localStorage.getItem("classnotes:dark") === "1";
-    } catch {
+    } catch (e) {
       return false;
     }
   });
@@ -58,38 +58,31 @@ export default function ClassNotesEnhanced() {
   useEffect(() => {
     try {
       localStorage.setItem("classnotes:dark", darkMode ? "1" : "0");
-    } catch {}
+    } catch (e) {}
   }, [darkMode]);
 
   useEffect(() => {
     let canceled = false;
-
     async function load() {
       setLoading(true);
       setError(null);
       setFiles([]);
-
       try {
         const url = `https://www.googleapis.com/drive/v3/files?q='${activeFolder}'+in+parents+and+trashed=false&key=${API_KEY}&fields=files(id,name,mimeType,webViewLink,webContentLink,thumbnailLink,createdTime)&pageSize=500`;
-        const res = await fetch(url);
 
+        const res = await fetch(url);
         if (!res.ok) throw new Error(`Drive API error ${res.status}`);
 
         const data = await res.json();
         if (canceled) return;
 
-        setFiles(
-          (data.files || []).map((f) => ({
-            ...f,
-          }))
-        );
+        setFiles(data.files || []);
       } catch (err) {
         setError(err.message);
       } finally {
         if (!canceled) setLoading(false);
       }
     }
-
     load();
     return () => (canceled = true);
   }, [activeFolder]);
@@ -116,24 +109,16 @@ export default function ClassNotesEnhanced() {
     <div
       style={{
         padding: 20,
-        fontFamily:
-          "Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial",
+        fontFamily: "Inter, system-ui",
         position: "relative",
         overflow: "hidden",
       }}
       data-theme={darkMode ? "dark" : "light"}
     >
-      {/* all your styling */}
       <style>{`
         [data-theme="dark"] { background:#0b1220; color:#e6eef8; }
-        .card { border:1px solid #e6e9ee; border-radius:12px; background:#fff; }
-        .card:hover { transform:scale(1.01); }
-        .thumb { width:100%; height:160px; object-fit:cover; }
-        .folder-btn { padding:10px 16px; border-radius:10px; cursor:pointer; font-weight:600; }
-        .active { background:#0d6efd; color:#fff; }
-        .inactive { background:#6c757d; color:white; }
 
-        /* ==== Waves Animation (added) ==== */
+        /* Waves Animation */
         .wave {
           position:absolute;
           width:200%;
@@ -149,22 +134,171 @@ export default function ClassNotesEnhanced() {
         .wave3 { bottom:40px; opacity:.4; animation-duration:16s; }
 
         @keyframes drift {
-          from { transform:translateX(0) rotate(0); }
+          from { transform:translateX(0) rotate(0deg); }
           to { transform:translateX(50px) rotate(360deg); }
         }
       `}</style>
 
-      {/* all your UI (folders, grid, modal etc.) */}
-      {/* ... unchanged code ... */}
+      {/* ------------------ TOP BAR ------------------ */}
+      <h2 style={{ fontSize: 22, fontWeight: 700, marginBottom: 15 }}>
+        Odia IT Training Hub — Class Notes
+      </h2>
 
-      {/* ==== FOOTER + WAVES ADDED HERE ==== */}
+      <label style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 20 }}>
+        <input type="checkbox" checked={darkMode} onChange={(e) => setDarkMode(e.target.checked)} />
+        Dark Mode
+      </label>
+
+      {/* ------------------ FOLDERS ------------------ */}
+      <div style={{ display: "flex", gap: 10, marginBottom: 20, flexWrap: "wrap" }}>
+        {FOLDERS.map((f) => (
+          <button
+            key={f.id}
+            onClick={() => setActiveFolder(f.id)}
+            style={{
+              padding: "10px 16px",
+              borderRadius: 10,
+              background: activeFolder === f.id ? "#0d6efd" : "#6c757d",
+              color: "white",
+              border: "none",
+              cursor: "pointer",
+            }}
+          >
+            {f.name}
+          </button>
+        ))}
+      </div>
+
+      {/* ------------------ SEARCH + SORT ------------------ */}
+      <div style={{ display: "flex", gap: 12, marginBottom: 18 }}>
+        <input
+          placeholder="Search..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          style={{ padding: 8, borderRadius: 8, border: "1px solid #ddd" }}
+        />
+
+        <select
+          value={sortBy}
+          onChange={(e) => setSortBy(e.target.value)}
+          style={{ padding: 8, borderRadius: 8, border: "1px solid #ddd" }}
+        >
+          <option value="newest">Newest</option>
+          <option value="oldest">Oldest</option>
+          <option value="name">Name (A–Z)</option>
+        </select>
+      </div>
+
+      {/* ------------------ GRID ------------------ */}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))",
+          gap: 18,
+        }}
+      >
+        {loading
+          ? Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} style={{ height: 220, background: "#eee", borderRadius: 10 }} />
+            ))
+          : filtered.map((file) => (
+              <div
+                key={file.id}
+                style={{
+                  border: "1px solid #e6e9ee",
+                  borderRadius: 12,
+                  overflow: "hidden",
+                  background: darkMode ? "#071226" : "#fff",
+                }}
+              >
+                <img
+                  src={thumbOrFallback(file)}
+                  alt={file.name}
+                  style={{ width: "100%", height: 160, objectFit: "cover" }}
+                  onError={(e) => (e.currentTarget.src = LOCAL_FALLBACK_IMAGE)}
+                />
+                <div style={{ padding: 12 }}>
+                  <b>{file.name}</b>
+                  <div style={{ fontSize: 12, opacity: 0.6 }}>
+                    {fileTypeIcon(file.mimeType)} {file.mimeType}
+                  </div>
+
+                  <button
+                    onClick={() => setPreviewFile(file)}
+                    style={{
+                      marginTop: 10,
+                      padding: "8px 12px",
+                      borderRadius: 8,
+                      background: "#0d6efd",
+                      color: "white",
+                      border: "none",
+                    }}
+                  >
+                    Preview
+                  </button>
+
+                  <a
+                    href={file.webContentLink || file.webViewLink}
+                    target="_blank"
+                    rel="noreferrer"
+                    style={{
+                      marginLeft: 10,
+                      padding: "8px 12px",
+                      borderRadius: 8,
+                      background: "#10b981",
+                      color: "white",
+                      textDecoration: "none",
+                    }}
+                  >
+                    Open
+                  </a>
+                </div>
+              </div>
+            ))}
+      </div>
+
+      {/* ------------------ PREVIEW MODAL ------------------ */}
+      {previewFile && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.7)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 100,
+            padding: 20,
+          }}
+        >
+          <div style={{ width: "90%", maxWidth: 900, background: "#fff", borderRadius: 10 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", padding: 10 }}>
+              <b>{previewFile.name}</b>
+              <button onClick={() => setPreviewFile(null)}>Close</button>
+            </div>
+            <iframe
+              src={previewFile.webViewLink}
+              style={{ width: "100%", height: "70vh", border: "none" }}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* ------------------ WAVES + FOOTER (ADDED) ------------------ */}
       <div className="wave wave1"></div>
       <div className="wave wave2"></div>
       <div className="wave wave3"></div>
 
       <footer
-        className="bg-gray-900 text-gray-300 text-center py-6"
-        style={{ marginTop: 40, position: "relative", zIndex: 10 }}
+        style={{
+          background: "#111827",
+          color: "#ccc",
+          textAlign: "center",
+          padding: "14px 0",
+          marginTop: 40,
+          position: "relative",
+          zIndex: 10,
+        }}
       >
         © 2022 Odia IT Training Hub. All rights reserved.
       </footer>
