@@ -1,190 +1,126 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
-const CLIENT_ID =
-  "1003811270380-b81a8a0j5mt6d8264rgqgf7dm561vde9.apps.googleusercontent.com";
+const API_KEY = "AIzaSyABWqFjKWGLzeK-RyW_rrsSEcdqc_EpAEK0";
 
-const REDIRECT_URI = "https://www.odiaittraininghub.in/class-notes"; // Correct
-
-const folders = [
-  { id: "1GqgkVbMdi2rFdaPAqqtAWEq7Oe5hodZV", category: "SQL" },
-  { id: "1Nxi5xpfGzmf_rWTibiCtunLjJDvaPw90", category: "Linux" },
-  { id: "17suGKdJr8phfH0F5EHF1znRUdGfPnt5K", category: "PL/SQL" },
-  { id: "1s_FpZdXhydo-zlUklhUW5Fpj1xm6kF1s", category: "Project" },
+// Your folder list
+const FOLDERS = [
+  { id: "1GqgkVbMdi2rFdaPAqqtAWEq7Oe5hodZV", name: "Folder 1" },
+  { id: "1s_FpZdXhydo-zlUklhUW5Fpj1xm6kF1s", name: "Folder 2" },
+  { id: "17suGKdJr8phfH0F5EHF1znRUdGfPnt5K", name: "Folder 3" },
+  { id: "1Nxi5xpfGzmf_rWTibiCtunLjJDvaPw90", name: "Folder 4" },
 ];
 
-export default function ClassNote() {
-  const [accessToken, setAccessToken] = useState(null);
-  const [notesList, setNotesList] = useState([]);
-  const [search, setSearch] = useState("");
-  const [filter, setFilter] = useState("All");
-  const [previewLink, setPreviewLink] = useState(null);
+export default function ClassNotes() {
+  const [files, setFiles] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [activeFolder, setActiveFolder] = useState(FOLDERS[0].id);
 
-  // Extract access token from redirect URL
-  useEffect(() => {
-    const hash = window.location.hash.slice(1);
-    const params = new URLSearchParams(hash);
-    const token = params.get("access_token");
+  const loadDriveFiles = async (folderId) => {
+    setLoading(true);
 
-    if (token) {
-      localStorage.setItem("accessToken", token);
-      setAccessToken(token);
-      window.location.hash = "";
-    } else {
-      const saved = localStorage.getItem("accessToken");
-      if (saved) setAccessToken(saved);
+    try {
+      const response = await fetch(
+        `https://www.googleapis.com/drive/v3/files?q='${folderId}'+in+parents&key=${API_KEY}&fields=files(id,name,mimeType,webViewLink,webContentLink,thumbnailLink)`
+      );
+
+      const data = await response.json();
+      setFiles(data.files || []);
+    } catch (error) {
+      console.error("Error loading files:", error);
     }
-  }, []);
 
-  // LOGIN FIXED (encoded redirect_uri)
-  const handleLogin = () => {
-    const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(
-      REDIRECT_URI
-    )}&response_type=token&scope=https://www.googleapis.com/auth/drive.readonly&include_granted_scopes=true`;
-
-    window.location.href = authUrl;
+    setLoading(false);
   };
 
-  // Fetch notes after login
   useEffect(() => {
-    if (!accessToken) return;
-
-    const fetchNotes = async () => {
-      const allNotes = [];
-
-      for (const folder of folders) {
-        try {
-          const url = `https://www.googleapis.com/drive/v3/files?q='${folder.id}'+in+parents and trashed=false&fields=files(id,name,createdTime)&pageSize=100&supportsAllDrives=true&includeItemsFromAllDrives=true&corpora=allDrives`;
-
-          const res = await fetch(url, {
-            headers: { Authorization: `Bearer ${accessToken}` },
-          });
-
-          const data = await res.json();
-          if (!data.files) continue;
-
-          data.files.forEach((file) => {
-            allNotes.push({
-              title: file.name,
-              category: folder.category,
-              link: `https://drive.google.com/file/d/${file.id}/view`,
-              preview: `https://drive.google.com/file/d/${file.id}/preview`,
-              thumbnail: `https://drive.google.com/thumbnail?id=${file.id}`,
-              date: new Date(file.createdTime).toLocaleDateString(),
-            });
-          });
-        } catch (err) {
-          console.error("Error fetching notes:", err);
-        }
-      }
-
-      setNotesList(allNotes);
-    };
-
-    fetchNotes();
-  }, [accessToken]);
-
-  const filteredNotes = notesList.filter(
-    (n) =>
-      (filter === "All" || n.category === filter) &&
-      n.title.toLowerCase().includes(search.toLowerCase())
-  );
-
-  // Login screen
-  if (!accessToken)
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <button
-          onClick={handleLogin}
-          className="bg-blue-600 text-white px-6 py-3 rounded-lg"
-        >
-          Login with Google Drive
-        </button>
-      </div>
-    );
+    loadDriveFiles(activeFolder);
+  }, [activeFolder]);
 
   return (
-    <main className="min-h-screen bg-gray-100 p-10 flex flex-col">
-      <h1 className="text-3xl font-bold text-blue-700 mb-6">Class Notes</h1>
+    <div style={{ padding: "20px" }}>
+      <h2 style={{ marginBottom: "20px" }}>Class Notes</h2>
 
-      <div className="flex flex-col md:flex-row gap-4 mb-6">
-        <input
-          type="text"
-          placeholder="Search notes..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="px-4 py-2 border rounded-lg shadow"
-        />
-
-        <select
-          value={filter}
-          onChange={(e) => setFilter(e.target.value)}
-          className="px-4 py-2 border rounded-lg shadow"
-        >
-          <option>All</option>
-          <option>Linux</option>
-          <option>SQL</option>
-          <option>PL/SQL</option>
-          <option>Project</option>
-        </select>
-      </div>
-
-      <div className="grid md:grid-cols-3 gap-6 flex-1">
-        {filteredNotes.length === 0 && (
-          <p className="text-center col-span-3 text-gray-600 text-xl">
-            No notes found.
-          </p>
-        )}
-
-        {filteredNotes.map((note, i) => (
-          <div key={i} className="bg-white p-5 rounded-xl shadow border">
-            <img
-              src={note.thumbnail}
-              alt="thumbnail"
-              className="w-full h-40 object-cover rounded mb-3"
-            />
-
-            <h3 className="text-xl font-semibold">{note.title}</h3>
-            <p className="text-gray-600 text-sm">Category: {note.category}</p>
-            <p className="text-gray-600 text-sm">Date: {note.date}</p>
-
-            <div className="flex gap-3 mt-4">
-              <button
-                onClick={() => setPreviewLink(note.preview)}
-                className="bg-blue-600 text-white px-3 py-2 rounded-lg"
-              >
-                View
-              </button>
-
-              <a
-                href={note.link}
-                target="_blank"
-                className="bg-green-600 text-white px-3 py-2 rounded-lg"
-              >
-                Download
-              </a>
-            </div>
-          </div>
+      {/* Folder Buttons */}
+      <div style={{ marginBottom: "25px", display: "flex", gap: "10px" }}>
+        {FOLDERS.map((folder) => (
+          <button
+            key={folder.id}
+            onClick={() => setActiveFolder(folder.id)}
+            style={{
+              padding: "10px 20px",
+              borderRadius: "5px",
+              border: "none",
+              background:
+                activeFolder === folder.id ? "#007bff" : "#6c757d",
+              color: "white",
+              cursor: "pointer",
+            }}
+          >
+            {folder.name}
+          </button>
         ))}
       </div>
 
-      {previewLink && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl p-4 w-full max-w-4xl relative">
-            <button
-              onClick={() => setPreviewLink(null)}
-              className="absolute top-2 right-2 text-white bg-red-600 px-3 py-1 rounded"
+      {loading && <p>Loading files...</p>}
+
+      {!loading && files.length === 0 && <p>No files found.</p>}
+
+      {/* File Cards */}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))",
+          gap: "20px",
+        }}
+      >
+        {files.map((file) => (
+          <div
+            key={file.id}
+            style={{
+              border: "1px solid #ddd",
+              padding: "15px",
+              borderRadius: "10px",
+              background: "#fafafa",
+              textAlign: "center",
+            }}
+          >
+            <img
+              src={
+                file.thumbnailLink ||
+                "https://via.placeholder.com/150?text=No+Preview"
+              }
+              alt={file.name}
+              style={{
+                width: "100%",
+                height: "160px",
+                objectFit: "cover",
+                borderRadius: "8px",
+              }}
+            />
+
+            <h4 style={{ marginTop: "10px", fontSize: "16px" }}>
+              {file.name}
+            </h4>
+
+            <a
+              href={file.webContentLink || file.webViewLink}
+              target="_blank"
+              rel="noreferrer"
+              style={{
+                marginTop: "10px",
+                display: "inline-block",
+                padding: "10px 15px",
+                background: "#007bff",
+                color: "white",
+                borderRadius: "5px",
+                textDecoration: "none",
+              }}
             >
-              X
-            </button>
-
-            <iframe src={previewLink} className="w-full h-[70vh] rounded" />
+              Open File
+            </a>
           </div>
-        </div>
-      )}
-
-      <footer className="bg-gray-800 text-gray-300 text-center py-6 mt-10">
-        © 2025 Odia IT Training Hub. All rights reserved.
-      </footer>
-    </main>
+        ))}
+      </div>
+    </div>
   );
 }
