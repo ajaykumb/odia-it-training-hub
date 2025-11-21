@@ -4,10 +4,10 @@ const API_KEY = "AIzaSyABWqFjKWGLzeK-RyW_rrsSEdqc_EpAEK0";
 
 // Your folder list
 const FOLDERS = [
-  { id: "1GqgkVbMdi2rFdaPAqqtAWEq7Oe5hodZV", name: "Folder 1" },
-  { id: "1s_FpZdXhydo-zlUklhUW5Fpj1xm6kF1s", name: "Folder 2" },
-  { id: "17suGKdJr8phfH0F5EHF1znRUdGfPnt5K", name: "Folder 3" },
-  { id: "1Nxi5xpfGzmf_rWTibiCtunLjJDvaPw90", name: "Folder 4" },
+  { id: "1GqgkVbMdi2rFdaPAqqtAWEq7Oe5hodZV", name: "Project Note" },
+  { id: "1s_FpZdXhydo-zlUklhUW5Fpj1xm6kF1s", name: "SQL Note" },
+  { id: "17suGKdJr8phfH0F5EHF1znRUdGfPnt5K", name: "Linux/Unix Note" },
+  { id: "1Nxi5xpfGzmf_rWTibiCtunLjJDvaPw90", name: "PL/SQL Note" },
 ];
 
 export default function ClassNotes() {
@@ -38,7 +38,7 @@ export default function ClassNotes() {
 
   return (
     <div style={{ padding: "20px" }}>
-      <h2 style={{ marginBottom: "20px" }}>Class Notes</h2>
+      <h2 style={{ marginBottom: "20px" }}>Odia IT Training Hub All Class Notes</h2>
 
       {/* Folder Buttons */}
       <div style={{ marginBottom: "25px", display: "flex", gap: "10px" }}>
