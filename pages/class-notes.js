@@ -2,15 +2,16 @@ import React, { useEffect, useState, useMemo } from "react";
 
 /**
  * ClassNotesEnhanced.jsx
+ * Dark Mode Always Enabled
  */
 
 const API_KEY = "AIzaSyABWqFjKWGLzeK-RyW_rrsSEdqc_EpAEK0";
 
 const FOLDERS = [
-  { id: "1s_FpZdXhydo-zlUklhUW5Fpj1xm6kF1s", name: "SQL Note" },
-  { id: "1GqgkVbMdi2rFdaPAqqtAWEq7Oe5hodZV", name: "Project Note" },
-  { id: "17suGKdJr8phfH0F5EHF1znRUdGfPnt5K", name: "Linux/Unix Note" },
-  { id: "1Nxi5xpfGzmf_rWTibiCtunLjJDvaPw90", name: "PL/SQL Note" },
+  { id: "1s_FpZdXhydo-zlUklhUW5Fpj1xm6kF1s", name: "Project Note" },
+  { id: "1GqgkVbMdi2rFdaPAqqtAWEq7Oe5hodZV", name: "SQL Note" },
+  { id: "17suGKdJr8phfH0F5EHF1znRUdGfPnt5K", name: "PL/SQL Note" },
+  { id: "1Nxi5xpfGzmf_rWTibiCtunLjJDvaPw90", name: "Linux/Unix Note" },
 ];
 
 const LOCAL_FALLBACK_IMAGE = "/mnt/data/80e95f7b-41c9-4752-be4d-517be8a2daa8.png";
@@ -47,19 +48,8 @@ export default function ClassNotesEnhanced() {
   const [sortBy, setSortBy] = useState("newest");
   const [previewFile, setPreviewFile] = useState(null);
 
-  const [darkMode, setDarkMode] = useState(() => {
-    try {
-      return localStorage.getItem("classnotes:dark") === "1";
-    } catch (e) {
-      return false;
-    }
-  });
-
-  useEffect(() => {
-    try {
-      localStorage.setItem("classnotes:dark", darkMode ? "1" : "0");
-    } catch (e) {}
-  }, [darkMode]);
+  // 🔥 Dark mode always on
+  const darkMode = true;
 
   useEffect(() => {
     let canceled = false;
@@ -112,13 +102,14 @@ export default function ClassNotesEnhanced() {
         fontFamily: "Inter, system-ui",
         position: "relative",
         overflow: "hidden",
+        background: "#0b1220",
+        color: "#e6eef8",
       }}
-      data-theme={darkMode ? "dark" : "light"}
+      data-theme="dark"
     >
       <style>{`
         [data-theme="dark"] { background:#0b1220; color:#e6eef8; }
 
-        /* Waves Animation */
         .wave {
           position:absolute;
           width:200%;
@@ -139,17 +130,12 @@ export default function ClassNotesEnhanced() {
         }
       `}</style>
 
-      {/* ------------------ TOP BAR ------------------ */}
+      {/* TOP BAR */}
       <h2 style={{ fontSize: 22, fontWeight: 700, marginBottom: 15 }}>
         Odia IT Training Hub — Class Notes
       </h2>
 
-      <label style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 20 }}>
-        <input type="checkbox" checked={darkMode} onChange={(e) => setDarkMode(e.target.checked)} />
-        Dark Mode
-      </label>
-
-      {/* ------------------ FOLDERS ------------------ */}
+      {/* FOLDER BUTTONS */}
       <div style={{ display: "flex", gap: 10, marginBottom: 20, flexWrap: "wrap" }}>
         {FOLDERS.map((f) => (
           <button
@@ -169,19 +155,31 @@ export default function ClassNotesEnhanced() {
         ))}
       </div>
 
-      {/* ------------------ SEARCH + SORT ------------------ */}
+      {/* SEARCH + SORT */}
       <div style={{ display: "flex", gap: 12, marginBottom: 18 }}>
         <input
           placeholder="Search..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          style={{ padding: 8, borderRadius: 8, border: "1px solid #ddd" }}
+          style={{
+            padding: 8,
+            borderRadius: 8,
+            border: "1px solid #333",
+            background: "#111827",
+            color: "white",
+          }}
         />
 
         <select
           value={sortBy}
           onChange={(e) => setSortBy(e.target.value)}
-          style={{ padding: 8, borderRadius: 8, border: "1px solid #ddd" }}
+          style={{
+            padding: 8,
+            borderRadius: 8,
+            border: "1px solid #333",
+            background: "#111827",
+            color: "white",
+          }}
         >
           <option value="newest">Newest</option>
           <option value="oldest">Oldest</option>
@@ -189,7 +187,7 @@ export default function ClassNotesEnhanced() {
         </select>
       </div>
 
-      {/* ------------------ GRID ------------------ */}
+      {/* GRID */}
       <div
         style={{
           display: "grid",
@@ -199,16 +197,16 @@ export default function ClassNotesEnhanced() {
       >
         {loading
           ? Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} style={{ height: 220, background: "#eee", borderRadius: 10 }} />
+              <div key={i} style={{ height: 220, background: "#1f2937", borderRadius: 10 }} />
             ))
           : filtered.map((file) => (
               <div
                 key={file.id}
                 style={{
-                  border: "1px solid #e6e9ee",
+                  border: "1px solid #1f2937",
                   borderRadius: 12,
                   overflow: "hidden",
-                  background: darkMode ? "#071226" : "#fff",
+                  background: "#071226",
                 }}
               >
                 <img
@@ -257,7 +255,7 @@ export default function ClassNotesEnhanced() {
             ))}
       </div>
 
-      {/* ------------------ PREVIEW MODAL ------------------ */}
+      {/* PREVIEW MODAL */}
       {previewFile && (
         <div
           style={{
@@ -284,7 +282,7 @@ export default function ClassNotesEnhanced() {
         </div>
       )}
 
-      {/* ------------------ WAVES + FOOTER (ADDED) ------------------ */}
+      {/* WAVES + FOOTER */}
       <div className="wave wave1"></div>
       <div className="wave wave2"></div>
       <div className="wave wave3"></div>
