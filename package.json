@@ -13,7 +13,8 @@
     "next": "latest",
     "nodemailer": "^6.9.0",
     "react": "latest",
-    "react-dom": "latest"
+    "react-dom": "latest",
+    "resend": "^3.0.0"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.18",
