@@ -117,12 +117,15 @@ export default function AllAnswers() {
 
             <hr className="my-3" />
 
-            {/* ✅ ANSWERS */}
-            <div className="space-y-2 mb-4">
-              <p><b>Q1:</b> {s.answers?.q1}</p>
-              <p><b>Q2:</b> {s.answers?.q2}</p>
-              <p><b>Q3:</b> {s.answers?.q3}</p>
-            </div>
+{/* ✅ ALL ANSWERS (DYNAMIC) */}
+<div className="space-y-2 mb-4">
+  {s.answers &&
+    Object.keys(s.answers).map((key, index) => (
+      <p key={key}>
+        <b>Q{index + 1}:</b> {s.answers[key]}
+      </p>
+    ))}
+</div>
 
             {/* ✅ DELETE BUTTON */}
             <button
