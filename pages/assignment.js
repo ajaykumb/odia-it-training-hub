@@ -1,170 +1,105 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { db } from "../utils/firebaseConfig";
+import { collection, doc, setDoc, getDoc } from "firebase/firestore";
 
-export default function AssignmentPage() {
-  const STORAGE_KEY = "assignmentSubmission";
+export default function Assignment() {
+  const [name, setName] = useState("");
+  const [answers, setAnswers] = useState({
+    q1: "",
+    q2: "",
+    q3: "",
+  });
 
-  // ✅ SQL + PL/SQL Questions (20 Total)
-  const questions = [
-    "What is SQL? Explain its main components.",
-    "What is the difference between DDL, DML, and TCL?",
-    "What is a primary key? Give an example.",
-    "What is a foreign key? How does it work?",
-    "Explain the difference between WHERE and HAVING clauses.",
-    "What is JOIN? Explain different types of joins in SQL.",
-    "What is Normalization? Explain 1NF, 2NF, and 3NF.",
-    "Write a SQL query to find the second highest salary.",
-    "What is the difference between DELETE, TRUNCATE, and DROP?",
-    "What is a view? Why is it used?",
-    "What is PL/SQL? How is it different from SQL?",
-    "Explain the structure of a PL/SQL block with an example.",
-    "What is the %TYPE and %ROWTYPE attribute?",
-    "What is an EXCEPTION in PL/SQL? Explain predefined exceptions.",
-    "What is a CURSOR? Explain implicit and explicit cursors.",
-    "Write a PL/SQL block to print numbers from 1 to 10.",
-    "Write a PL/SQL program to check if a number is even or odd.",
-    "What is a Stored Procedure? How is it different from a function?",
-    "What is a Trigger? Explain different types of triggers.",
-    "What is the use of the SELECT INTO clause in PL/SQL?"
-  ];
-
-  const [studentName, setStudentName] = useState("");
-  const [answers, setAnswers] = useState([]);
   const [submitted, setSubmitted] = useState(false);
-  const [examStarted, setExamStarted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [successMsg, setSuccessMsg] = useState("");
 
-  // Load saved submission when page loads
-  useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      const data = JSON.parse(saved);
-      setStudentName(data.name);
-      setAnswers(data.answers);
-      setSubmitted(true);
-    } else {
-      setAnswers(Array(questions.length).fill(""));
-    }
-  }, []);
+  const questions = {
+    q1: "1) What is a Primary Key in SQL?",
+    q2: "2) Write a PL/SQL block to print 'Hello World'.",
+    q3: "3) What is the difference between VARCHAR and CHAR?",
+  };
 
-  const startExam = () => {
-    if (studentName.trim() === "") {
-      alert("Please enter your name before starting the exam.");
+  const handleSubmit = async () => {
+    if (!name.trim()) {
+      setError("Please enter your name");
       return;
     }
-    setExamStarted(true);
-  };
 
-  const submitAssignment = () => {
-    const data = {
-      name: studentName,
-      answers,
-      submittedAt: new Date().toISOString(),
-    };
+    setLoading(true);
+    setError("");
 
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-    setSubmitted(true);
-    alert("Your answers have been submitted successfully!");
-  };
+    try {
+      const docRef = doc(db, "assignments", name.toLowerCase());
+      const existing = await getDoc(docRef);
 
-  const handleAnswerChange = (index, value) => {
-    const updated = [...answers];
-    updated[index] = value;
-    setAnswers(updated);
+      if (existing.exists()) {
+        setError("You have already submitted your assignment.");
+        setLoading(false);
+        return;
+      }
+
+      await setDoc(docRef, {
+        name,
+        answers,
+        submittedAt: new Date(),
+      });
+
+      setSubmitted(true);
+      setSuccessMsg("Assignment submitted successfully!");
+    } catch (err) {
+      setError("Error submitting assignment.");
+    }
+
+    setLoading(false);
   };
 
   return (
-    <div style={{ padding: "20px", maxWidth: "900px", margin: "auto" }}>
-      <h1>Student Assignment</h1>
+    <main className="p-6 max-w-3xl mx-auto">
+      <h1 className="text-3xl font-bold mb-6 text-center">Assignment</h1>
 
-      {/* NAME INPUT SECTION */}
-      {!submitted && !examStarted && (
-        <div style={{ marginBottom: "20px" }}>
-          <label><b>Your Name:</b></label>
+      {submitted ? (
+        <div className="bg-green-200 p-4 rounded-md text-center">
+          <h2 className="text-xl font-semibold">{successMsg}</h2>
+          <p>You can close this page now.</p>
+        </div>
+      ) : (
+        <div className="space-y-4">
+
           <input
             type="text"
-            value={studentName}
-            onChange={(e) => setStudentName(e.target.value)}
-            style={{
-              display: "block",
-              marginTop: "10px",
-              padding: "10px",
-              width: "100%",
-              borderRadius: "5px",
-              border: "1px solid #aaa",
-            }}
-            placeholder="Enter your full name"
+            placeholder="Enter Your Name"
+            className="w-full p-3 border rounded-md"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
           />
-        </div>
-      )}
 
-      {/* SHOW STUDENT NAME IF ALREADY SUBMITTED */}
-      {submitted && (
-        <div style={{ marginBottom: "20px", background: "#eef", padding: "10px", borderRadius: "5px" }}>
-          <b>Student Name:</b> {studentName}
-        </div>
-      )}
-
-      {/* START EXAM BUTTON */}
-      {!examStarted && !submitted && (
-        <button
-          onClick={startExam}
-          style={{
-            padding: "10px 20px",
-            background: "green",
-            color: "white",
-            border: "none",
-            borderRadius: "5px",
-            marginBottom: "20px",
-          }}
-        >
-          Start Exam
-        </button>
-      )}
-
-      {/* QUESTIONS DISPLAY */}
-      {(examStarted || submitted) && (
-        <div>
-          {questions.map((question, index) => (
-            <div key={index} style={{ marginBottom: "20px" }}>
-              <p><b>Q{index + 1}. {question}</b></p>
+          {Object.keys(questions).map((key) => (
+            <div key={key}>
+              <label className="font-bold">{questions[key]}</label>
               <textarea
-                value={answers[index]}
-                disabled={submitted}
-                onChange={(e) => handleAnswerChange(index, e.target.value)}
-                style={{
-                  width: "100%",
-                  height: "100px",
-                  padding: "10px",
-                  borderRadius: "5px",
-                }}
-              />
+                className="w-full p-3 border rounded-md mt-2"
+                rows="4"
+                value={answers[key]}
+                onChange={(e) =>
+                  setAnswers({ ...answers, [key]: e.target.value })
+                }
+              ></textarea>
             </div>
           ))}
 
-          {/* SUBMIT BUTTON */}
-          {!submitted && (
-            <button
-              onClick={submitAssignment}
-              style={{
-                padding: "10px 20px",
-                background: "blue",
-                color: "white",
-                border: "none",
-                borderRadius: "5px",
-              }}
-            >
-              Submit Answers
-            </button>
-          )}
+          {error && <p className="text-red-600">{error}</p>}
 
-          {/* AFTER SUBMISSION MESSAGE */}
-          {submitted && (
-            <div style={{ marginTop: "20px", padding: "10px", background: "#e3ffe3" }}>
-              <h3>Your answers have been submitted ✔</h3>
-              <p>You cannot edit them now.</p>
-            </div>
-          )}
+          <button
+            onClick={handleSubmit}
+            disabled={loading}
+            className="bg-blue-600 text-white px-6 py-3 rounded-lg"
+          >
+            {loading ? "Submitting..." : "Submit Assignment"}
+          </button>
         </div>
       )}
-    </div>
+    </main>
   );
 }
