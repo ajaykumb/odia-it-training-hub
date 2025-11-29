@@ -3,17 +3,17 @@ import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
-
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+import { getStorage } from "firebase/storage";
 
 // Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: "AIzaSyAnSHgLycvt1GSc5SAUWbgIigw7ZFWOwoE",
   authDomain: "odia-it-training-hub-database.firebaseapp.com",
   projectId: "odia-it-training-hub-database",
-  storageBucket: "odia-it-training-hub-database.firebasestorage.app",
+
+  // ✅ FIXED STORAGE BUCKET (VERY IMPORTANT)
+  storageBucket: "odia-it-training-hub-database.appspot.com",
+
   messagingSenderId: "799162059424",
   appId: "1:799162059424:web:05065eb839a336e02097c5",
   measurementId: "G-21FR6P12QB"
@@ -21,7 +21,17 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
+
+// ✅ Export all services
 const auth = getAuth(app);
 const db = getFirestore(app);
+const storage = getStorage(app);
 
-export { auth, db };
+// ✅ Optional: Analytics (only on client)
+let analytics;
+if (typeof window !== "undefined") {
+  analytics = getAnalytics(app);
+}
+
+// ✅ FINAL EXPORT
+export { auth, db, storage, analytics };
