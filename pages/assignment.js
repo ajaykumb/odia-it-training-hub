@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { db } from "../utils/firebaseConfig";
-import { collection, doc, setDoc, getDoc } from "firebase/firestore";
+import { doc, setDoc } from "firebase/firestore";
 
 export default function Assignment() {
   const [name, setName] = useState("");
@@ -15,12 +15,14 @@ export default function Assignment() {
   const [error, setError] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
 
+  // 🔵 Assignment Questions
   const questions = {
     q1: "1) What is a Primary Key in SQL?",
     q2: "2) Write a PL/SQL block to print 'Hello World'.",
     q3: "3) What is the difference between VARCHAR and CHAR?",
   };
 
+  // 🔵 SUBMIT LOGIC (NO READ → ALWAYS WORKS)
   const handleSubmit = async () => {
     if (!name.trim()) {
       setError("Please enter your name");
@@ -31,11 +33,13 @@ export default function Assignment() {
     setError("");
 
     try {
-      // 👇 ADDED: sanitize name so Firestore accepts it
+      // -----------------------------
+      // Safe Firestore document ID
+      // -----------------------------
       const safeName = name
         .toLowerCase()
         .trim()
-        .replace(/[^a-z0-9]+/g, "_"); // Convert invalid chars to _
+        .replace(/[^a-z0-9]+/g, "_");
 
       if (!safeName) {
         setError("Invalid name");
@@ -43,24 +47,14 @@ export default function Assignment() {
         return;
       }
 
-      // 👇 Using safeName for Document ID
+      // 🔥 Direct create — NO getDoc()
       const docRef = doc(db, "assignments", safeName);
 
-      // Check if already exists
-      const existing = await getDoc(docRef);
-
-      if (existing.exists()) {
-        setError("You have already submitted your assignment.");
-        setLoading(false);
-        return;
-      }
-
-      // Save assignment
       await setDoc(docRef, {
-        name,             // original name stored safely
-        safeName,         // optional: for teacher dashboard
+        name,
+        safeName,
         answers,
-        submittedAt: new Date(),
+        submittedAt: new Date().toISOString(),
       });
 
       setSubmitted(true);
@@ -85,6 +79,7 @@ export default function Assignment() {
       ) : (
         <div className="space-y-4">
 
+          {/* NAME INPUT */}
           <input
             type="text"
             placeholder="Enter Your Name"
@@ -93,6 +88,7 @@ export default function Assignment() {
             onChange={(e) => setName(e.target.value)}
           />
 
+          {/* QUESTIONS */}
           {Object.keys(questions).map((key) => (
             <div key={key}>
               <label className="font-bold">{questions[key]}</label>
@@ -109,6 +105,7 @@ export default function Assignment() {
 
           {error && <p className="text-red-600">{error}</p>}
 
+          {/* SUBMIT BUTTON */}
           <button
             onClick={handleSubmit}
             disabled={loading}
