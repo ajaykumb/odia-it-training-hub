@@ -1,6 +1,13 @@
 import { useEffect, useState } from "react";
 import { db, auth } from "../../utils/firebaseConfig";
-import { collection, getDocs, orderBy, query } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  orderBy,
+  query,
+  deleteDoc,
+  doc,
+} from "firebase/firestore";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { useRouter } from "next/router";
 
@@ -15,7 +22,6 @@ export default function AllAnswers() {
         return;
       }
 
-      // ✅ Ordered by latest submission
       const q = query(
         collection(db, "assignments"),
         orderBy("submittedAt", "desc")
@@ -23,8 +29,8 @@ export default function AllAnswers() {
 
       const snapshot = await getDocs(q);
       const arr = [];
-      snapshot.forEach((doc) => {
-        arr.push({ id: doc.id, ...doc.data() });
+      snapshot.forEach((docData) => {
+        arr.push({ id: docData.id, ...docData.data() });
       });
 
       setAnswers(arr);
@@ -33,17 +39,32 @@ export default function AllAnswers() {
     return () => unsubscribe();
   }, []);
 
-  // ✅ Safe date formatter (works for both Timestamp & ISO string)
+  // ✅ Safe date formatter
   const formatDate = (d) => {
     if (!d) return "N/A";
-
-    // If Firestore Timestamp
-    if (d.seconds) {
-      return new Date(d.seconds * 1000).toLocaleString();
-    }
-
-    // If ISO string
+    if (d.seconds) return new Date(d.seconds * 1000).toLocaleString();
     return new Date(d).toLocaleString();
+  };
+
+  // ✅ DELETE HANDLER
+  const handleDelete = async (id) => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this student's answer?"
+    );
+
+    if (!confirmDelete) return;
+
+    try {
+      await deleteDoc(doc(db, "assignments", id));
+
+      // ✅ Remove from UI instantly
+      setAnswers((prev) => prev.filter((item) => item.id !== id));
+
+      alert("Student answer deleted successfully.");
+    } catch (err) {
+      console.error("Delete Error:", err.message);
+      alert("Failed to delete. Check Firestore rules.");
+    }
   };
 
   return (
@@ -67,7 +88,7 @@ export default function AllAnswers() {
             key={i}
             className="p-4 border rounded-lg shadow bg-white"
           >
-            {/* ✅ STUDENT HEADER */}
+            {/* ✅ HEADER */}
             <div className="flex items-center gap-4 mb-4">
               {s.cameraImage ? (
                 <img
@@ -96,16 +117,23 @@ export default function AllAnswers() {
 
             <hr className="my-3" />
 
-            {/* ✅ STUDENT ANSWERS */}
-            <div className="space-y-2">
+            {/* ✅ ANSWERS */}
+            <div className="space-y-2 mb-4">
               <p><b>Q1:</b> {s.answers?.q1}</p>
               <p><b>Q2:</b> {s.answers?.q2}</p>
               <p><b>Q3:</b> {s.answers?.q3}</p>
             </div>
+
+            {/* ✅ DELETE BUTTON */}
+            <button
+              onClick={() => handleDelete(s.id)}
+              className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md w-full"
+            >
+              Delete This Submission
+            </button>
           </div>
         ))}
 
-        {/* ✅ EMPTY STATE */}
         {answers.length === 0 && (
           <p className="text-center col-span-2 text-gray-500">
             No student submissions yet.
