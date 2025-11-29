@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
-import { db } from "../utils/firebaseConfig";
+import { db, storage } from "../utils/firebaseConfig";
 import { doc, setDoc } from "firebase/firestore";
+import { ref, uploadString, getDownloadURL } from "firebase/storage";
 
 // 🔴 CHANGE DEADLINE HERE
 const DEADLINE = new Date("2025-12-05T23:59:00");
@@ -55,7 +56,7 @@ export default function Assignment() {
     localStorage.setItem("assignmentDraft", JSON.stringify(answers));
   }, [answers]);
 
-  // ✅ PREVENT REFRESH / BACK
+  // ✅ PREVENT REFRESH
   useEffect(() => {
     const warn = (e) => {
       e.preventDefault();
@@ -65,19 +66,17 @@ export default function Assignment() {
     return () => window.removeEventListener("beforeunload", warn);
   }, []);
 
-  // ✅ START CAMERA AUTOMATICALLY
+  // ✅ START CAMERA
   useEffect(() => {
     navigator.mediaDevices.getUserMedia({ video: true })
       .then((stream) => {
         const video = document.getElementById("studentCam");
         if (video) video.srcObject = stream;
       })
-      .catch((err) => {
-        console.log("Camera permission denied", err);
-      });
+      .catch((err) => console.log("Camera denied", err));
   }, []);
 
-  // ✅ CAPTURE PHOTO FUNCTION
+  // ✅ CAPTURE PHOTO
   const capturePhoto = () => {
     const video = document.getElementById("studentCam");
     const canvas = document.createElement("canvas");
@@ -85,12 +84,12 @@ export default function Assignment() {
     canvas.height = 240;
     const ctx = canvas.getContext("2d");
     ctx.drawImage(video, 0, 0, 320, 240);
-    const imageData = canvas.toDataURL("image/png");
-    setCameraImage(imageData);
-    return imageData;
+    const img = canvas.toDataURL("image/png");
+    setCameraImage(img);
+    return img;
   };
 
-  // ✅ SUBMIT LOGIC WITH CAMERA SAVE
+  // ✅ SUBMIT
   const handleSubmit = async () => {
     if (!name.trim()) {
       setError("Please enter your name");
@@ -111,30 +110,32 @@ export default function Assignment() {
     setError("");
 
     try {
-      const safeName = name
-        .toLowerCase()
-        .trim()
-        .replace(/[^a-z0-9]+/g, "_");
-
+      const safeName = name.toLowerCase().trim().replace(/[^a-z0-9]+/g, "_");
       const docRef = doc(db, "assignments", safeName);
 
-      // ✅ CAPTURE CAMERA IMAGE
+      // ✅ CAPTURE + UPLOAD TO STORAGE
       const cameraSnap = capturePhoto();
+      const imageRef = ref(storage, `faces/${safeName}.png`);
 
+      await uploadString(imageRef, cameraSnap, "data_url");
+      const imageUrl = await getDownloadURL(imageRef);
+
+      // ✅ SAVE ONLY IMAGE URL TO FIRESTORE
       await setDoc(docRef, {
         name,
         safeName,
         answers,
-        cameraImage: cameraSnap, // ✅ PHOTO SAVED
+        cameraImage: imageUrl,   // ✅ FIXED
         submittedAt: new Date().toISOString(),
       });
 
       setSubmitted(true);
       setSuccessMsg("Assignment submitted successfully!");
       localStorage.removeItem("assignmentDraft");
+
     } catch (err) {
-      console.error(err);
-      setError("Error submitting assignment.");
+      console.error("Submit Error:", err.message);
+      setError(err.message);
     }
 
     setLoading(false);
@@ -156,7 +157,6 @@ export default function Assignment() {
       ) : (
         <div className="space-y-4">
 
-          {/* NAME INPUT */}
           <input
             type="text"
             placeholder="Enter Your Name"
@@ -175,7 +175,6 @@ export default function Assignment() {
             ></video>
           </div>
 
-          {/* QUESTIONS */}
           {Object.keys(questions).map((key) => (
             <div key={key}>
               <label className="font-bold">{questions[key]}</label>
