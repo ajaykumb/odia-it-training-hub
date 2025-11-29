@@ -5,9 +5,22 @@ import { collection, addDoc } from "firebase/firestore";
 // 🔴 CHANGE DEADLINE HERE
 const DEADLINE = new Date("2025-12-05T23:59:00");
 
+// ✅ GOOGLE SHEET CSV LINK (YOUR LINK)
+const GOOGLE_SHEET_CSV_URL =
+  "https://docs.google.com/spreadsheets/d/e/2PACX-1vSq_FDI-zBgdDU-VgkVW7ZXb5XsmXDvTEInkvCkUtFzdjMdBEQoTYnnCwqaE5H55kFlN4DYCkzKHcmN/pub?gid=0&single=true&output=csv";
+
 export default function Assignment() {
   const [name, setName] = useState("");
+
+  // ✅ ANSWERS (UNCHANGED)
   const [answers, setAnswers] = useState({
+    q1: "",
+    q2: "",
+    q3: "",
+  });
+
+  // ✅ QUESTIONS FROM GOOGLE SHEET
+  const [questions, setQuestions] = useState({
     q1: "",
     q2: "",
     q3: "",
@@ -22,12 +35,34 @@ export default function Assignment() {
 
   const videoRef = useRef(null);
 
-  // 🔵 Assignment Questions
-  const questions = {
-    q1: "1) What is a Primary Key in SQL?",
-    q2: "2) Write a PL/SQL block to print 'Hello World'.",
-    q3: "3) What is the difference between VARCHAR and CHAR?",
-  };
+  // ✅ LOAD QUESTIONS FROM GOOGLE SHEET
+  useEffect(() => {
+    const loadQuestions = async () => {
+      try {
+        const res = await fetch(
+          GOOGLE_SHEET_CSV_URL + "&t=" + Date.now() // cache bypass
+        );
+        const text = await res.text();
+
+        const rows = text.split("\n").map((r) => r.split(","));
+        const qObj = {};
+
+        // Skip header row
+        for (let i = 1; i < rows.length; i++) {
+          const key = rows[i][0]?.trim();
+          const value = rows[i][1]?.trim();
+          if (key && value) qObj[key] = value;
+        }
+
+        setQuestions(qObj);
+      } catch (err) {
+        console.error("Question Load Error:", err);
+        setError("Failed to load questions from Google Sheet.");
+      }
+    };
+
+    loadQuestions();
+  }, []);
 
   // ✅ TIMER COUNTDOWN
   useEffect(() => {
@@ -82,7 +117,7 @@ export default function Assignment() {
       });
   }, []);
 
-  // ✅ SUBMIT (USING addDoc – NO PERMISSION ERROR)
+  // ✅ SUBMIT (UNCHANGED)
   const handleSubmit = async () => {
     if (!name.trim()) {
       setError("Please enter your name");
@@ -110,12 +145,11 @@ export default function Assignment() {
     try {
       const safeName = name.toLowerCase().trim().replace(/[^a-z0-9]+/g, "_");
 
-      // ✅ AUTO DOC ID (NO PERMISSION ERROR)
       await addDoc(collection(db, "assignments"), {
         name,
         safeName,
         answers,
-        cameraVerified: true,   // ✅ Camera mandatory proof
+        cameraVerified: true,
         submittedAt: new Date().toISOString(),
       });
 
@@ -151,7 +185,6 @@ export default function Assignment() {
         </div>
       ) : (
         <div className="space-y-4">
-
           {/* NAME INPUT */}
           <input
             type="text"
@@ -174,7 +207,7 @@ export default function Assignment() {
             />
           </div>
 
-          {/* QUESTIONS */}
+          {/* ✅ QUESTIONS FROM GOOGLE SHEET */}
           {Object.keys(questions).map((key) => (
             <div key={key}>
               <label className="font-bold">{questions[key]}</label>
