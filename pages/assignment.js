@@ -1,36 +1,30 @@
-import { useState, useEffect } from "react";
-import { db, storage } from "../utils/firebaseConfig";
+import { useState, useEffect, useRef } from "react";
+import { db } from "../utils/firebaseConfig";
 import { doc, setDoc } from "firebase/firestore";
-import { ref, uploadString, getDownloadURL } from "firebase/storage";
 
 // 🔴 CHANGE DEADLINE HERE
 const DEADLINE = new Date("2025-12-05T23:59:00");
 
 export default function Assignment() {
   const [name, setName] = useState("");
-  const [answers, setAnswers] = useState({
-    q1: "",
-    q2: "",
-    q3: "",
-  });
-
+  const [answers, setAnswers] = useState({ q1: "", q2: "", q3: "" });
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
   const [timeLeft, setTimeLeft] = useState("");
+  const [cameraOn, setCameraOn] = useState(false);
 
-  // ✅ CAMERA STATE
-  const [cameraImage, setCameraImage] = useState(null);
+  const videoRef = useRef(null);
 
-  // 🔵 Assignment Questions
+  // 🔵 Questions
   const questions = {
     q1: "1) What is a Primary Key in SQL?",
     q2: "2) Write a PL/SQL block to print 'Hello World'.",
     q3: "3) What is the difference between VARCHAR and CHAR?",
   };
 
-  // ✅ TIMER COUNTDOWN
+  // ✅ TIMER
   useEffect(() => {
     const timer = setInterval(() => {
       const diff = DEADLINE - new Date();
@@ -46,7 +40,7 @@ export default function Assignment() {
     return () => clearInterval(timer);
   }, []);
 
-  // ✅ AUTO SAVE DRAFT
+  // ✅ AUTO SAVE
   useEffect(() => {
     const saved = localStorage.getItem("assignmentDraft");
     if (saved) setAnswers(JSON.parse(saved));
@@ -66,30 +60,23 @@ export default function Assignment() {
     return () => window.removeEventListener("beforeunload", warn);
   }, []);
 
-  // ✅ START CAMERA
+  // ✅ START CAMERA (VIDEO ONLY, NO SAVE)
   useEffect(() => {
-    navigator.mediaDevices.getUserMedia({ video: true })
+    navigator.mediaDevices
+      .getUserMedia({ video: true })
       .then((stream) => {
-        const video = document.getElementById("studentCam");
-        if (video) video.srcObject = stream;
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+          setCameraOn(true);
+        }
       })
-      .catch((err) => console.log("Camera denied", err));
+      .catch(() => {
+        setCameraOn(false);
+        setError("Camera access is required to take the assignment.");
+      });
   }, []);
 
-  // ✅ CAPTURE PHOTO
-  const capturePhoto = () => {
-    const video = document.getElementById("studentCam");
-    const canvas = document.createElement("canvas");
-    canvas.width = 320;
-    canvas.height = 240;
-    const ctx = canvas.getContext("2d");
-    ctx.drawImage(video, 0, 0, 320, 240);
-    const img = canvas.toDataURL("image/png");
-    setCameraImage(img);
-    return img;
-  };
-
-  // ✅ SUBMIT
+  // ✅ SUBMIT (BLOCK IF CAMERA OFF)
   const handleSubmit = async () => {
     if (!name.trim()) {
       setError("Please enter your name");
@@ -106,6 +93,11 @@ export default function Assignment() {
       return;
     }
 
+    if (!cameraOn) {
+      setError("Camera must be ON to submit the assignment.");
+      return;
+    }
+
     setLoading(true);
     setError("");
 
@@ -113,26 +105,17 @@ export default function Assignment() {
       const safeName = name.toLowerCase().trim().replace(/[^a-z0-9]+/g, "_");
       const docRef = doc(db, "assignments", safeName);
 
-      // ✅ CAPTURE + UPLOAD TO STORAGE
-      const cameraSnap = capturePhoto();
-      const imageRef = ref(storage, `faces/${safeName}.png`);
-
-      await uploadString(imageRef, cameraSnap, "data_url");
-      const imageUrl = await getDownloadURL(imageRef);
-
-      // ✅ SAVE ONLY IMAGE URL TO FIRESTORE
       await setDoc(docRef, {
         name,
         safeName,
         answers,
-        cameraImage: imageUrl,   // ✅ FIXED
+        cameraVerified: true, // ✅ Only boolean, no image stored
         submittedAt: new Date().toISOString(),
       });
 
       setSubmitted(true);
       setSuccessMsg("Assignment submitted successfully!");
       localStorage.removeItem("assignmentDraft");
-
     } catch (err) {
       console.error("Submit Error:", err.message);
       setError(err.message);
@@ -148,6 +131,12 @@ export default function Assignment() {
       <p className="text-red-600 font-bold text-center mb-4">
         Time Left: {timeLeft}
       </p>
+
+      {!cameraOn && (
+        <p className="text-red-600 text-center font-semibold mb-4">
+          ⚠ Camera access is mandatory to attempt this assignment.
+        </p>
+      )}
 
       {submitted ? (
         <div className="bg-green-200 p-4 rounded-md text-center">
@@ -165,14 +154,17 @@ export default function Assignment() {
             onChange={(e) => setName(e.target.value)}
           />
 
-          {/* ✅ CAMERA PREVIEW */}
+          {/* ✅ LIVE VIDEO (MANDATORY) */}
           <div className="mb-6 text-center">
-            <p className="font-semibold mb-2 text-red-600">Face Verification</p>
+            <p className="font-semibold mb-2 text-red-600">
+              Live Camera (Mandatory)
+            </p>
             <video
-              id="studentCam"
+              ref={videoRef}
               autoPlay
+              playsInline
               className="mx-auto w-48 h-36 border rounded-md shadow"
-            ></video>
+            />
           </div>
 
           {Object.keys(questions).map((key) => (
@@ -195,9 +187,11 @@ export default function Assignment() {
 
           <button
             onClick={handleSubmit}
-            disabled={loading || submitted}
+            disabled={loading || submitted || !cameraOn}
             className={`px-6 py-3 rounded-lg text-white ${
-              loading ? "bg-gray-400" : "bg-blue-600 hover:bg-blue-700"
+              loading || !cameraOn
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-blue-600 hover:bg-blue-700"
             }`}
           >
             {loading ? "Submitting..." : "Submit Assignment"}
