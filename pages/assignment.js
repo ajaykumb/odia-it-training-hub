@@ -1,13 +1,18 @@
 import { useState, useEffect, useRef } from "react";
 import { db } from "../utils/firebaseConfig";
-import { doc, setDoc } from "firebase/firestore";
+import { collection, addDoc } from "firebase/firestore";
 
 // 🔴 CHANGE DEADLINE HERE
 const DEADLINE = new Date("2025-12-05T23:59:00");
 
 export default function Assignment() {
   const [name, setName] = useState("");
-  const [answers, setAnswers] = useState({ q1: "", q2: "", q3: "" });
+  const [answers, setAnswers] = useState({
+    q1: "",
+    q2: "",
+    q3: "",
+  });
+
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -17,14 +22,14 @@ export default function Assignment() {
 
   const videoRef = useRef(null);
 
-  // 🔵 Questions
+  // 🔵 Assignment Questions
   const questions = {
     q1: "1) What is a Primary Key in SQL?",
     q2: "2) Write a PL/SQL block to print 'Hello World'.",
     q3: "3) What is the difference between VARCHAR and CHAR?",
   };
 
-  // ✅ TIMER
+  // ✅ TIMER COUNTDOWN
   useEffect(() => {
     const timer = setInterval(() => {
       const diff = DEADLINE - new Date();
@@ -37,10 +42,11 @@ export default function Assignment() {
         setTimeLeft(`${mins}m ${secs}s`);
       }
     }, 1000);
+
     return () => clearInterval(timer);
   }, []);
 
-  // ✅ AUTO SAVE
+  // ✅ AUTO SAVE DRAFT
   useEffect(() => {
     const saved = localStorage.getItem("assignmentDraft");
     if (saved) setAnswers(JSON.parse(saved));
@@ -60,7 +66,7 @@ export default function Assignment() {
     return () => window.removeEventListener("beforeunload", warn);
   }, []);
 
-  // ✅ START CAMERA (VIDEO ONLY, NO SAVE)
+  // ✅ START CAMERA (MANDATORY – VIDEO ONLY)
   useEffect(() => {
     navigator.mediaDevices
       .getUserMedia({ video: true })
@@ -72,11 +78,11 @@ export default function Assignment() {
       })
       .catch(() => {
         setCameraOn(false);
-        setError("Camera access is required to take the assignment.");
+        setError("Camera access is required to submit the assignment.");
       });
   }, []);
 
-  // ✅ SUBMIT (BLOCK IF CAMERA OFF)
+  // ✅ SUBMIT (USING addDoc – NO PERMISSION ERROR)
   const handleSubmit = async () => {
     if (!name.trim()) {
       setError("Please enter your name");
@@ -103,13 +109,13 @@ export default function Assignment() {
 
     try {
       const safeName = name.toLowerCase().trim().replace(/[^a-z0-9]+/g, "_");
-      const docRef = doc(db, "assignments", safeName);
 
-      await setDoc(docRef, {
+      // ✅ AUTO DOC ID (NO PERMISSION ERROR)
+      await addDoc(collection(db, "assignments"), {
         name,
         safeName,
         answers,
-        cameraVerified: true, // ✅ Only boolean, no image stored
+        cameraVerified: true,   // ✅ Camera mandatory proof
         submittedAt: new Date().toISOString(),
       });
 
@@ -146,6 +152,7 @@ export default function Assignment() {
       ) : (
         <div className="space-y-4">
 
+          {/* NAME INPUT */}
           <input
             type="text"
             placeholder="Enter Your Name"
@@ -154,7 +161,7 @@ export default function Assignment() {
             onChange={(e) => setName(e.target.value)}
           />
 
-          {/* ✅ LIVE VIDEO (MANDATORY) */}
+          {/* ✅ LIVE CAMERA (MANDATORY) */}
           <div className="mb-6 text-center">
             <p className="font-semibold mb-2 text-red-600">
               Live Camera (Mandatory)
@@ -167,6 +174,7 @@ export default function Assignment() {
             />
           </div>
 
+          {/* QUESTIONS */}
           {Object.keys(questions).map((key) => (
             <div key={key}>
               <label className="font-bold">{questions[key]}</label>
@@ -185,6 +193,7 @@ export default function Assignment() {
 
           {error && <p className="text-red-600">{error}</p>}
 
+          {/* ✅ SUBMIT BUTTON */}
           <button
             onClick={handleSubmit}
             disabled={loading || submitted || !cameraOn}
