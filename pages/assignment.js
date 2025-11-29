@@ -19,6 +19,9 @@ export default function Assignment() {
   const [successMsg, setSuccessMsg] = useState("");
   const [timeLeft, setTimeLeft] = useState("");
 
+  // ✅ CAMERA STATE
+  const [cameraImage, setCameraImage] = useState(null);
+
   // 🔵 Assignment Questions
   const questions = {
     q1: "1) What is a Primary Key in SQL?",
@@ -26,7 +29,7 @@ export default function Assignment() {
     q3: "3) What is the difference between VARCHAR and CHAR?",
   };
 
-  // ✅ 2️⃣ TIMER COUNTDOWN
+  // ✅ TIMER COUNTDOWN
   useEffect(() => {
     const timer = setInterval(() => {
       const diff = DEADLINE - new Date();
@@ -39,11 +42,10 @@ export default function Assignment() {
         setTimeLeft(`${mins}m ${secs}s`);
       }
     }, 1000);
-
     return () => clearInterval(timer);
   }, []);
 
-  // ✅ 4️⃣ AUTO SAVE DRAFT
+  // ✅ AUTO SAVE DRAFT
   useEffect(() => {
     const saved = localStorage.getItem("assignmentDraft");
     if (saved) setAnswers(JSON.parse(saved));
@@ -53,7 +55,7 @@ export default function Assignment() {
     localStorage.setItem("assignmentDraft", JSON.stringify(answers));
   }, [answers]);
 
-  // ✅ 5️⃣ PREVENT REFRESH / BACK
+  // ✅ PREVENT REFRESH / BACK
   useEffect(() => {
     const warn = (e) => {
       e.preventDefault();
@@ -63,7 +65,32 @@ export default function Assignment() {
     return () => window.removeEventListener("beforeunload", warn);
   }, []);
 
-  // ✅ SUBMIT LOGIC WITH ALL PROTECTIONS
+  // ✅ START CAMERA AUTOMATICALLY
+  useEffect(() => {
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then((stream) => {
+        const video = document.getElementById("studentCam");
+        if (video) video.srcObject = stream;
+      })
+      .catch((err) => {
+        console.log("Camera permission denied", err);
+      });
+  }, []);
+
+  // ✅ CAPTURE PHOTO FUNCTION
+  const capturePhoto = () => {
+    const video = document.getElementById("studentCam");
+    const canvas = document.createElement("canvas");
+    canvas.width = 320;
+    canvas.height = 240;
+    const ctx = canvas.getContext("2d");
+    ctx.drawImage(video, 0, 0, 320, 240);
+    const imageData = canvas.toDataURL("image/png");
+    setCameraImage(imageData);
+    return imageData;
+  };
+
+  // ✅ SUBMIT LOGIC WITH CAMERA SAVE
   const handleSubmit = async () => {
     if (!name.trim()) {
       setError("Please enter your name");
@@ -75,7 +102,6 @@ export default function Assignment() {
       return;
     }
 
-    // ✅ 1️⃣ DEADLINE LOCK
     if (new Date() > DEADLINE) {
       setError("Assignment submission is closed.");
       return;
@@ -85,7 +111,6 @@ export default function Assignment() {
     setError("");
 
     try {
-      // Safe Firestore document ID
       const safeName = name
         .toLowerCase()
         .trim()
@@ -93,10 +118,14 @@ export default function Assignment() {
 
       const docRef = doc(db, "assignments", safeName);
 
+      // ✅ CAPTURE CAMERA IMAGE
+      const cameraSnap = capturePhoto();
+
       await setDoc(docRef, {
         name,
         safeName,
         answers,
+        cameraImage: cameraSnap, // ✅ PHOTO SAVED
         submittedAt: new Date().toISOString(),
       });
 
@@ -115,7 +144,6 @@ export default function Assignment() {
     <main className="p-6 max-w-3xl mx-auto">
       <h1 className="text-3xl font-bold mb-4 text-center">Assignment</h1>
 
-      {/* ✅ TIMER DISPLAY */}
       <p className="text-red-600 font-bold text-center mb-4">
         Time Left: {timeLeft}
       </p>
@@ -137,6 +165,16 @@ export default function Assignment() {
             onChange={(e) => setName(e.target.value)}
           />
 
+          {/* ✅ CAMERA PREVIEW */}
+          <div className="mb-6 text-center">
+            <p className="font-semibold mb-2 text-red-600">Face Verification</p>
+            <video
+              id="studentCam"
+              autoPlay
+              className="mx-auto w-48 h-36 border rounded-md shadow"
+            ></video>
+          </div>
+
           {/* QUESTIONS */}
           {Object.keys(questions).map((key) => (
             <div key={key}>
@@ -148,7 +186,6 @@ export default function Assignment() {
                 onChange={(e) =>
                   setAnswers({ ...answers, [key]: e.target.value })
                 }
-                // ✅ 3️⃣ DISABLE COPY–PASTE
                 onPaste={(e) => e.preventDefault()}
                 onCopy={(e) => e.preventDefault()}
               ></textarea>
@@ -157,7 +194,6 @@ export default function Assignment() {
 
           {error && <p className="text-red-600">{error}</p>}
 
-          {/* ✅ 6️⃣ DOUBLE SUBMIT PROTECTION */}
           <button
             onClick={handleSubmit}
             disabled={loading || submitted}
