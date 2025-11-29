@@ -2,9 +2,6 @@ import { useState, useEffect, useRef } from "react";
 import { db } from "../utils/firebaseConfig";
 import { collection, addDoc } from "firebase/firestore";
 
-// 🔴 CHANGE DEADLINE HERE
-const DEADLINE = new Date("2025-12-05T23:59:00");
-
 // ✅ GOOGLE SHEET CSV LINK (YOUR LINK)
 const GOOGLE_SHEET_CSV_URL =
   "https://docs.google.com/spreadsheets/d/e/2PACX-1vSq_FDI-zBgdDU-VgkVW7ZXb5XsmXDvTEInkvCkUtFzdjMdBEQoTYnnCwqaE5H55kFlN4DYCkzKHcmN/pub?gid=0&single=true&output=csv";
@@ -40,14 +37,13 @@ export default function Assignment() {
     const loadQuestions = async () => {
       try {
         const res = await fetch(
-          GOOGLE_SHEET_CSV_URL + "&t=" + Date.now() // cache bypass
+          GOOGLE_SHEET_CSV_URL + "&t=" + Date.now()
         );
         const text = await res.text();
 
         const rows = text.split("\n").map((r) => r.split(","));
         const qObj = {};
 
-        // Skip header row
         for (let i = 1; i < rows.length; i++) {
           const key = rows[i][0]?.trim();
           const value = rows[i][1]?.trim();
@@ -64,10 +60,17 @@ export default function Assignment() {
     loadQuestions();
   }, []);
 
-  // ✅ TIMER COUNTDOWN
+  // ✅ ✅ 30-MINUTE TIMER (SESSION BASED)
   useEffect(() => {
+    const endTime =
+      localStorage.getItem("examEndTime") ||
+      new Date(Date.now() + 30 * 60 * 1000).toISOString();
+
+    localStorage.setItem("examEndTime", endTime);
+
     const timer = setInterval(() => {
-      const diff = DEADLINE - new Date();
+      const diff = new Date(endTime) - new Date();
+
       if (diff <= 0) {
         setTimeLeft("Time Over");
         clearInterval(timer);
@@ -117,7 +120,7 @@ export default function Assignment() {
       });
   }, []);
 
-  // ✅ SUBMIT (UNCHANGED)
+  // ✅ SUBMIT (WITH TIME CHECK)
   const handleSubmit = async () => {
     if (!name.trim()) {
       setError("Please enter your name");
@@ -129,8 +132,8 @@ export default function Assignment() {
       return;
     }
 
-    if (new Date() > DEADLINE) {
-      setError("Assignment submission is closed.");
+    if (timeLeft === "Time Over") {
+      setError("Time is over. Submission not allowed.");
       return;
     }
 
@@ -156,6 +159,7 @@ export default function Assignment() {
       setSubmitted(true);
       setSuccessMsg("Assignment submitted successfully!");
       localStorage.removeItem("assignmentDraft");
+      localStorage.removeItem("examEndTime"); // ✅ RESET TIMER AFTER SUBMIT
     } catch (err) {
       console.error("Submit Error:", err.message);
       setError(err.message);
