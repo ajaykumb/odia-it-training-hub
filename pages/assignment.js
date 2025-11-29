@@ -31,7 +31,22 @@ export default function Assignment() {
     setError("");
 
     try {
-      const docRef = doc(db, "assignments", name.toLowerCase());
+      // 👇 ADDED: sanitize name so Firestore accepts it
+      const safeName = name
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9]+/g, "_"); // Convert invalid chars to _
+
+      if (!safeName) {
+        setError("Invalid name");
+        setLoading(false);
+        return;
+      }
+
+      // 👇 Using safeName for Document ID
+      const docRef = doc(db, "assignments", safeName);
+
+      // Check if already exists
       const existing = await getDoc(docRef);
 
       if (existing.exists()) {
@@ -40,8 +55,10 @@ export default function Assignment() {
         return;
       }
 
+      // Save assignment
       await setDoc(docRef, {
-        name,
+        name,             // original name stored safely
+        safeName,         // optional: for teacher dashboard
         answers,
         submittedAt: new Date(),
       });
@@ -49,6 +66,7 @@ export default function Assignment() {
       setSubmitted(true);
       setSuccessMsg("Assignment submitted successfully!");
     } catch (err) {
+      console.error(err);
       setError("Error submitting assignment.");
     }
 
