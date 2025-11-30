@@ -29,6 +29,7 @@ export default function AllAnswers() {
 
       const snapshot = await getDocs(q);
       const arr = [];
+
       snapshot.forEach((docData) => {
         arr.push({ id: docData.id, ...docData.data() });
       });
@@ -37,9 +38,9 @@ export default function AllAnswers() {
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [router]);
 
-  // ✅ Safe date formatter
+  // ✅ SAFE DATE FORMATTER
   const formatDate = (d) => {
     if (!d) return "N/A";
     if (d.seconds) return new Date(d.seconds * 1000).toLocaleString();
@@ -85,7 +86,7 @@ export default function AllAnswers() {
       <div className="grid md:grid-cols-2 gap-6">
         {answers.map((s, i) => (
           <div
-            key={i}
+            key={s.id}
             className="p-4 border rounded-lg shadow bg-white"
           >
             {/* ✅ HEADER */}
@@ -117,15 +118,22 @@ export default function AllAnswers() {
 
             <hr className="my-3" />
 
-{/* ✅ ALL ANSWERS (DYNAMIC) */}
-<div className="space-y-2 mb-4">
-  {s.answers &&
-    Object.keys(s.answers).map((key, index) => (
-      <p key={key}>
-        <b>Q{index + 1}:</b> {s.answers[key]}
-      </p>
-    ))}
-</div>
+            {/* ✅ ALL ANSWERS (SORTED Q1 → QN) */}
+            <div className="space-y-2 mb-4">
+              {s.answers &&
+                Object.entries(s.answers)
+                  .sort((a, b) => {
+                    const numA = parseInt(a[0].replace("q", ""));
+                    const numB = parseInt(b[0].replace("q", ""));
+                    return numA - numB;
+                  })
+                  .map(([key, value]) => (
+                    <p key={key}>
+                      <b>{key.toUpperCase()}:</b>{" "}
+                      {value ? value : <span className="text-red-500">-</span>}
+                    </p>
+                  ))}
+            </div>
 
             {/* ✅ DELETE BUTTON */}
             <button
