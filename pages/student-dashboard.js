@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import {
   HomeIcon,
@@ -8,17 +8,51 @@ import {
   ArrowLeftIcon,
 } from "@heroicons/react/24/outline";
 
+// ✅ FIREBASE IMPORTS (LIVE STATUS ONLY)
+import { db } from "../utils/firebaseConfig";   // ✅ adjust path if needed
+import { doc, onSnapshot } from "firebase/firestore";
+
 export default function StudentDashboard() {
   const router = useRouter();
 
+  // ✅ LIVE CLASS STATES
+  const [isLive, setIsLive] = useState(false);
+  const [meetingUrl, setMeetingUrl] = useState("");
+  const [className, setClassName] = useState("");
+
+  // ✅ LOGIN CHECK (YOUR ORIGINAL CODE)
   useEffect(() => {
     const token = localStorage.getItem("studentToken");
     if (!token) router.push("/login");
   }, []);
 
+  // ✅ LISTEN TO LIVE CLASS STATUS FROM FIRESTORE
+  useEffect(() => {
+    const liveRef = doc(db, "liveClass", "current");
+
+    const unsub = onSnapshot(liveRef, (snap) => {
+      if (snap.exists()) {
+        const data = snap.data();
+        setIsLive(data.isLive);
+        setMeetingUrl(data.meetingUrl);
+        setClassName(data.className);
+      }
+    });
+
+    return () => unsub();
+  }, []);
+
+  // ✅ LOGOUT (YOUR ORIGINAL)
   const logout = () => {
     localStorage.removeItem("studentToken");
     router.push("/login");
+  };
+
+  // ✅ JOIN LIVE CLASS (NO ATTENDANCE)
+  const joinLiveClass = () => {
+    const url =
+      meetingUrl || "https://meet.jit.si/OdiaITTrainingHubLiveClass";
+    window.open(url, "_blank");
   };
 
   return (
@@ -52,7 +86,6 @@ export default function StudentDashboard() {
               <UserIcon className="w-5 h-5" /> Profile
             </a>
 
-            {/* Notifications */}
             <a className="flex items-center gap-3 hover:text-blue-600" href="/notifications">
               🔔 Notifications
             </a>
@@ -85,6 +118,7 @@ export default function StudentDashboard() {
           </h1>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+
             {/* Card 1 */}
             <div className="bg-white/80 backdrop-blur-md p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all border border-gray-200">
               <h3 className="text-xl font-semibold mb-2 text-gray-900">
@@ -122,13 +156,47 @@ export default function StudentDashboard() {
               <p className="mb-4 text-gray-600">
                 View and submit class assignments.
               </p>
-<a
-  href="/assignment"
-  className="inline-block bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700 transition"
->
-  View Assignments
-</a>
+              <a
+                href="/assignment"
+                className="inline-block bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700 transition"
+              >
+                View Assignments
+              </a>
             </div>
+
+            {/* ✅ Card 4 - Live Class (NEW) */}
+            <div className="bg-white/80 backdrop-blur-md p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all border border-gray-200">
+              <h3 className="text-xl font-semibold mb-2 text-gray-900">
+                Live Class
+              </h3>
+
+              {isLive ? (
+                <>
+                  <p className="mb-4 text-green-700 font-medium">
+                    Class is LIVE: {className}
+                  </p>
+                  <button
+                    onClick={joinLiveClass}
+                    className="bg-green-600 text-white px-4 py-2 rounded-lg shadow hover:bg-green-700 transition"
+                  >
+                    Join Live Class
+                  </button>
+                </>
+              ) : (
+                <>
+                  <p className="mb-4 text-red-600">
+                    No live class right now.
+                  </p>
+                  <button
+                    disabled
+                    className="bg-gray-400 text-white px-4 py-2 rounded-lg cursor-not-allowed"
+                  >
+                    Waiting for Teacher
+                  </button>
+                </>
+              )}
+            </div>
+
           </div>
         </section>
       </div>
