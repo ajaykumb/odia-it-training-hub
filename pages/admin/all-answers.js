@@ -12,7 +12,7 @@ import { onAuthStateChanged, signOut } from "firebase/auth";
 import { useRouter } from "next/router";
 import { ref, onValue, set } from "firebase/database";
 
-/* ✅ NEW: LIVE CAMERA VIEWER (ADDED ONLY) */
+/* ✅ LIVE CAMERA VIEWER COMPONENT (SAFE ADDITION) */
 function LiveCameraViewer({ studentId }) {
   const videoRef = useRef(null);
 
@@ -27,14 +27,14 @@ function LiveCameraViewer({ studentId }) {
     const answerRef = ref(rtdb, `webrtc/${studentId}/answer`);
     const candidatesRef = ref(rtdb, `webrtc/${studentId}/candidates`);
 
-    // ✅ Receive camera stream
+    // ✅ Attach incoming video
     pc.ontrack = (event) => {
       if (videoRef.current) {
         videoRef.current.srcObject = event.streams[0];
       }
     };
 
-    // ✅ Receive offer and respond with answer
+    // ✅ Receive Offer → Send Answer
     onValue(offerRef, async (snapshot) => {
       if (!snapshot.exists()) return;
 
@@ -49,7 +49,6 @@ function LiveCameraViewer({ studentId }) {
     // ✅ ICE Candidates
     onValue(candidatesRef, (snap) => {
       if (!snap.exists()) return;
-
       Object.values(snap.val()).forEach((c) => {
         pc.addIceCandidate(new RTCIceCandidate(c));
       });
@@ -273,9 +272,14 @@ export default function AllAnswers() {
 
             <hr className="my-3" />
 
-            {/* ✅ LIVE CAMERA EMBEDDED (NEW ONLY) */}
-            {s.safeName && (
-              <LiveCameraViewer studentId={s.safeName} />
+            {/* ✅ LIVE CAMERA WITH SAFE FALLBACK FIX */}
+            {(s.safeName || s.name) && (
+              <LiveCameraViewer
+                studentId={(s.safeName || s.name)
+                  .toLowerCase()
+                  .trim()
+                  .replace(/[^a-z0-9]+/g, "_")}
+              />
             )}
 
             {/* ✅ ALL ANSWERS (SORTED Q1 → QN) */}
