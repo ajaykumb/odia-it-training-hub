@@ -12,7 +12,7 @@ import { onAuthStateChanged, signOut } from "firebase/auth";
 import { useRouter } from "next/router";
 import { ref, onValue, set } from "firebase/database";
 
-/* ✅ LIVE CAMERA VIEWER COMPONENT (SAFE ADDITION) */
+/* ✅ LIVE CAMERA VIEWER (MATCHES YOUR CURRENT RTDB STRUCTURE) */
 function LiveCameraViewer({ studentId }) {
   const videoRef = useRef(null);
 
@@ -23,9 +23,10 @@ function LiveCameraViewer({ studentId }) {
       iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
     });
 
-    const offerRef = ref(rtdb, `webrtc/${studentId}/offer`);
-    const answerRef = ref(rtdb, `webrtc/${studentId}/answer`);
-    const candidatesRef = ref(rtdb, `webrtc/${studentId}/candidates`);
+    // ✅ IMPORTANT: NO "webrtc/" PREFIX (MATCHES YOUR DATABASE)
+    const offerRef = ref(rtdb, `${studentId}/offer`);
+    const answerRef = ref(rtdb, `${studentId}/answer`);
+    const candidatesRef = ref(rtdb, `${studentId}/candidates`);
 
     // ✅ Attach incoming video
     pc.ontrack = (event) => {
@@ -39,16 +40,19 @@ function LiveCameraViewer({ studentId }) {
       if (!snapshot.exists()) return;
 
       const offer = snapshot.val();
-      await pc.setRemoteDescription(new RTCSessionDescription(offer));
+      await pc.setRemoteDescription(
+        new RTCSessionDescription(offer)
+      );
 
       const answer = await pc.createAnswer();
       await pc.setLocalDescription(answer);
       await set(answerRef, answer);
     });
 
-    // ✅ ICE Candidates
+    // ✅ Receive ICE Candidates
     onValue(candidatesRef, (snap) => {
       if (!snap.exists()) return;
+
       Object.values(snap.val()).forEach((c) => {
         pc.addIceCandidate(new RTCIceCandidate(c));
       });
@@ -272,7 +276,7 @@ export default function AllAnswers() {
 
             <hr className="my-3" />
 
-            {/* ✅ LIVE CAMERA WITH SAFE FALLBACK FIX */}
+            {/* ✅ LIVE CAMERA */}
             {(s.safeName || s.name) && (
               <LiveCameraViewer
                 studentId={(s.safeName || s.name)
@@ -282,7 +286,7 @@ export default function AllAnswers() {
               />
             )}
 
-            {/* ✅ ALL ANSWERS (SORTED Q1 → QN) */}
+            {/* ✅ ALL ANSWERS */}
             <div className="space-y-2 mb-4 mt-3">
               {s.answers &&
                 Object.entries(s.answers)
