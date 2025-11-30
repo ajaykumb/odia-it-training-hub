@@ -9,137 +9,290 @@ const GOOGLE_SHEET_CSV_URL =
 export default function Assignment() {
   const [name, setName] = useState("");
   const [liveStudentId, setLiveStudentId] = useState(null);
-  const [answers, setAnswers] = useState({});
-  const [questions, setQuestions] = useState({});
+
+  const [answers, setAnswers] = useState({ q1: "", q2: "", q3: "" });
+  const [questions, setQuestions] = useState({ q1: "", q2: "", q3: "" });
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [successMsg, setSuccessMsg] = useState("");
   const [timeLeft, setTimeLeft] = useState("");
   const [cameraOn, setCameraOn] = useState(false);
 
   const videoRef = useRef(null);
-  const pcRef = useRef(null);
 
-  // ✅ Load Questions
+  // ✅ RESET FOR NEW ATTEMPT
   useEffect(() => {
-    fetch(GOOGLE_SHEET_CSV_URL)
-      .then((r) => r.text())
-      .then((text) => {
+    localStorage.removeItem("examEndTime");
+    localStorage.removeItem("assignmentDraft");
+  }, []);
+
+  // ✅ LOAD QUESTIONS
+  useEffect(() => {
+    const loadQuestions = async () => {
+      try {
+        const res = await fetch(GOOGLE_SHEET_CSV_URL + "&t=" + Date.now());
+        const text = await res.text();
         const rows = text.split("\n").map((r) => r.split(","));
-        const q = {};
-        rows.slice(1).forEach((r) => (q[r[0]] = r[1]));
-        setQuestions(q);
+        const qObj = {};
+
+        for (let i = 1; i < rows.length; i++) {
+          const key = rows[i][0]?.trim();
+          const value = rows[i][1]?.trim();
+          if (key && value) qObj[key] = value;
+        }
+
+        setQuestions(qObj);
+      } catch {
+        setError("Failed to load questions.");
+      }
+    };
+
+    loadQuestions();
+  }, []);
+
+  // ✅ AUTO SAVE DRAFT
+  useEffect(() => {
+    const saved = localStorage.getItem("assignmentDraft");
+    if (saved) setAnswers(JSON.parse(saved));
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("assignmentDraft", JSON.stringify(answers));
+  }, [answers]);
+
+  // ✅ PREVENT REFRESH WARNING
+  useEffect(() => {
+    const warn = (e) => {
+      e.preventDefault();
+      e.returnValue = "";
+    };
+    window.addEventListener("beforeunload", warn);
+    return () => window.removeEventListener("beforeunload", warn);
+  }, []);
+
+  // ✅ CAMERA INIT
+  useEffect(() => {
+    navigator.mediaDevices
+      .getUserMedia({ video: true })
+      .then((stream) => {
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+          setCameraOn(true);
+        }
+      })
+      .catch(() => {
+        setCameraOn(false);
+        setError("Camera access is mandatory.");
       });
   }, []);
 
-  // ✅ Camera Init + WebRTC Sender
+  // ✅ STABLE LIVE STUDENT ID (DEBOUNCED)
   useEffect(() => {
-    navigator.mediaDevices.getUserMedia({ video: true }).then((stream) => {
-      videoRef.current.srcObject = stream;
-      setCameraOn(true);
+    if (!name.trim()) return;
 
-      const pc = new RTCPeerConnection({
-        iceServers: [
-          { urls: "stun:stun.l.google.com:19302" },
-          {
-            urls: "turn:openrelay.metered.ca:80",
-            username: "openrelayproject",
-            credential: "openrelayproject",
-          },
-          {
-            urls: "turn:openrelay.metered.ca:443",
-            username: "openrelayproject",
-            credential: "openrelayproject",
-          },
-        ],
-      });
+    const timeout = setTimeout(() => {
+      const stableId = name
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9]+/g, "_");
 
-      stream.getTracks().forEach((t) => pc.addTrack(t, stream));
-      pcRef.current = pc;
-    });
-  }, []);
+      setLiveStudentId(stableId);
+    }, 1200);
 
-  // ✅ Stable student ID
-  useEffect(() => {
-    if (!name) return;
-    const t = setTimeout(() => {
-      setLiveStudentId(name.toLowerCase().replace(/[^a-z0-9]+/g, "_"));
-    }, 1000);
-    return () => clearTimeout(t);
+    return () => clearTimeout(timeout);
   }, [name]);
 
-  // ✅ Push Live Student
+  // ✅ PUSH LIVE STUDENT TO RTDB (CLEAN)
   useEffect(() => {
-    if (!liveStudentId || !cameraOn) return;
+    if (!cameraOn || !liveStudentId) return;
 
     const liveRef = ref(rtdb, `liveStudents/${liveStudentId}`);
-    set(liveRef, { name, live: true });
-    onDisconnect(liveRef).remove();
-  }, [liveStudentId, cameraOn]);
 
-  // ✅ Timer
-  useEffect(() => {
-    const end = Date.now() + 30 * 60 * 1000;
-    const t = setInterval(() => {
-      const d = end - Date.now();
-      setTimeLeft(
-        `${Math.floor(d / 60000)}m ${Math.floor((d % 60000) / 1000)}s`
-      );
-    }, 1000);
-    return () => clearInterval(t);
-  }, []);
-
-  // ✅ Submit
-  const handleSubmit = async () => {
-    await addDoc(collection(db, "assignments"), {
+    set(liveRef, {
       name,
-      safeName: liveStudentId,
-      answers,
-      cameraVerified: true,
-      autoSubmitted: false,
-      submittedAt: new Date().toISOString(),
+      status: "live",
+      startedAt: Date.now(),
     });
 
-    await set(ref(rtdb, `liveStudents/${liveStudentId}`), null);
-    setSubmitted(true);
+    onDisconnect(liveRef).remove();
+
+    return () => {
+      set(liveRef, null); // ✅ clean old entries
+    };
+  }, [cameraOn, liveStudentId]);
+
+  // ✅ 30 MINUTE TIMER WITH AUTO SUBMIT
+  useEffect(() => {
+    let endTime = localStorage.getItem("examEndTime");
+
+    if (!endTime) {
+      endTime = new Date(Date.now() + 30 * 60 * 1000).toISOString();
+      localStorage.setItem("examEndTime", endTime);
+    }
+
+    const timer = setInterval(() => {
+      const diff = new Date(endTime) - new Date();
+
+      if (diff <= 0) {
+        clearInterval(timer);
+        setTimeLeft("Time Over");
+
+        if (!submitted) autoSubmit();
+      } else {
+        const mins = Math.floor(diff / 60000);
+        const secs = Math.floor((diff % 60000) / 1000);
+        setTimeLeft(`${mins}m ${secs}s`);
+      }
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [submitted]);
+
+  // ✅ REMOVE LIVE AFTER SUBMIT
+  const removeLive = async () => {
+    if (liveStudentId) {
+      await set(ref(rtdb, `liveStudents/${liveStudentId}`), null);
+    }
+  };
+
+  // ✅ AUTO SUBMIT
+  const autoSubmit = async () => {
+    if (!name.trim()) return;
+
+    try {
+      const safeName = liveStudentId;
+
+      await addDoc(collection(db, "assignments"), {
+        name,
+        safeName,
+        answers,
+        cameraVerified: cameraOn,
+        autoSubmitted: true,
+        submittedAt: new Date().toISOString(),
+      });
+
+      await removeLive();
+
+      setSubmitted(true);
+      setSuccessMsg("Time Over! Assignment Auto Submitted.");
+      localStorage.removeItem("assignmentDraft");
+      localStorage.removeItem("examEndTime");
+    } catch (err) {
+      console.error("Auto submit error:", err);
+    }
+  };
+
+  // ✅ MANUAL SUBMIT
+  const handleSubmit = async () => {
+    if (!name.trim()) {
+      setError("Please enter your name");
+      return;
+    }
+
+    if (!cameraOn) {
+      setError("Camera must be ON.");
+      return;
+    }
+
+    setLoading(true);
+    setError("");
+
+    try {
+      const safeName = liveStudentId;
+
+      await addDoc(collection(db, "assignments"), {
+        name,
+        safeName,
+        answers,
+        cameraVerified: true,
+        autoSubmitted: false,
+        submittedAt: new Date().toISOString(),
+      });
+
+      await removeLive();
+
+      setSubmitted(true);
+      setSuccessMsg("Assignment Submitted Successfully!");
+      localStorage.removeItem("assignmentDraft");
+      localStorage.removeItem("examEndTime");
+    } catch (err) {
+      setError(err.message);
+    }
+
+    setLoading(false);
   };
 
   return (
-    <main className="p-6 max-w-2xl mx-auto">
-      <h1 className="text-3xl text-center font-bold">Assignment</h1>
+    <main className="p-6 max-w-3xl mx-auto">
+      <h1 className="text-3xl font-bold mb-4 text-center">Assignment</h1>
 
-      <p className="text-center text-red-600">Time Left: {timeLeft}</p>
+      <p className="text-red-600 font-bold text-center mb-4">
+        Time Left: {timeLeft}
+      </p>
 
-      <input
-        className="w-full p-3 border mt-4"
-        placeholder="Enter Name"
-        onChange={(e) => setName(e.target.value)}
-      />
+      {!cameraOn && (
+        <p className="text-red-600 text-center font-semibold mb-4">
+          ⚠ Camera access is mandatory.
+        </p>
+      )}
 
-      <p className="text-red-600 mt-4">Live Camera (Mandatory)</p>
-      <video
-        ref={videoRef}
-        autoPlay
-        playsInline
-        className="w-48 h-36 border"
-      />
-
-      {Object.keys(questions).map((k) => (
-        <div key={k}>
-          <b>{questions[k]}</b>
-          <textarea
-            className="w-full p-2 border"
-            onChange={(e) =>
-              setAnswers({ ...answers, [k]: e.target.value })
-            }
-          />
+      {submitted ? (
+        <div className="bg-green-200 p-4 rounded text-center">
+          <h2 className="text-xl font-semibold">{successMsg}</h2>
+          <p>You can close this page.</p>
         </div>
-      ))}
+      ) : (
+        <div className="space-y-4">
+          <input
+            type="text"
+            placeholder="Enter Your Name"
+            className="w-full p-3 border rounded"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
 
-      <button
-        className="bg-blue-600 text-white px-6 py-2 mt-4"
-        onClick={handleSubmit}
-      >
-        Submit
-      </button>
+          <div className="text-center">
+            <p className="text-red-600 font-bold mb-2">
+              Live Camera (Mandatory)
+            </p>
+            <video
+              ref={videoRef}
+              autoPlay
+              playsInline
+              className="mx-auto w-48 h-36 border rounded"
+            />
+          </div>
+
+          {Object.keys(questions).map((key) => (
+            <div key={key}>
+              <label className="font-bold">{questions[key]}</label>
+              <textarea
+                className="w-full p-3 border rounded mt-2"
+                rows="4"
+                value={answers[key]}
+                onChange={(e) =>
+                  setAnswers({ ...answers, [key]: e.target.value })
+                }
+              ></textarea>
+            </div>
+          ))}
+
+          {error && <p className="text-red-600">{error}</p>}
+
+          <button
+            onClick={handleSubmit}
+            disabled={loading || submitted || !cameraOn}
+            className={`px-6 py-3 rounded text-white ${
+              loading || !cameraOn
+                ? "bg-gray-400"
+                : "bg-blue-600 hover:bg-blue-700"
+            }`}
+          >
+            {loading ? "Submitting..." : "Submit Assignment"}
+          </button>
+        </div>
+      )}
     </main>
   );
 }
