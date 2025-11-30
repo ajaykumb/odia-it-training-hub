@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { db, rtdb } from "../utils/firebaseConfig";
 import { collection, addDoc } from "firebase/firestore";
-import { ref, set, onValue, push } from "firebase/database";
+import { ref, set, onDisconnect } from "firebase/database";
 
 const GOOGLE_SHEET_CSV_URL =
   "https://docs.google.com/spreadsheets/d/e/2PACX-1vSq_FDI-zBgdDU-VgkVW7ZXb5XsmXDvTEInkvCkUtFzdjMdBEQoTYnnCwqaE5H55kFlN4DYCkzKHcmN/pub?gid=0&single=true&output=csv";
@@ -19,13 +19,15 @@ export default function Assignment() {
 
   const videoRef = useRef(null);
 
-  // ✅ RESET FOR NEW ATTEMPT ON REFRESH
+  const liveStudentId = name
+    ? name.toLowerCase().trim().replace(/[^a-z0-9]+/g, "_")
+    : null;
+
   useEffect(() => {
     localStorage.removeItem("examEndTime");
     localStorage.removeItem("assignmentDraft");
   }, []);
 
-  // ✅ LOAD QUESTIONS
   useEffect(() => {
     const loadQuestions = async () => {
       try {
@@ -33,23 +35,19 @@ export default function Assignment() {
         const text = await res.text();
         const rows = text.split("\n").map((r) => r.split(","));
         const qObj = {};
-
         for (let i = 1; i < rows.length; i++) {
           const key = rows[i][0]?.trim();
           const value = rows[i][1]?.trim();
           if (key && value) qObj[key] = value;
         }
-
         setQuestions(qObj);
       } catch {
         setError("Failed to load questions.");
       }
     };
-
     loadQuestions();
   }, []);
 
-  // ✅ AUTO SAVE DRAFT
   useEffect(() => {
     const saved = localStorage.getItem("assignmentDraft");
     if (saved) setAnswers(JSON.parse(saved));
@@ -59,7 +57,6 @@ export default function Assignment() {
     localStorage.setItem("assignmentDraft", JSON.stringify(answers));
   }, [answers]);
 
-  // ✅ PREVENT REFRESH WARNING
   useEffect(() => {
     const warn = (e) => {
       e.preventDefault();
@@ -69,7 +66,7 @@ export default function Assignment() {
     return () => window.removeEventListener("beforeunload", warn);
   }, []);
 
-  // ✅ CAMERA (LOCAL)
+  // ✅ CAMERA + LIVE PUSH
   useEffect(() => {
     navigator.mediaDevices
       .getUserMedia({ video: true })
@@ -85,57 +82,22 @@ export default function Assignment() {
       });
   }, []);
 
-  // ✅ STEP-2: SEND LIVE CAMERA TO ADMIN (WEBRTC SIGNALING)
+  // ✅ PUSH LIVE STATUS TO RTDB
   useEffect(() => {
-    if (!cameraOn || !videoRef.current?.srcObject || !name.trim()) return;
+    if (!cameraOn || !liveStudentId) return;
 
-    const studentId = name.toLowerCase().trim().replace(/[^a-z0-9]+/g, "_");
+    const liveRef = ref(rtdb, `liveStudents/${liveStudentId}`);
 
-    const pc = new RTCPeerConnection({
-      iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
+    set(liveRef, {
+      name,
+      status: "live",
+      startedAt: Date.now(),
     });
 
-    const localStream = videoRef.current.srcObject;
+    onDisconnect(liveRef).remove();
+  }, [cameraOn, liveStudentId, name]);
 
-    localStream.getTracks().forEach((track) => {
-      pc.addTrack(track, localStream);
-    });
-
-    const offerRef = ref(rtdb, `webrtc/${studentId}/offer`);
-    const answerRef = ref(rtdb, `webrtc/${studentId}/answer`);
-    const candidatesRef = ref(rtdb, `webrtc/${studentId}/candidates`);
-
-    pc.onicecandidate = (event) => {
-      if (event.candidate) {
-        push(candidatesRef, event.candidate.toJSON());
-      }
-    };
-
-    async function createOffer() {
-      const offer = await pc.createOffer();
-      await pc.setLocalDescription(offer);
-      await set(offerRef, offer);
-    }
-
-    createOffer();
-
-    onValue(answerRef, async (snap) => {
-      if (!snap.exists()) return;
-
-      const answer = snap.val();
-      if (!pc.currentRemoteDescription) {
-        await pc.setRemoteDescription(
-          new RTCSessionDescription(answer)
-        );
-      }
-    });
-
-    return () => {
-      pc.close();
-    };
-  }, [cameraOn, name]);
-
-  // ✅ 30 MINUTE TIMER WITH AUTO SUBMIT
+  // ✅ TIMER + AUTO SUBMIT
   useEffect(() => {
     let endTime = localStorage.getItem("examEndTime");
 
@@ -162,12 +124,17 @@ export default function Assignment() {
     return () => clearInterval(timer);
   }, [submitted]);
 
-  // ✅ AUTO SUBMIT FUNCTION
+  const removeLive = async () => {
+    if (liveStudentId) {
+      await set(ref(rtdb, `liveStudents/${liveStudentId}`), null);
+    }
+  };
+
   const autoSubmit = async () => {
     if (!name.trim()) return;
 
     try {
-      const safeName = name.toLowerCase().trim().replace(/[^a-z0-9]+/g, "_");
+      const safeName = liveStudentId;
 
       await addDoc(collection(db, "assignments"), {
         name,
@@ -178,6 +145,8 @@ export default function Assignment() {
         submittedAt: new Date().toISOString(),
       });
 
+      await removeLive();
+
       setSubmitted(true);
       setSuccessMsg("Time Over! Assignment Auto Submitted.");
       localStorage.removeItem("assignmentDraft");
@@ -187,7 +156,6 @@ export default function Assignment() {
     }
   };
 
-  // ✅ MANUAL SUBMIT
   const handleSubmit = async () => {
     if (!name.trim()) {
       setError("Please enter your name");
@@ -203,7 +171,7 @@ export default function Assignment() {
     setError("");
 
     try {
-      const safeName = name.toLowerCase().trim().replace(/[^a-z0-9]+/g, "_");
+      const safeName = liveStudentId;
 
       await addDoc(collection(db, "assignments"), {
         name,
@@ -213,6 +181,8 @@ export default function Assignment() {
         autoSubmitted: false,
         submittedAt: new Date().toISOString(),
       });
+
+      await removeLive();
 
       setSubmitted(true);
       setSuccessMsg("Assignment Submitted Successfully!");
@@ -227,9 +197,7 @@ export default function Assignment() {
 
   return (
     <main className="p-6 max-w-3xl mx-auto">
-      <h1 className="text-3xl font-bold mb-4 text-center">
-        Assignment
-      </h1>
+      <h1 className="text-3xl font-bold mb-4 text-center">Assignment</h1>
 
       <p className="text-red-600 font-bold text-center mb-4">
         Time Left: {timeLeft}
@@ -278,8 +246,6 @@ export default function Assignment() {
                 onChange={(e) =>
                   setAnswers({ ...answers, [key]: e.target.value })
                 }
-                onPaste={(e) => e.preventDefault()}
-                onCopy={(e) => e.preventDefault()}
               ></textarea>
             </div>
           ))}
