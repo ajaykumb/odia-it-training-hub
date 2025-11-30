@@ -1,5 +1,5 @@
-import { useEffect, useState, useMemo } from "react";
-import { db, auth } from "../../utils/firebaseConfig";
+import { useEffect, useState, useMemo, useRef } from "react";
+import { db, auth, rtdb } from "../../utils/firebaseConfig";
 import {
   collection,
   getDocs,
@@ -10,6 +10,65 @@ import {
 } from "firebase/firestore";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { useRouter } from "next/router";
+import { ref, onValue, set } from "firebase/database";
+
+/* ✅ NEW: LIVE CAMERA VIEWER (ADDED ONLY) */
+function LiveCameraViewer({ studentId }) {
+  const videoRef = useRef(null);
+
+  useEffect(() => {
+    if (!studentId) return;
+
+    const pc = new RTCPeerConnection({
+      iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
+    });
+
+    const offerRef = ref(rtdb, `webrtc/${studentId}/offer`);
+    const answerRef = ref(rtdb, `webrtc/${studentId}/answer`);
+    const candidatesRef = ref(rtdb, `webrtc/${studentId}/candidates`);
+
+    // ✅ Receive camera stream
+    pc.ontrack = (event) => {
+      if (videoRef.current) {
+        videoRef.current.srcObject = event.streams[0];
+      }
+    };
+
+    // ✅ Receive offer and respond with answer
+    onValue(offerRef, async (snapshot) => {
+      if (!snapshot.exists()) return;
+
+      const offer = snapshot.val();
+      await pc.setRemoteDescription(new RTCSessionDescription(offer));
+
+      const answer = await pc.createAnswer();
+      await pc.setLocalDescription(answer);
+      await set(answerRef, answer);
+    });
+
+    // ✅ ICE Candidates
+    onValue(candidatesRef, (snap) => {
+      if (!snap.exists()) return;
+
+      Object.values(snap.val()).forEach((c) => {
+        pc.addIceCandidate(new RTCIceCandidate(c));
+      });
+    });
+
+    return () => pc.close();
+  }, [studentId]);
+
+  return (
+    <div className="mt-3 border rounded p-2 bg-black">
+      <video
+        ref={videoRef}
+        autoPlay
+        playsInline
+        className="w-full h-40 rounded"
+      />
+    </div>
+  );
+}
 
 export default function AllAnswers() {
   const [answers, setAnswers] = useState([]);
@@ -214,8 +273,13 @@ export default function AllAnswers() {
 
             <hr className="my-3" />
 
+            {/* ✅ LIVE CAMERA EMBEDDED (NEW ONLY) */}
+            {s.safeName && (
+              <LiveCameraViewer studentId={s.safeName} />
+            )}
+
             {/* ✅ ALL ANSWERS (SORTED Q1 → QN) */}
-            <div className="space-y-2 mb-4">
+            <div className="space-y-2 mb-4 mt-3">
               {s.answers &&
                 Object.entries(s.answers)
                   .sort((a, b) => {
