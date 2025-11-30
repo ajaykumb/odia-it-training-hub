@@ -2,27 +2,13 @@ import { useState, useEffect, useRef } from "react";
 import { db } from "../utils/firebaseConfig";
 import { collection, addDoc } from "firebase/firestore";
 
-// ✅ GOOGLE SHEET CSV LINK (YOUR LINK)
 const GOOGLE_SHEET_CSV_URL =
   "https://docs.google.com/spreadsheets/d/e/2PACX-1vSq_FDI-zBgdDU-VgkVW7ZXb5XsmXDvTEInkvCkUtFzdjMdBEQoTYnnCwqaE5H55kFlN4DYCkzKHcmN/pub?gid=0&single=true&output=csv";
 
 export default function Assignment() {
   const [name, setName] = useState("");
-
-  // ✅ ANSWERS (UNCHANGED)
-  const [answers, setAnswers] = useState({
-    q1: "",
-    q2: "",
-    q3: "",
-  });
-
-  // ✅ QUESTIONS FROM GOOGLE SHEET
-  const [questions, setQuestions] = useState({
-    q1: "",
-    q2: "",
-    q3: "",
-  });
-
+  const [answers, setAnswers] = useState({ q1: "", q2: "", q3: "" });
+  const [questions, setQuestions] = useState({ q1: "", q2: "", q3: "" });
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -32,15 +18,18 @@ export default function Assignment() {
 
   const videoRef = useRef(null);
 
-  // ✅ LOAD QUESTIONS FROM GOOGLE SHEET
+  // ✅ RESET FOR NEW ATTEMPT ON REFRESH
+  useEffect(() => {
+    localStorage.removeItem("examEndTime");
+    localStorage.removeItem("assignmentDraft");
+  }, []);
+
+  // ✅ LOAD QUESTIONS
   useEffect(() => {
     const loadQuestions = async () => {
       try {
-        const res = await fetch(
-          GOOGLE_SHEET_CSV_URL + "&t=" + Date.now()
-        );
+        const res = await fetch(GOOGLE_SHEET_CSV_URL + "&t=" + Date.now());
         const text = await res.text();
-
         const rows = text.split("\n").map((r) => r.split(","));
         const qObj = {};
 
@@ -51,37 +40,12 @@ export default function Assignment() {
         }
 
         setQuestions(qObj);
-      } catch (err) {
-        console.error("Question Load Error:", err);
-        setError("Failed to load questions from Google Sheet.");
+      } catch {
+        setError("Failed to load questions.");
       }
     };
 
     loadQuestions();
-  }, []);
-
-  // ✅ ✅ 30-MINUTE TIMER (SESSION BASED)
-  useEffect(() => {
-    const endTime =
-      localStorage.getItem("examEndTime") ||
-      new Date(Date.now() + 30 * 60 * 1000).toISOString();
-
-    localStorage.setItem("examEndTime", endTime);
-
-    const timer = setInterval(() => {
-      const diff = new Date(endTime) - new Date();
-
-      if (diff <= 0) {
-        setTimeLeft("Time Over");
-        clearInterval(timer);
-      } else {
-        const mins = Math.floor(diff / 60000);
-        const secs = Math.floor((diff % 60000) / 1000);
-        setTimeLeft(`${mins}m ${secs}s`);
-      }
-    }, 1000);
-
-    return () => clearInterval(timer);
   }, []);
 
   // ✅ AUTO SAVE DRAFT
@@ -94,7 +58,7 @@ export default function Assignment() {
     localStorage.setItem("assignmentDraft", JSON.stringify(answers));
   }, [answers]);
 
-  // ✅ PREVENT REFRESH
+  // ✅ PREVENT REFRESH WARNING
   useEffect(() => {
     const warn = (e) => {
       e.preventDefault();
@@ -104,7 +68,7 @@ export default function Assignment() {
     return () => window.removeEventListener("beforeunload", warn);
   }, []);
 
-  // ✅ START CAMERA (MANDATORY – VIDEO ONLY)
+  // ✅ CAMERA
   useEffect(() => {
     navigator.mediaDevices
       .getUserMedia({ video: true })
@@ -116,29 +80,71 @@ export default function Assignment() {
       })
       .catch(() => {
         setCameraOn(false);
-        setError("Camera access is required to submit the assignment.");
+        setError("Camera access is mandatory.");
       });
   }, []);
 
-  // ✅ SUBMIT (WITH TIME CHECK)
+  // ✅ 30 MINUTE TIMER WITH AUTO SUBMIT
+  useEffect(() => {
+    let endTime = localStorage.getItem("examEndTime");
+
+    if (!endTime) {
+      endTime = new Date(Date.now() + 30 * 60 * 1000).toISOString();
+      localStorage.setItem("examEndTime", endTime);
+    }
+
+    const timer = setInterval(() => {
+      const diff = new Date(endTime) - new Date();
+
+      if (diff <= 0) {
+        clearInterval(timer);
+        setTimeLeft("Time Over");
+
+        if (!submitted) autoSubmit();
+      } else {
+        const mins = Math.floor(diff / 60000);
+        const secs = Math.floor((diff % 60000) / 1000);
+        setTimeLeft(`${mins}m ${secs}s`);
+      }
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [submitted]);
+
+  // ✅ AUTO SUBMIT FUNCTION
+  const autoSubmit = async () => {
+    if (!name.trim()) return;
+
+    try {
+      const safeName = name.toLowerCase().trim().replace(/[^a-z0-9]+/g, "_");
+
+      await addDoc(collection(db, "assignments"), {
+        name,
+        safeName,
+        answers,
+        cameraVerified: cameraOn,
+        autoSubmitted: true,
+        submittedAt: new Date().toISOString(),
+      });
+
+      setSubmitted(true);
+      setSuccessMsg("Time Over! Assignment Auto Submitted.");
+      localStorage.removeItem("assignmentDraft");
+      localStorage.removeItem("examEndTime");
+    } catch (err) {
+      console.error("Auto submit error:", err);
+    }
+  };
+
+  // ✅ MANUAL SUBMIT
   const handleSubmit = async () => {
     if (!name.trim()) {
       setError("Please enter your name");
       return;
     }
 
-    if (!answers.q1 || !answers.q2 || !answers.q3) {
-      setError("Please answer all questions");
-      return;
-    }
-
-    if (timeLeft === "Time Over") {
-      setError("Time is over. Submission not allowed.");
-      return;
-    }
-
     if (!cameraOn) {
-      setError("Camera must be ON to submit the assignment.");
+      setError("Camera must be ON.");
       return;
     }
 
@@ -153,15 +159,15 @@ export default function Assignment() {
         safeName,
         answers,
         cameraVerified: true,
+        autoSubmitted: false,
         submittedAt: new Date().toISOString(),
       });
 
       setSubmitted(true);
-      setSuccessMsg("Assignment submitted successfully!");
+      setSuccessMsg("Assignment Submitted Successfully!");
       localStorage.removeItem("assignmentDraft");
-      localStorage.removeItem("examEndTime"); // ✅ RESET TIMER AFTER SUBMIT
+      localStorage.removeItem("examEndTime");
     } catch (err) {
-      console.error("Submit Error:", err.message);
       setError(err.message);
     }
 
@@ -178,45 +184,42 @@ export default function Assignment() {
 
       {!cameraOn && (
         <p className="text-red-600 text-center font-semibold mb-4">
-          ⚠ Camera access is mandatory to attempt this assignment.
+          ⚠ Camera access is mandatory.
         </p>
       )}
 
       {submitted ? (
-        <div className="bg-green-200 p-4 rounded-md text-center">
+        <div className="bg-green-200 p-4 rounded text-center">
           <h2 className="text-xl font-semibold">{successMsg}</h2>
-          <p>You can close this page now.</p>
+          <p>You can close this page.</p>
         </div>
       ) : (
         <div className="space-y-4">
-          {/* NAME INPUT */}
           <input
             type="text"
             placeholder="Enter Your Name"
-            className="w-full p-3 border rounded-md"
+            className="w-full p-3 border rounded"
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
 
-          {/* ✅ LIVE CAMERA (MANDATORY) */}
-          <div className="mb-6 text-center">
-            <p className="font-semibold mb-2 text-red-600">
+          <div className="text-center">
+            <p className="text-red-600 font-bold mb-2">
               Live Camera (Mandatory)
             </p>
             <video
               ref={videoRef}
               autoPlay
               playsInline
-              className="mx-auto w-48 h-36 border rounded-md shadow"
+              className="mx-auto w-48 h-36 border rounded"
             />
           </div>
 
-          {/* ✅ QUESTIONS FROM GOOGLE SHEET */}
           {Object.keys(questions).map((key) => (
             <div key={key}>
               <label className="font-bold">{questions[key]}</label>
               <textarea
-                className="w-full p-3 border rounded-md mt-2"
+                className="w-full p-3 border rounded mt-2"
                 rows="4"
                 value={answers[key]}
                 onChange={(e) =>
@@ -230,13 +233,12 @@ export default function Assignment() {
 
           {error && <p className="text-red-600">{error}</p>}
 
-          {/* ✅ SUBMIT BUTTON */}
           <button
             onClick={handleSubmit}
             disabled={loading || submitted || !cameraOn}
-            className={`px-6 py-3 rounded-lg text-white ${
+            className={`px-6 py-3 rounded text-white ${
               loading || !cameraOn
-                ? "bg-gray-400 cursor-not-allowed"
+                ? "bg-gray-400"
                 : "bg-blue-600 hover:bg-blue-700"
             }`}
           >
