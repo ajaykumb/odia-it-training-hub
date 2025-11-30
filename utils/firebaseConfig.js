@@ -4,6 +4,7 @@ import { getAnalytics } from "firebase/analytics";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
+import { getDatabase } from "firebase/database"; // ✅ RTDB IMPORT
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -11,7 +12,7 @@ const firebaseConfig = {
   authDomain: "odia-it-training-hub-database.firebaseapp.com",
   projectId: "odia-it-training-hub-database",
 
-  // ✅ FIXED STORAGE BUCKET (VERY IMPORTANT)
+  // ✅ FIXED STORAGE BUCKET
   storageBucket: "odia-it-training-hub-database.appspot.com",
 
   messagingSenderId: "799162059424",
@@ -26,6 +27,7 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 const storage = getStorage(app);
+const rtdb = getDatabase(app); // ✅ REALTIME DATABASE INIT
 
 // ✅ Optional: Analytics (only on client)
 let analytics;
@@ -33,5 +35,5 @@ if (typeof window !== "undefined") {
   analytics = getAnalytics(app);
 }
 
-// ✅ FINAL EXPORT
-export { auth, db, storage, analytics };
+// ✅ FINAL EXPORT (RTDB ADDED SAFELY)
+export { auth, db, storage, analytics, rtdb };
