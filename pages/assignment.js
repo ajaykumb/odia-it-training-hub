@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { db, rtdb } from "../utils/firebaseConfig";
 import { collection, addDoc } from "firebase/firestore";
-import { ref, set, onDisconnect } from "firebase/database";
+import { ref, set, onDisconnect, push, onValue } from "firebase/database";
 
 const GOOGLE_SHEET_CSV_URL =
   "https://docs.google.com/spreadsheets/d/e/2PACX-1vSq_FDI-zBgdDU-VgkVW7ZXb5XsmXDvTEInkvCkUtFzdjMdBEQoTYnnCwqaE5H55kFlN4DYCkzKHcmN/pub?gid=0&single=true&output=csv";
@@ -71,7 +71,7 @@ export default function Assignment() {
     return () => window.removeEventListener("beforeunload", warn);
   }, []);
 
-  // ✅ CAMERA INIT
+  // ✅ CAMERA INIT (LOCAL PREVIEW)
   useEffect(() => {
     navigator.mediaDevices
       .getUserMedia({ video: true })
@@ -103,7 +103,7 @@ export default function Assignment() {
     return () => clearTimeout(timeout);
   }, [name]);
 
-  // ✅ PUSH LIVE STUDENT TO RTDB (CLEAN)
+  // ✅ PUSH LIVE STUDENT TO RTDB (PRESENCE)
   useEffect(() => {
     if (!cameraOn || !liveStudentId) return;
 
@@ -118,7 +118,59 @@ export default function Assignment() {
     onDisconnect(liveRef).remove();
 
     return () => {
-      set(liveRef, null); // ✅ clean old entries
+      set(liveRef, null);
+    };
+  }, [cameraOn, liveStudentId]);
+
+  // ✅ ✅ ✅ SEND LIVE VIDEO TO ADMIN (WEBRTC SENDER)
+  useEffect(() => {
+    if (!cameraOn || !liveStudentId || !videoRef.current) return;
+
+    let pc;
+    let localStream;
+
+    const startStreaming = async () => {
+      localStream = videoRef.current.srcObject;
+
+      pc = new RTCPeerConnection({
+        iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
+      });
+
+      localStream.getTracks().forEach((track) => {
+        pc.addTrack(track, localStream);
+      });
+
+      const offerRef = ref(rtdb, `${liveStudentId}/offer`);
+      const answerRef = ref(rtdb, `${liveStudentId}/answer`);
+      const candidatesRef = ref(rtdb, `${liveStudentId}/candidates`);
+
+      pc.onicecandidate = (e) => {
+        if (e.candidate) {
+          push(candidatesRef, e.candidate.toJSON());
+        }
+      };
+
+      const offer = await pc.createOffer();
+      await pc.setLocalDescription(offer);
+      await set(offerRef, offer);
+
+      // ✅ RECEIVE ADMIN ANSWER
+      onValue(answerRef, async (snap) => {
+        if (!snap.exists()) return;
+        const ans = snap.val();
+
+        if (!pc.currentRemoteDescription) {
+          await pc.setRemoteDescription(
+            new RTCSessionDescription(ans)
+          );
+        }
+      });
+    };
+
+    startStreaming();
+
+    return () => {
+      if (pc) pc.close();
     };
   }, [cameraOn, liveStudentId]);
 
@@ -225,7 +277,9 @@ export default function Assignment() {
 
   return (
     <main className="p-6 max-w-3xl mx-auto">
-      <h1 className="text-3xl font-bold mb-4 text-center">Assignment</h1>
+      <h1 className="text-3xl font-bold mb-4 text-center">
+        Assignment
+      </h1>
 
       <p className="text-red-600 font-bold text-center mb-4">
         Time Left: {timeLeft}
@@ -239,7 +293,9 @@ export default function Assignment() {
 
       {submitted ? (
         <div className="bg-green-200 p-4 rounded text-center">
-          <h2 className="text-xl font-semibold">{successMsg}</h2>
+          <h2 className="text-xl font-semibold">
+            {successMsg}
+          </h2>
           <p>You can close this page.</p>
         </div>
       ) : (
@@ -266,13 +322,18 @@ export default function Assignment() {
 
           {Object.keys(questions).map((key) => (
             <div key={key}>
-              <label className="font-bold">{questions[key]}</label>
+              <label className="font-bold">
+                {questions[key]}
+              </label>
               <textarea
                 className="w-full p-3 border rounded mt-2"
                 rows="4"
                 value={answers[key]}
                 onChange={(e) =>
-                  setAnswers({ ...answers, [key]: e.target.value })
+                  setAnswers({
+                    ...answers,
+                    [key]: e.target.value,
+                  })
                 }
               ></textarea>
             </div>
