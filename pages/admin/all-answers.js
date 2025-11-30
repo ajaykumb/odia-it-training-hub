@@ -1,138 +1,142 @@
-import { useEffect, useState, useRef } from "react";
-import { auth, rtdb } from "../../utils/firebaseConfig";
+import { useEffect, useState, useMemo } from "react";
+import { db, auth, rtdb } from "../../utils/firebaseConfig";
+import {
+  collection,
+  getDocs,
+  orderBy,
+  query,
+  deleteDoc,
+  doc,
+} from "firebase/firestore";
 import { onAuthStateChanged, signOut } from "firebase/auth";
-import { ref, onValue, set } from "firebase/database";
 import { useRouter } from "next/router";
+import { ref, onValue } from "firebase/database";
 
-/* ✅ LIVE CAMERA VIEWER — MATCHES YOUR EXACT RTDB STRUCTURE */
-function LiveCameraViewer({ studentId }) {
-  const videoRef = useRef(null);
-
-  useEffect(() => {
-    if (!studentId) return;
-
-    const pc = new RTCPeerConnection({
-      iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
-    });
-
-    const offerRef = ref(rtdb, `${studentId}/offer`);
-    const answerRef = ref(rtdb, `${studentId}/answer`);
-    const candidatesRef = ref(rtdb, `${studentId}/candidates`);
-
-    pc.ontrack = (event) => {
-      if (videoRef.current) {
-        videoRef.current.srcObject = event.streams[0];
-      }
-    };
-
-    onValue(offerRef, async (snapshot) => {
-      if (!snapshot.exists()) return;
-
-      const offer = snapshot.val();
-      await pc.setRemoteDescription(
-        new RTCSessionDescription(offer)
-      );
-
-      const answer = await pc.createAnswer();
-      await pc.setLocalDescription(answer);
-      await set(answerRef, answer);
-    });
-
-    onValue(candidatesRef, (snap) => {
-      if (!snap.exists()) return;
-
-      Object.values(snap.val()).forEach((c) => {
-        pc.addIceCandidate(new RTCIceCandidate(c));
-      });
-    });
-
-    return () => pc.close();
-  }, [studentId]);
-
-  return (
-    <div className="mt-3 border rounded p-2 bg-black">
-      <video
-        ref={videoRef}
-        autoPlay
-        playsInline
-        className="w-full h-40 rounded"
-      />
-    </div>
-  );
-}
-
-export default function LiveMonitorOnly() {
-  const [liveStudents, setLiveStudents] = useState([]);
+export default function AllAnswers() {
+  const [answers, setAnswers] = useState([]);
+  const [liveStudents, setLiveStudents] = useState({});
+  const [filter, setFilter] = useState("all");
   const router = useRouter();
 
-  // ✅ ADMIN PROTECTION
+  // ✅ AUTH + FIRESTORE
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, (user) => {
-      if (!user) router.push("/admin/login");
-    });
-    return () => unsub();
-  }, [router]);
-
-  // ✅ PURE LIVE STUDENT LIST FROM RTDB
-  useEffect(() => {
-    const rootRef = ref(rtdb);
-
-    const unsubscribe = onValue(rootRef, (snapshot) => {
-      if (!snapshot.exists()) {
-        setLiveStudents([]);
+    const unsub = onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        router.push("/admin/login");
         return;
       }
 
-      const data = snapshot.val();
-
-      // Only students that have "offer" = LIVE
-      const active = Object.keys(data).filter(
-        (id) => data[id]?.offer
+      const q = query(
+        collection(db, "assignments"),
+        orderBy("submittedAt", "desc")
       );
 
-      setLiveStudents(active);
+      const snapshot = await getDocs(q);
+      const arr = [];
+      snapshot.forEach((docData) => {
+        arr.push({ id: docData.id, ...docData.data() });
+      });
+
+      setAnswers(arr);
     });
 
-    return () => unsubscribe();
+    return () => unsub();
+  }, [router]);
+
+  // ✅ RTDB LIVE STUDENTS
+  useEffect(() => {
+    const liveRef = ref(rtdb, "liveStudents");
+
+    onValue(liveRef, (snap) => {
+      setLiveStudents(snap.val() || {});
+    });
   }, []);
+
+  const filteredAnswers = useMemo(() => {
+    if (filter === "auto") {
+      return answers.filter((a) => a.autoSubmitted === true);
+    }
+    if (filter === "manual") {
+      return answers.filter((a) => a.autoSubmitted === false);
+    }
+    return answers;
+  }, [answers, filter]);
+
+  const handleDelete = async (id) => {
+    const confirmDelete = window.confirm("Delete this submission?");
+    if (!confirmDelete) return;
+
+    await deleteDoc(doc(db, "assignments", id));
+    setAnswers((prev) => prev.filter((i) => i.id !== id));
+  };
 
   return (
     <main className="p-6 max-w-6xl mx-auto">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-center">
+        <h1 className="text-3xl font-bold">
           🔴 LIVE STUDENT MONITORING
         </h1>
-
         <button
-          onClick={() => signOut(auth)}
           className="bg-red-600 text-white px-4 py-2 rounded"
+          onClick={() => signOut(auth)}
         >
           Logout
         </button>
       </div>
 
-      <p className="mb-4 text-sm text-gray-600 text-center">
-        Live Students Connected: <b>{liveStudents.length}</b>
-      </p>
+      {/* ✅ LIVE STUDENTS */}
+      <div className="mb-10">
+        <p className="text-lg font-semibold mb-2">
+          Live Students Connected:{" "}
+          {Object.keys(liveStudents).length}
+        </p>
+
+        {Object.keys(liveStudents).length === 0 && (
+          <p className="text-red-500">❌ No students are live right now.</p>
+        )}
+
+        <div className="grid md:grid-cols-3 gap-4">
+          {Object.entries(liveStudents).map(([id, s]) => (
+            <div
+              key={id}
+              className="border p-4 rounded shadow bg-green-50"
+            >
+              <p className="font-bold">{s.name}</p>
+              <p className="text-green-600 font-semibold">
+                LIVE 🎥
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ✅ SUBMITTED STUDENTS */}
+      <h2 className="text-2xl font-bold mb-4">✅ SUBMITTED STUDENTS</h2>
 
       <div className="grid md:grid-cols-2 gap-6">
-        {liveStudents.map((studentId) => (
-          <div
-            key={studentId}
-            className="p-4 border rounded-lg shadow bg-white"
-          >
-            <h2 className="font-bold text-xl">
-              {studentId} — LIVE 🎥
-            </h2>
+        {filteredAnswers.map((s) => (
+          <div key={s.id} className="p-4 border rounded shadow">
+            <h2 className="font-bold text-xl">{s.name}</h2>
 
-            <LiveCameraViewer studentId={studentId} />
+            <div className="mt-2 space-y-1">
+              {Object.entries(s.answers || {}).map(([k, v]) => (
+                <p key={k}>
+                  <b>{k.toUpperCase()}:</b> {v || "-"}
+                </p>
+              ))}
+            </div>
+
+            <button
+              onClick={() => handleDelete(s.id)}
+              className="bg-red-500 text-white w-full mt-4 py-2 rounded"
+            >
+              Delete Submission
+            </button>
           </div>
         ))}
 
-        {liveStudents.length === 0 && (
-          <p className="text-center col-span-2 text-gray-500">
-            ❌ No students are live right now.
-          </p>
+        {filteredAnswers.length === 0 && (
+          <p>No submitted students yet.</p>
         )}
       </div>
     </main>
