@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
-import { db } from "../utils/firebaseConfig";
+import { db, rtdb } from "../utils/firebaseConfig";
 import { collection, addDoc } from "firebase/firestore";
+import { ref, set, onValue, push } from "firebase/database";
 
 const GOOGLE_SHEET_CSV_URL =
   "https://docs.google.com/spreadsheets/d/e/2PACX-1vSq_FDI-zBgdDU-VgkVW7ZXb5XsmXDvTEInkvCkUtFzdjMdBEQoTYnnCwqaE5H55kFlN4DYCkzKHcmN/pub?gid=0&single=true&output=csv";
@@ -68,7 +69,7 @@ export default function Assignment() {
     return () => window.removeEventListener("beforeunload", warn);
   }, []);
 
-  // ✅ CAMERA
+  // ✅ CAMERA (LOCAL)
   useEffect(() => {
     navigator.mediaDevices
       .getUserMedia({ video: true })
@@ -83,6 +84,56 @@ export default function Assignment() {
         setError("Camera access is mandatory.");
       });
   }, []);
+
+  // ✅ STEP-2: SEND LIVE CAMERA TO ADMIN (WEBRTC SIGNALING)
+  useEffect(() => {
+    if (!cameraOn || !videoRef.current?.srcObject || !name.trim()) return;
+
+    const studentId = name.toLowerCase().trim().replace(/[^a-z0-9]+/g, "_");
+
+    const pc = new RTCPeerConnection({
+      iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
+    });
+
+    const localStream = videoRef.current.srcObject;
+
+    localStream.getTracks().forEach((track) => {
+      pc.addTrack(track, localStream);
+    });
+
+    const offerRef = ref(rtdb, `webrtc/${studentId}/offer`);
+    const answerRef = ref(rtdb, `webrtc/${studentId}/answer`);
+    const candidatesRef = ref(rtdb, `webrtc/${studentId}/candidates`);
+
+    pc.onicecandidate = (event) => {
+      if (event.candidate) {
+        push(candidatesRef, event.candidate.toJSON());
+      }
+    };
+
+    async function createOffer() {
+      const offer = await pc.createOffer();
+      await pc.setLocalDescription(offer);
+      await set(offerRef, offer);
+    }
+
+    createOffer();
+
+    onValue(answerRef, async (snap) => {
+      if (!snap.exists()) return;
+
+      const answer = snap.val();
+      if (!pc.currentRemoteDescription) {
+        await pc.setRemoteDescription(
+          new RTCSessionDescription(answer)
+        );
+      }
+    });
+
+    return () => {
+      pc.close();
+    };
+  }, [cameraOn, name]);
 
   // ✅ 30 MINUTE TIMER WITH AUTO SUBMIT
   useEffect(() => {
@@ -176,7 +227,9 @@ export default function Assignment() {
 
   return (
     <main className="p-6 max-w-3xl mx-auto">
-      <h1 className="text-3xl font-bold mb-4 text-center">Assignment</h1>
+      <h1 className="text-3xl font-bold mb-4 text-center">
+        Assignment
+      </h1>
 
       <p className="text-red-600 font-bold text-center mb-4">
         Time Left: {timeLeft}
