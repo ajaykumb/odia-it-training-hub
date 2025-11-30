@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { db, auth } from "../../utils/firebaseConfig";
 import {
   collection,
@@ -13,6 +13,7 @@ import { useRouter } from "next/router";
 
 export default function AllAnswers() {
   const [answers, setAnswers] = useState([]);
+  const [filter, setFilter] = useState("all"); // all | manual | auto
   const router = useRouter();
 
   useEffect(() => {
@@ -40,11 +41,34 @@ export default function AllAnswers() {
     return () => unsubscribe();
   }, [router]);
 
+  // ✅ FILTERED DATA (AUTO vs MANUAL)
+  const filteredAnswers = useMemo(() => {
+    if (filter === "auto") {
+      return answers.filter((a) => a.autoSubmitted === true);
+    }
+    if (filter === "manual") {
+      return answers.filter((a) => a.autoSubmitted === false);
+    }
+    return answers;
+  }, [answers, filter]);
+
   // ✅ SAFE DATE FORMATTER
   const formatDate = (d) => {
     if (!d) return "N/A";
     if (d.seconds) return new Date(d.seconds * 1000).toLocaleString();
     return new Date(d).toLocaleString();
+  };
+
+  // ✅ TIMER USED TEXT
+  const getTimerUsed = (s) => {
+    if (s.autoSubmitted) return "30:00 (Time Over)";
+    return "Submitted Before Time Over";
+  };
+
+  // ✅ CAMERA STATUS TEXT
+  const getCameraStatus = (s) => {
+    if (s.cameraVerified) return "ON";
+    return "OFF";
   };
 
   // ✅ DELETE HANDLER
@@ -57,10 +81,7 @@ export default function AllAnswers() {
 
     try {
       await deleteDoc(doc(db, "assignments", id));
-
-      // ✅ Remove from UI instantly
       setAnswers((prev) => prev.filter((item) => item.id !== id));
-
       alert("Student answer deleted successfully.");
     } catch (err) {
       console.error("Delete Error:", err.message);
@@ -74,7 +95,45 @@ export default function AllAnswers() {
         All Student Answers (Admin)
       </h1>
 
-      <div className="flex justify-end mb-6">
+      {/* ✅ TOP BAR */}
+      <div className="flex flex-wrap items-center justify-between mb-6 gap-3">
+        {/* ✅ FILTER BUTTONS */}
+        <div className="flex gap-2">
+          <button
+            onClick={() => setFilter("all")}
+            className={`px-4 py-2 rounded-md ${
+              filter === "all"
+                ? "bg-blue-600 text-white"
+                : "bg-gray-200"
+            }`}
+          >
+            All
+          </button>
+
+          <button
+            onClick={() => setFilter("manual")}
+            className={`px-4 py-2 rounded-md ${
+              filter === "manual"
+                ? "bg-green-600 text-white"
+                : "bg-gray-200"
+            }`}
+          >
+            Manual Only
+          </button>
+
+          <button
+            onClick={() => setFilter("auto")}
+            className={`px-4 py-2 rounded-md ${
+              filter === "auto"
+                ? "bg-orange-600 text-white"
+                : "bg-gray-200"
+            }`}
+          >
+            Auto-Submitted Only
+          </button>
+        </div>
+
+        {/* ✅ LOGOUT */}
         <button
           className="bg-red-600 text-white px-4 py-2 rounded-md"
           onClick={() => signOut(auth)}
@@ -83,8 +142,13 @@ export default function AllAnswers() {
         </button>
       </div>
 
+      {/* ✅ RESULT COUNT */}
+      <p className="mb-4 text-sm text-gray-600">
+        Showing <b>{filteredAnswers.length}</b> submissions
+      </p>
+
       <div className="grid md:grid-cols-2 gap-6">
-        {answers.map((s, i) => (
+        {filteredAnswers.map((s) => (
           <div
             key={s.id}
             className="p-4 border rounded-lg shadow bg-white"
@@ -105,11 +169,43 @@ export default function AllAnswers() {
 
               <div>
                 <h2 className="font-bold text-xl">{s.name}</h2>
+
                 <p className="text-sm text-gray-600">
                   Submitted: {formatDate(s.submittedAt)}
                 </p>
+
+                {/* ✅ AUTO / MANUAL BADGE */}
+                <span
+                  className={`inline-block mt-1 px-3 py-1 text-xs rounded-full ${
+                    s.autoSubmitted
+                      ? "bg-orange-100 text-orange-700"
+                      : "bg-green-100 text-green-700"
+                  }`}
+                >
+                  {s.autoSubmitted ? "AUTO SUBMITTED" : "MANUAL SUBMITTED"}
+                </span>
+
+                {/* ✅ CAMERA STATUS */}
+                <span
+                  className={`inline-block mt-1 ml-2 px-3 py-1 text-xs rounded-full ${
+                    s.cameraVerified
+                      ? "bg-blue-100 text-blue-700"
+                      : "bg-red-100 text-red-700"
+                  }`}
+                >
+                  Camera: {getCameraStatus(s)}
+                </span>
+
+                {/* ✅ TIMER USED */}
+                <p className="text-sm mt-1">
+                  ⏱ Timer Used:{" "}
+                  <b className="text-gray-700">
+                    {getTimerUsed(s)}
+                  </b>
+                </p>
+
                 {s.studentId && (
-                  <p className="text-sm font-semibold">
+                  <p className="text-sm font-semibold mt-1">
                     Student ID: {s.studentId}
                   </p>
                 )}
@@ -130,7 +226,9 @@ export default function AllAnswers() {
                   .map(([key, value]) => (
                     <p key={key}>
                       <b>{key.toUpperCase()}:</b>{" "}
-                      {value ? value : <span className="text-red-500">-</span>}
+                      {value ? value : (
+                        <span className="text-red-500">-</span>
+                      )}
                     </p>
                   ))}
             </div>
@@ -145,9 +243,9 @@ export default function AllAnswers() {
           </div>
         ))}
 
-        {answers.length === 0 && (
+        {filteredAnswers.length === 0 && (
           <p className="text-center col-span-2 text-gray-500">
-            No student submissions yet.
+            No student submissions found for this filter.
           </p>
         )}
       </div>
