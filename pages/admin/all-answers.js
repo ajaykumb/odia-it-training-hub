@@ -2,11 +2,9 @@ import { useEffect, useState, useMemo } from "react";
 import { db, auth, rtdb } from "../../utils/firebaseConfig";
 import {
   collection,
-  getDocs,
-  orderBy,
-  query,
   deleteDoc,
   doc,
+  onSnapshot,
 } from "firebase/firestore";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { useRouter } from "next/router";
@@ -18,29 +16,31 @@ export default function AllAnswers() {
   const [filter, setFilter] = useState("all"); // all | manual | auto
   const router = useRouter();
 
-  // ✅ AUTH + FIRESTORE SUBMISSIONS
+  // ✅ AUTH + FIRESTORE SUBMISSIONS (REALTIME SAFE)
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, async (user) => {
+    const unsubAuth = onAuthStateChanged(auth, (user) => {
       if (!user) {
         router.push("/admin/login");
         return;
       }
 
-      const q = query(
+      const unsubSnap = onSnapshot(
         collection(db, "assignments"),
-        orderBy("submittedAt", "desc")
+        (snapshot) => {
+          const arr = snapshot.docs.map((d) => ({
+            id: d.id,
+            ...d.data(),
+          }));
+
+          console.log("ADMIN LIVE DATA:", arr); // ✅ DEBUG
+          setAnswers(arr);
+        }
       );
 
-      const snapshot = await getDocs(q);
-      const arr = [];
-      snapshot.forEach((docData) => {
-        arr.push({ id: docData.id, ...docData.data() });
-      });
-
-      setAnswers(arr);
+      return () => unsubSnap();
     });
 
-    return () => unsub();
+    return () => unsubAuth();
   }, [router]);
 
   // ✅ REALTIME LIVE STUDENTS
