@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { db, rtdb } from "../utils/firebaseConfig";
 import { collection, addDoc } from "firebase/firestore";
-import { ref, set, onDisconnect, push, onValue } from "firebase/database";
+import { ref, set, onDisconnect, push } from "firebase/database";
 
 const GOOGLE_SHEET_CSV_URL =
   "https://docs.google.com/spreadsheets/d/e/2PACX-1vSq_FDI-zBgdDU-VgkVW7ZXb5XsmXDvTEInkvCkUtFzdjMdBEQoTYnnCwqaE5H55kFlN4DYCkzKHcmN/pub?gid=0&single=true&output=csv";
@@ -9,9 +9,8 @@ const GOOGLE_SHEET_CSV_URL =
 export default function Assignment() {
   const [name, setName] = useState("");
   const [liveStudentId, setLiveStudentId] = useState(null);
-
-  const [answers, setAnswers] = useState({ q1: "", q2: "", q3: "" });
-  const [questions, setQuestions] = useState({ q1: "", q2: "", q3: "" });
+  const [answers, setAnswers] = useState({ q1: "", q2: "", q3: "", q4: "" });
+  const [questions, setQuestions] = useState({});
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -21,7 +20,7 @@ export default function Assignment() {
 
   const videoRef = useRef(null);
 
-  // ✅ RESET FOR NEW ATTEMPT
+  // ✅ RESET
   useEffect(() => {
     localStorage.removeItem("examEndTime");
     localStorage.removeItem("assignmentDraft");
@@ -61,20 +60,10 @@ export default function Assignment() {
     localStorage.setItem("assignmentDraft", JSON.stringify(answers));
   }, [answers]);
 
-  // ✅ PREVENT REFRESH WARNING
-  useEffect(() => {
-    const warn = (e) => {
-      e.preventDefault();
-      e.returnValue = "";
-    };
-    window.addEventListener("beforeunload", warn);
-    return () => window.removeEventListener("beforeunload", warn);
-  }, []);
-
-  // ✅ CAMERA INIT (LOCAL PREVIEW)
+  // ✅ CAMERA INIT
   useEffect(() => {
     navigator.mediaDevices
-      .getUserMedia({ video: true })
+      .getUserMedia({ video: true, audio: false })
       .then((stream) => {
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
@@ -87,23 +76,23 @@ export default function Assignment() {
       });
   }, []);
 
-  // ✅ STABLE LIVE STUDENT ID (DEBOUNCED)
+  // ✅ STABLE STUDENT ID
   useEffect(() => {
     if (!name.trim()) return;
 
-    const timeout = setTimeout(() => {
-      const stableId = name
+    const t = setTimeout(() => {
+      const safe = name
         .toLowerCase()
         .trim()
         .replace(/[^a-z0-9]+/g, "_");
 
-      setLiveStudentId(stableId);
-    }, 1200);
+      setLiveStudentId(safe);
+    }, 1000);
 
-    return () => clearTimeout(timeout);
+    return () => clearTimeout(t);
   }, [name]);
 
-  // ✅ PUSH LIVE STUDENT TO RTDB (PRESENCE)
+  // ✅ PUSH LIVE STUDENT TO RTDB
   useEffect(() => {
     if (!cameraOn || !liveStudentId) return;
 
@@ -122,59 +111,40 @@ export default function Assignment() {
     };
   }, [cameraOn, liveStudentId]);
 
-  // ✅ ✅ ✅ SEND LIVE VIDEO TO ADMIN (WEBRTC SENDER)
+  // ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅
+  // ✅ WEBRTC SENDER (THIS FIXES BLACK SCREEN)
+  // ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅
   useEffect(() => {
     if (!cameraOn || !liveStudentId || !videoRef.current) return;
 
-    let pc;
-    let localStream;
+    const pc = new RTCPeerConnection({
+      iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
+    });
 
-    const startStreaming = async () => {
-      localStream = videoRef.current.srcObject;
+    const offerRef = ref(rtdb, `${liveStudentId}/offer`);
+    const candidatesRef = ref(rtdb, `${liveStudentId}/candidates`);
 
-      pc = new RTCPeerConnection({
-        iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
-      });
+    const stream = videoRef.current.srcObject;
+    stream.getTracks().forEach((track) => pc.addTrack(track, stream));
 
-      localStream.getTracks().forEach((track) => {
-        pc.addTrack(track, localStream);
-      });
+    pc.onicecandidate = (event) => {
+      if (event.candidate) {
+        push(candidatesRef, event.candidate.toJSON());
+      }
+    };
 
-      const offerRef = ref(rtdb, `${liveStudentId}/offer`);
-      const answerRef = ref(rtdb, `${liveStudentId}/answer`);
-      const candidatesRef = ref(rtdb, `${liveStudentId}/candidates`);
-
-      pc.onicecandidate = (e) => {
-        if (e.candidate) {
-          push(candidatesRef, e.candidate.toJSON());
-        }
-      };
-
+    const createOffer = async () => {
       const offer = await pc.createOffer();
       await pc.setLocalDescription(offer);
       await set(offerRef, offer);
-
-      // ✅ RECEIVE ADMIN ANSWER
-      onValue(answerRef, async (snap) => {
-        if (!snap.exists()) return;
-        const ans = snap.val();
-
-        if (!pc.currentRemoteDescription) {
-          await pc.setRemoteDescription(
-            new RTCSessionDescription(ans)
-          );
-        }
-      });
     };
 
-    startStreaming();
+    createOffer();
 
-    return () => {
-      if (pc) pc.close();
-    };
+    return () => pc.close();
   }, [cameraOn, liveStudentId]);
 
-  // ✅ 30 MINUTE TIMER WITH AUTO SUBMIT
+  // ✅ 30 MIN TIMER
   useEffect(() => {
     let endTime = localStorage.getItem("examEndTime");
 
@@ -189,7 +159,6 @@ export default function Assignment() {
       if (diff <= 0) {
         clearInterval(timer);
         setTimeLeft("Time Over");
-
         if (!submitted) autoSubmit();
       } else {
         const mins = Math.floor(diff / 60000);
@@ -201,7 +170,6 @@ export default function Assignment() {
     return () => clearInterval(timer);
   }, [submitted]);
 
-  // ✅ REMOVE LIVE AFTER SUBMIT
   const removeLive = async () => {
     if (liveStudentId) {
       await set(ref(rtdb, `liveStudents/${liveStudentId}`), null);
@@ -213,11 +181,9 @@ export default function Assignment() {
     if (!name.trim()) return;
 
     try {
-      const safeName = liveStudentId;
-
       await addDoc(collection(db, "assignments"), {
         name,
-        safeName,
+        safeName: liveStudentId,
         answers,
         cameraVerified: cameraOn,
         autoSubmitted: true,
@@ -225,37 +191,26 @@ export default function Assignment() {
       });
 
       await removeLive();
-
       setSubmitted(true);
-      setSuccessMsg("Time Over! Assignment Auto Submitted.");
-      localStorage.removeItem("assignmentDraft");
-      localStorage.removeItem("examEndTime");
+      setSuccessMsg("Time Over! Auto Submitted.");
+      localStorage.clear();
     } catch (err) {
-      console.error("Auto submit error:", err);
+      console.error(err);
     }
   };
 
   // ✅ MANUAL SUBMIT
   const handleSubmit = async () => {
-    if (!name.trim()) {
-      setError("Please enter your name");
-      return;
-    }
-
-    if (!cameraOn) {
-      setError("Camera must be ON.");
-      return;
-    }
+    if (!name.trim()) return setError("Enter name");
+    if (!cameraOn) return setError("Camera required");
 
     setLoading(true);
     setError("");
 
     try {
-      const safeName = liveStudentId;
-
       await addDoc(collection(db, "assignments"), {
         name,
-        safeName,
+        safeName: liveStudentId,
         answers,
         cameraVerified: true,
         autoSubmitted: false,
@@ -263,11 +218,9 @@ export default function Assignment() {
       });
 
       await removeLive();
-
       setSubmitted(true);
-      setSuccessMsg("Assignment Submitted Successfully!");
-      localStorage.removeItem("assignmentDraft");
-      localStorage.removeItem("examEndTime");
+      setSuccessMsg("Submitted Successfully!");
+      localStorage.clear();
     } catch (err) {
       setError(err.message);
     }
@@ -277,82 +230,50 @@ export default function Assignment() {
 
   return (
     <main className="p-6 max-w-3xl mx-auto">
-      <h1 className="text-3xl font-bold mb-4 text-center">
-        Assignment
-      </h1>
-
+      <h1 className="text-3xl font-bold text-center mb-4">Assignment</h1>
       <p className="text-red-600 font-bold text-center mb-4">
         Time Left: {timeLeft}
       </p>
 
-      {!cameraOn && (
-        <p className="text-red-600 text-center font-semibold mb-4">
-          ⚠ Camera access is mandatory.
-        </p>
-      )}
-
       {submitted ? (
         <div className="bg-green-200 p-4 rounded text-center">
-          <h2 className="text-xl font-semibold">
-            {successMsg}
-          </h2>
-          <p>You can close this page.</p>
+          {successMsg}
         </div>
       ) : (
-        <div className="space-y-4">
+        <>
           <input
-            type="text"
+            className="w-full p-3 border rounded mb-4"
             placeholder="Enter Your Name"
-            className="w-full p-3 border rounded"
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
 
-          <div className="text-center">
-            <p className="text-red-600 font-bold mb-2">
-              Live Camera (Mandatory)
-            </p>
-            <video
-              ref={videoRef}
-              autoPlay
-              playsInline
-              className="mx-auto w-48 h-36 border rounded"
-            />
-          </div>
+          <video
+            ref={videoRef}
+            autoPlay
+            playsInline
+            className="mx-auto w-48 h-36 border rounded mb-4"
+          />
 
           {Object.keys(questions).map((key) => (
-            <div key={key}>
-              <label className="font-bold">
-                {questions[key]}
-              </label>
-              <textarea
-                className="w-full p-3 border rounded mt-2"
-                rows="4"
-                value={answers[key]}
-                onChange={(e) =>
-                  setAnswers({
-                    ...answers,
-                    [key]: e.target.value,
-                  })
-                }
-              ></textarea>
-            </div>
+            <textarea
+              key={key}
+              className="w-full border p-2 mb-3"
+              value={answers[key] || ""}
+              onChange={(e) =>
+                setAnswers({ ...answers, [key]: e.target.value })
+              }
+            />
           ))}
-
-          {error && <p className="text-red-600">{error}</p>}
 
           <button
             onClick={handleSubmit}
-            disabled={loading || submitted || !cameraOn}
-            className={`px-6 py-3 rounded text-white ${
-              loading || !cameraOn
-                ? "bg-gray-400"
-                : "bg-blue-600 hover:bg-blue-700"
-            }`}
+            disabled={loading || !cameraOn}
+            className="bg-blue-600 text-white px-6 py-3 rounded"
           >
-            {loading ? "Submitting..." : "Submit Assignment"}
+            Submit
           </button>
-        </div>
+        </>
       )}
     </main>
   );
