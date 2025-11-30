@@ -8,6 +8,8 @@ const GOOGLE_SHEET_CSV_URL =
 
 export default function Assignment() {
   const [name, setName] = useState("");
+  const [liveStudentId, setLiveStudentId] = useState(null);
+
   const [answers, setAnswers] = useState({ q1: "", q2: "", q3: "" });
   const [questions, setQuestions] = useState({ q1: "", q2: "", q3: "" });
   const [submitted, setSubmitted] = useState(false);
@@ -19,15 +21,13 @@ export default function Assignment() {
 
   const videoRef = useRef(null);
 
-  const liveStudentId = name
-    ? name.toLowerCase().trim().replace(/[^a-z0-9]+/g, "_")
-    : null;
-
+  // ✅ RESET FOR NEW ATTEMPT
   useEffect(() => {
     localStorage.removeItem("examEndTime");
     localStorage.removeItem("assignmentDraft");
   }, []);
 
+  // ✅ LOAD QUESTIONS
   useEffect(() => {
     const loadQuestions = async () => {
       try {
@@ -35,19 +35,23 @@ export default function Assignment() {
         const text = await res.text();
         const rows = text.split("\n").map((r) => r.split(","));
         const qObj = {};
+
         for (let i = 1; i < rows.length; i++) {
           const key = rows[i][0]?.trim();
           const value = rows[i][1]?.trim();
           if (key && value) qObj[key] = value;
         }
+
         setQuestions(qObj);
       } catch {
         setError("Failed to load questions.");
       }
     };
+
     loadQuestions();
   }, []);
 
+  // ✅ AUTO SAVE DRAFT
   useEffect(() => {
     const saved = localStorage.getItem("assignmentDraft");
     if (saved) setAnswers(JSON.parse(saved));
@@ -57,6 +61,7 @@ export default function Assignment() {
     localStorage.setItem("assignmentDraft", JSON.stringify(answers));
   }, [answers]);
 
+  // ✅ PREVENT REFRESH WARNING
   useEffect(() => {
     const warn = (e) => {
       e.preventDefault();
@@ -66,7 +71,7 @@ export default function Assignment() {
     return () => window.removeEventListener("beforeunload", warn);
   }, []);
 
-  // ✅ CAMERA + LIVE PUSH
+  // ✅ CAMERA INIT
   useEffect(() => {
     navigator.mediaDevices
       .getUserMedia({ video: true })
@@ -82,7 +87,23 @@ export default function Assignment() {
       });
   }, []);
 
-  // ✅ PUSH LIVE STATUS TO RTDB
+  // ✅ STABLE LIVE STUDENT ID (DEBOUNCED)
+  useEffect(() => {
+    if (!name.trim()) return;
+
+    const timeout = setTimeout(() => {
+      const stableId = name
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9]+/g, "_");
+
+      setLiveStudentId(stableId);
+    }, 1200);
+
+    return () => clearTimeout(timeout);
+  }, [name]);
+
+  // ✅ PUSH LIVE STUDENT TO RTDB (CLEAN)
   useEffect(() => {
     if (!cameraOn || !liveStudentId) return;
 
@@ -95,9 +116,13 @@ export default function Assignment() {
     });
 
     onDisconnect(liveRef).remove();
-  }, [cameraOn, liveStudentId, name]);
 
-  // ✅ TIMER + AUTO SUBMIT
+    return () => {
+      set(liveRef, null); // ✅ clean old entries
+    };
+  }, [cameraOn, liveStudentId]);
+
+  // ✅ 30 MINUTE TIMER WITH AUTO SUBMIT
   useEffect(() => {
     let endTime = localStorage.getItem("examEndTime");
 
@@ -124,12 +149,14 @@ export default function Assignment() {
     return () => clearInterval(timer);
   }, [submitted]);
 
+  // ✅ REMOVE LIVE AFTER SUBMIT
   const removeLive = async () => {
     if (liveStudentId) {
       await set(ref(rtdb, `liveStudents/${liveStudentId}`), null);
     }
   };
 
+  // ✅ AUTO SUBMIT
   const autoSubmit = async () => {
     if (!name.trim()) return;
 
@@ -156,6 +183,7 @@ export default function Assignment() {
     }
   };
 
+  // ✅ MANUAL SUBMIT
   const handleSubmit = async () => {
     if (!name.trim()) {
       setError("Please enter your name");
