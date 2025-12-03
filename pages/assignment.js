@@ -2,10 +2,9 @@
 import { useState, useEffect, useRef } from "react";
 import { db, rtdb } from "../utils/firebaseConfig";
 import {
-  collection,
-  // addDoc, // not used
   doc,
   setDoc,
+  serverTimestamp,
 } from "firebase/firestore";
 import { ref, set, onDisconnect } from "firebase/database";
 
@@ -50,8 +49,7 @@ export default function Assignment() {
   // ----------------------------
   useEffect(() => {
     localStorage.removeItem("examEndTime");
-    // do not remove assignmentDraft here if you want restore on reload - optional
-    // localStorage.removeItem("assignmentDraft");
+    // keep draft for reload resilience
   }, []);
 
   // ----------------------------
@@ -64,15 +62,15 @@ export default function Assignment() {
         const res = await fetch(GOOGLE_SHEET_CSV_URL + "&t=" + Date.now());
         const text = await res.text();
 
-        // Robust CSV split (works for simple CSV: key,question)
         const rows = text
           .trim()
           .split("\n")
           .map((r) => {
-            // split only first comma so question may contain commas
             const idx = r.indexOf(",");
-            if (idx === -1) return [r];
-            return [r.slice(0, idx), r.slice(idx + 1)];
+            if (idx === -1) return [r.trim()];
+            const k = r.slice(0, idx).trim();
+            const v = r.slice(idx + 1).trim();
+            return [k, v];
           });
 
         const qObj = {};
@@ -83,19 +81,18 @@ export default function Assignment() {
           const value = rows[i][1]?.trim();
           if (key && value) {
             qObj[key] = value;
-            aObj[key] = ""; // create corresponding answer key
+            aObj[key] = "";
           }
         }
 
         if (!mounted) return;
         setQuestions(qObj);
 
-        // If there's a saved draft, prefer it; otherwise use new aObj
+        // Load saved draft, merge to ensure keys present
         const saved = localStorage.getItem("assignmentDraft");
         if (saved) {
           try {
             const parsed = JSON.parse(saved);
-            // ensure we include all keys from sheet (merge)
             const merged = { ...aObj, ...parsed };
             setAnswers(merged);
           } catch {
@@ -123,7 +120,8 @@ export default function Assignment() {
     try {
       localStorage.setItem("assignmentDraft", JSON.stringify(answers));
     } catch (e) {
-      // ignore storage errors
+      // ignore quota errors
+      console.warn("Failed saving draft:", e);
     }
   }, [answers]);
 
@@ -148,13 +146,16 @@ export default function Assignment() {
       .getUserMedia({ video: true })
       .then((stream) => {
         if (cancelled) {
-          // stop tracks if not needed
           stream.getTracks().forEach((t) => t.stop());
           return;
         }
         if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-          videoRef.current.play?.();
+          try {
+            videoRef.current.srcObject = stream;
+            videoRef.current.play?.();
+          } catch (e) {
+            console.warn("Video attach error:", e);
+          }
           setCameraOn(true);
         }
       })
@@ -166,12 +167,9 @@ export default function Assignment() {
 
     return () => {
       cancelled = true;
-      // stop camera if attached
       try {
         const stream = videoRef.current?.srcObject;
-        if (stream) {
-          stream.getTracks().forEach((t) => t.stop());
-        }
+        if (stream) stream.getTracks().forEach((t) => t.stop());
       } catch (e) {}
     };
   }, []);
@@ -187,7 +185,7 @@ export default function Assignment() {
     const to = setTimeout(() => {
       const sid = makeSafeName(name);
       setLiveStudentId(sid);
-    }, 800);
+    }, 600);
 
     return () => clearTimeout(to);
   }, [name]);
@@ -199,7 +197,6 @@ export default function Assignment() {
     if (!cameraOn || !liveStudentId) return;
     const liveRef = ref(rtdb, `liveStudents/${liveStudentId}`);
 
-    // push live status
     set(liveRef, {
       name,
       status: "live",
@@ -208,10 +205,8 @@ export default function Assignment() {
       console.warn("RTDB set error:", e);
     });
 
-    // Ensure removal on disconnect
     onDisconnect(liveRef).remove();
 
-    // cleanup function: remove entry when component unmounts / student leaves
     return () => {
       set(liveRef, null).catch(() => {});
     };
@@ -248,7 +243,6 @@ export default function Assignment() {
 
   // ----------------------------
   // Anti-cheat: detect visibilitychange & blur/focus
-  // counts switches; auto-submit after 3 switches
   // ----------------------------
   useEffect(() => {
     const handleVisibility = () => {
@@ -258,13 +252,10 @@ export default function Assignment() {
         setError(
           `Warning: You switched tabs or minimized the browser (${visibilityCountRef.current} times). Avoid switching.`
         );
-
-        // auto-submit after 3 switches
         if (visibilityCountRef.current >= 3 && !submitted) {
           autoSubmit("tab-switch");
         }
       } else {
-        // regained focus
         setError("");
       }
     };
@@ -280,10 +271,7 @@ export default function Assignment() {
       }
     };
 
-    const handleFocus = () => {
-      // clear any non-critical error when back
-      setError("");
-    };
+    const handleFocus = () => setError("");
 
     document.addEventListener("visibilitychange", handleVisibility);
     window.addEventListener("blur", handleBlur);
@@ -300,10 +288,11 @@ export default function Assignment() {
   // ----------------------------
   // Remove live student from RTDB
   // ----------------------------
-  const removeLive = async () => {
-    if (liveStudentId) {
+  const removeLive = async (sid) => {
+    const id = sid || liveStudentId;
+    if (id) {
       try {
-        await set(ref(rtdb, `liveStudents/${liveStudentId}`), null);
+        await set(ref(rtdb, `liveStudents/${id}`), null);
       } catch (e) {
         console.warn("removeLive error:", e);
       }
@@ -312,27 +301,30 @@ export default function Assignment() {
 
   // ----------------------------
   // Auto submit helper (used by timer and anti-cheat)
-  // reason: "timeout" | "tab-switch"
   // ----------------------------
   const autoSubmit = async (reason = "auto") => {
-    if (!name.trim() || !liveStudentId) {
-      console.warn("autoSubmit skipped: missing name or liveStudentId");
+    // ensure we have a safe name (compute from current name to avoid stale state)
+    const sid = makeSafeName(name);
+    if (!name.trim() || !sid) {
+      console.warn("autoSubmit skipped: missing name or sid");
       return;
     }
 
     try {
       setLoading(true);
-      await setDoc(doc(db, "assignments", liveStudentId), {
+      console.info("Auto-submitting for", sid, "reason:", reason);
+
+      await setDoc(doc(db, "assignments", sid), {
         name,
-        safeName: liveStudentId,
+        safeName: sid,
         answers,
         cameraVerified: cameraOn,
         autoSubmitted: true,
-        submittedAt: new Date(),
+        submittedAt: serverTimestamp(),
         autoSubmitReason: reason,
       });
 
-      await removeLive();
+      await removeLive(sid);
 
       setSubmitted(true);
       setSuccessMsg(
@@ -368,7 +360,8 @@ export default function Assignment() {
       return;
     }
 
-    if (!liveStudentId) {
+    const sid = makeSafeName(name);
+    if (!sid) {
       setError("Invalid student id. Please change name and try again.");
       return;
     }
@@ -377,16 +370,18 @@ export default function Assignment() {
     setError("");
 
     try {
-      await setDoc(doc(db, "assignments", liveStudentId), {
+      console.info("Manual submit for", sid);
+
+      await setDoc(doc(db, "assignments", sid), {
         name,
-        safeName: liveStudentId,
+        safeName: sid,
         answers,
         cameraVerified: true,
         autoSubmitted: false,
-        submittedAt: new Date(),
+        submittedAt: serverTimestamp(),
       });
 
-      await removeLive();
+      await removeLive(sid);
 
       setSubmitted(true);
       setSuccessMsg("Assignment Submitted Successfully!");
