@@ -1,23 +1,27 @@
+// pages/assignment.js
 import { useState, useEffect, useRef } from "react";
 import { db, rtdb } from "../utils/firebaseConfig";
-import { collection, addDoc } from "firebase/firestore";
+import {
+  collection,
+  // addDoc, // not used
+  doc,
+  setDoc,
+} from "firebase/firestore";
 import { ref, set, onDisconnect } from "firebase/database";
 
 const GOOGLE_SHEET_CSV_URL =
   "https://docs.google.com/spreadsheets/d/e/2PACX-1vSq_FDI-zBgdDU-VgkVW7ZXb5XsmXDvTEInkvCkUtFzdjMdBEQoTYnnCwqaE5H55kFlN4DYCkzKHcmN/pub?gid=0&single=true&output=csv";
 
 export default function Assignment() {
+  // student info
   const [name, setName] = useState("");
   const [liveStudentId, setLiveStudentId] = useState(null);
 
-  // ❌ OLD (fixed)
-  // const [answers, setAnswers] = useState({ q1: "", q2: "", q3: "" });
-  // const [questions, setQuestions] = useState({ q1: "", q2: "", q3: "" });
-
-  // ✅ NEW — dynamic
+  // dynamic questions & answers
   const [questions, setQuestions] = useState({});
   const [answers, setAnswers] = useState({});
 
+  // UI state
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -25,56 +29,107 @@ export default function Assignment() {
   const [timeLeft, setTimeLeft] = useState("");
   const [cameraOn, setCameraOn] = useState(false);
 
+  // anti-cheat: count times page hidden / blurred
+  const [tabSwitchCount, setTabSwitchCount] = useState(0);
+  const visibilityCountRef = useRef(0);
+
   const videoRef = useRef(null);
 
-  // RESET
+  // ----------------------------
+  // Utilities
+  // ----------------------------
+  const makeSafeName = (raw) =>
+    raw
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]+/g, "_")
+      .replace(/^_+|_+$/g, "") || null;
+
+  // ----------------------------
+  // RESET on mount (fresh attempt)
+  // ----------------------------
   useEffect(() => {
     localStorage.removeItem("examEndTime");
-    localStorage.removeItem("assignmentDraft");
+    // do not remove assignmentDraft here if you want restore on reload - optional
+    // localStorage.removeItem("assignmentDraft");
   }, []);
 
-  // ✅ LOAD QUESTIONS FROM GOOGLE SHEET
+  // ----------------------------
+  // Load questions from Google Sheet & init answers
+  // ----------------------------
   useEffect(() => {
+    let mounted = true;
     const loadQuestions = async () => {
       try {
         const res = await fetch(GOOGLE_SHEET_CSV_URL + "&t=" + Date.now());
         const text = await res.text();
-        const rows = text.split("\n").map((r) => r.split(","));
+
+        // Robust CSV split (works for simple CSV: key,question)
+        const rows = text
+          .trim()
+          .split("\n")
+          .map((r) => {
+            // split only first comma so question may contain commas
+            const idx = r.indexOf(",");
+            if (idx === -1) return [r];
+            return [r.slice(0, idx), r.slice(idx + 1)];
+          });
 
         const qObj = {};
-        const ansObj = {};
+        const aObj = {};
 
         for (let i = 1; i < rows.length; i++) {
-          const key = rows[i][0]?.trim();     // q1, q2, q3 ...
-          const value = rows[i][1]?.trim();   // question text
+          const key = rows[i][0]?.trim();
+          const value = rows[i][1]?.trim();
           if (key && value) {
             qObj[key] = value;
-            ansObj[key] = "";
+            aObj[key] = ""; // create corresponding answer key
           }
         }
 
+        if (!mounted) return;
         setQuestions(qObj);
-        setAnswers(ansObj);
 
-      } catch {
-        setError("Failed to load questions.");
+        // If there's a saved draft, prefer it; otherwise use new aObj
+        const saved = localStorage.getItem("assignmentDraft");
+        if (saved) {
+          try {
+            const parsed = JSON.parse(saved);
+            // ensure we include all keys from sheet (merge)
+            const merged = { ...aObj, ...parsed };
+            setAnswers(merged);
+          } catch {
+            setAnswers(aObj);
+          }
+        } else {
+          setAnswers(aObj);
+        }
+      } catch (e) {
+        console.error("Failed to load questions:", e);
+        setError("Failed to load questions. Try reloading the page.");
       }
     };
 
     loadQuestions();
+    return () => {
+      mounted = false;
+    };
   }, []);
 
-  // AUTO SAVE DRAFT
+  // ----------------------------
+  // Auto-save draft to localStorage
+  // ----------------------------
   useEffect(() => {
-    const saved = localStorage.getItem("assignmentDraft");
-    if (saved) setAnswers(JSON.parse(saved));
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem("assignmentDraft", JSON.stringify(answers));
+    try {
+      localStorage.setItem("assignmentDraft", JSON.stringify(answers));
+    } catch (e) {
+      // ignore storage errors
+    }
   }, [answers]);
 
-  // PREVENT REFRESH
+  // ----------------------------
+  // Prevent accidental refresh/close
+  // ----------------------------
   useEffect(() => {
     const warn = (e) => {
       e.preventDefault();
@@ -84,117 +139,224 @@ export default function Assignment() {
     return () => window.removeEventListener("beforeunload", warn);
   }, []);
 
-  // CAMERA INIT
+  // ----------------------------
+  // Camera init
+  // ----------------------------
   useEffect(() => {
+    let cancelled = false;
     navigator.mediaDevices
       .getUserMedia({ video: true })
       .then((stream) => {
+        if (cancelled) {
+          // stop tracks if not needed
+          stream.getTracks().forEach((t) => t.stop());
+          return;
+        }
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
+          videoRef.current.play?.();
           setCameraOn(true);
         }
       })
-      .catch(() => {
+      .catch((err) => {
+        console.warn("Camera error:", err);
         setCameraOn(false);
-        setError("Camera access is mandatory.");
+        setError("Camera access is mandatory. Please allow camera and refresh.");
       });
+
+    return () => {
+      cancelled = true;
+      // stop camera if attached
+      try {
+        const stream = videoRef.current?.srcObject;
+        if (stream) {
+          stream.getTracks().forEach((t) => t.stop());
+        }
+      } catch (e) {}
+    };
   }, []);
 
-  // STUDENT ID STABILIZER
+  // ----------------------------
+  // Stable student id (debounced)
+  // ----------------------------
   useEffect(() => {
-    if (!name.trim()) return;
+    if (!name.trim()) {
+      setLiveStudentId(null);
+      return;
+    }
+    const to = setTimeout(() => {
+      const sid = makeSafeName(name);
+      setLiveStudentId(sid);
+    }, 800);
 
-    const timeout = setTimeout(() => {
-      const stableId = name
-        .toLowerCase()
-        .trim()
-        .replace(/[^a-z0-9]+/g, "_");
-
-      setLiveStudentId(stableId);
-    }, 1200);
-
-    return () => clearTimeout(timeout);
+    return () => clearTimeout(to);
   }, [name]);
 
-  // LIVE STUDENT ENTRY
+  // ----------------------------
+  // Push live student entry to RTDB and cleanup with onDisconnect
+  // ----------------------------
   useEffect(() => {
     if (!cameraOn || !liveStudentId) return;
-
     const liveRef = ref(rtdb, `liveStudents/${liveStudentId}`);
 
+    // push live status
     set(liveRef, {
       name,
       status: "live",
       startedAt: Date.now(),
+    }).catch((e) => {
+      console.warn("RTDB set error:", e);
     });
 
+    // Ensure removal on disconnect
     onDisconnect(liveRef).remove();
 
+    // cleanup function: remove entry when component unmounts / student leaves
     return () => {
-      set(liveRef, null);
+      set(liveRef, null).catch(() => {});
     };
-  }, [cameraOn, liveStudentId]);
+  }, [cameraOn, liveStudentId, name]);
 
-  // TIMER LOGIC
+  // ----------------------------
+  // Timer: 30 minutes default, auto-submit at end
+  // ----------------------------
   useEffect(() => {
     let endTime = localStorage.getItem("examEndTime");
-
     if (!endTime) {
       endTime = new Date(Date.now() + 30 * 60 * 1000).toISOString();
       localStorage.setItem("examEndTime", endTime);
     }
 
-    const timer = setInterval(() => {
+    const tick = () => {
       const diff = new Date(endTime) - new Date();
-
       if (diff <= 0) {
-        clearInterval(timer);
         setTimeLeft("Time Over");
-
-        if (!submitted) autoSubmit();
+        if (!submitted) {
+          autoSubmit("timeout");
+        }
       } else {
         const mins = Math.floor(diff / 60000);
         const secs = Math.floor((diff % 60000) / 1000);
         setTimeLeft(`${mins}m ${secs}s`);
       }
-    }, 1000);
+    };
 
+    tick();
+    const timer = setInterval(tick, 1000);
     return () => clearInterval(timer);
   }, [submitted]);
 
-  // REMOVE LIVE
+  // ----------------------------
+  // Anti-cheat: detect visibilitychange & blur/focus
+  // counts switches; auto-submit after 3 switches
+  // ----------------------------
+  useEffect(() => {
+    const handleVisibility = () => {
+      if (document.hidden) {
+        visibilityCountRef.current += 1;
+        setTabSwitchCount(visibilityCountRef.current);
+        setError(
+          `Warning: You switched tabs or minimized the browser (${visibilityCountRef.current} times). Avoid switching.`
+        );
+
+        // auto-submit after 3 switches
+        if (visibilityCountRef.current >= 3 && !submitted) {
+          autoSubmit("tab-switch");
+        }
+      } else {
+        // regained focus
+        setError("");
+      }
+    };
+
+    const handleBlur = () => {
+      visibilityCountRef.current += 1;
+      setTabSwitchCount(visibilityCountRef.current);
+      setError(
+        `Warning: You left the page (${visibilityCountRef.current} times). Avoid switching.`
+      );
+      if (visibilityCountRef.current >= 3 && !submitted) {
+        autoSubmit("tab-switch");
+      }
+    };
+
+    const handleFocus = () => {
+      // clear any non-critical error when back
+      setError("");
+    };
+
+    document.addEventListener("visibilitychange", handleVisibility);
+    window.addEventListener("blur", handleBlur);
+    window.addEventListener("focus", handleFocus);
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibility);
+      window.removeEventListener("blur", handleBlur);
+      window.removeEventListener("focus", handleFocus);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [submitted]);
+
+  // ----------------------------
+  // Remove live student from RTDB
+  // ----------------------------
   const removeLive = async () => {
     if (liveStudentId) {
-      await set(ref(rtdb, `liveStudents/${liveStudentId}`), null);
+      try {
+        await set(ref(rtdb, `liveStudents/${liveStudentId}`), null);
+      } catch (e) {
+        console.warn("removeLive error:", e);
+      }
     }
   };
 
-  // AUTO SUBMIT
-  const autoSubmit = async () => {
-    if (!name.trim()) return;
+  // ----------------------------
+  // Auto submit helper (used by timer and anti-cheat)
+  // reason: "timeout" | "tab-switch"
+  // ----------------------------
+  const autoSubmit = async (reason = "auto") => {
+    if (!name.trim() || !liveStudentId) {
+      console.warn("autoSubmit skipped: missing name or liveStudentId");
+      return;
+    }
 
     try {
-      await addDoc(collection(db, "assignments"), {
+      setLoading(true);
+      await setDoc(doc(db, "assignments", liveStudentId), {
         name,
         safeName: liveStudentId,
         answers,
         cameraVerified: cameraOn,
         autoSubmitted: true,
-        submittedAt: new Date().toISOString(),
+        submittedAt: new Date(),
+        autoSubmitReason: reason,
       });
 
       await removeLive();
 
       setSubmitted(true);
-      setSuccessMsg("Time Over! Assignment Auto Submitted.");
+      setSuccessMsg(
+        reason === "timeout"
+          ? "Time Over! Assignment Auto-Submitted."
+          : reason === "tab-switch"
+          ? "Auto-Submitted due to multiple tab switches."
+          : "Assignment Auto-Submitted."
+      );
+
       localStorage.removeItem("assignmentDraft");
       localStorage.removeItem("examEndTime");
+      setError("");
     } catch (err) {
       console.error("Auto submit error:", err);
+      setError("Auto-submit failed. Please contact admin.");
+    } finally {
+      setLoading(false);
     }
   };
 
-  // MANUAL SUBMIT
+  // ----------------------------
+  // Manual submit (user clicks)
+  // ----------------------------
   const handleSubmit = async () => {
     if (!name.trim()) {
       setError("Please enter your name");
@@ -206,17 +368,22 @@ export default function Assignment() {
       return;
     }
 
+    if (!liveStudentId) {
+      setError("Invalid student id. Please change name and try again.");
+      return;
+    }
+
     setLoading(true);
     setError("");
 
     try {
-      await addDoc(collection(db, "assignments"), {
+      await setDoc(doc(db, "assignments", liveStudentId), {
         name,
         safeName: liveStudentId,
         answers,
         cameraVerified: true,
         autoSubmitted: false,
-        submittedAt: new Date().toISOString(),
+        submittedAt: new Date(),
       });
 
       await removeLive();
@@ -226,17 +393,21 @@ export default function Assignment() {
       localStorage.removeItem("assignmentDraft");
       localStorage.removeItem("examEndTime");
     } catch (err) {
-      setError(err.message);
+      console.error("Submit error:", err);
+      setError(err?.message || "Submit failed. Try again.");
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
+  // ----------------------------
+  // UI render
+  // ----------------------------
   return (
     <main className="p-6 max-w-3xl mx-auto">
       <h1 className="text-3xl font-bold mb-4 text-center">Assignment</h1>
 
-      <p className="text-red-600 font-bold text-center mb-4">
+      <p className="text-red-600 font-bold text-center mb-2">
         Time Left: {timeLeft}
       </p>
 
@@ -249,7 +420,7 @@ export default function Assignment() {
       {submitted ? (
         <div className="bg-green-200 p-4 rounded text-center">
           <h2 className="text-xl font-semibold">{successMsg}</h2>
-          <p>You can close this page.</p>
+          <p>You can now close this page.</p>
         </div>
       ) : (
         <div className="space-y-4">
@@ -259,33 +430,45 @@ export default function Assignment() {
             className="w-full p-3 border rounded"
             value={name}
             onChange={(e) => setName(e.target.value)}
+            disabled={loading || submitted}
           />
 
           <div className="text-center">
-            <p className="text-red-600 font-bold mb-2">
-              Live Camera (Mandatory)
-            </p>
+            <p className="text-red-600 font-bold mb-2">Live Camera (Mandatory)</p>
             <video
               ref={videoRef}
               autoPlay
               playsInline
-              className="mx-auto w-48 h-36 border rounded"
+              muted
+              className="mx-auto w-48 h-36 border rounded bg-black"
             />
           </div>
 
+          {Object.keys(questions).length === 0 && (
+            <p className="text-gray-600">Loading questions…</p>
+          )}
+
           {Object.keys(questions).map((key) => (
             <div key={key}>
-              <label className="font-bold">{questions[key]}</label>
+              <label className="font-bold block">{questions[key]}</label>
               <textarea
                 className="w-full p-3 border rounded mt-2"
                 rows="4"
                 value={answers[key] || ""}
                 onChange={(e) =>
-                  setAnswers({ ...answers, [key]: e.target.value })
+                  setAnswers((prev) => ({ ...prev, [key]: e.target.value }))
                 }
-              ></textarea>
+                disabled={loading || submitted}
+              />
             </div>
           ))}
+
+          {tabSwitchCount > 0 && (
+            <p className="text-yellow-600">
+              ⚠ You switched away from the test {tabSwitchCount} time
+              {tabSwitchCount > 1 ? "s" : ""}. Avoid switching tabs.
+            </p>
+          )}
 
           {error && <p className="text-red-600">{error}</p>}
 
@@ -293,9 +476,7 @@ export default function Assignment() {
             onClick={handleSubmit}
             disabled={loading || submitted || !cameraOn}
             className={`px-6 py-3 rounded text-white ${
-              loading || !cameraOn
-                ? "bg-gray-400"
-                : "bg-blue-600 hover:bg-blue-700"
+              loading || !cameraOn ? "bg-gray-400" : "bg-blue-600 hover:bg-blue-700"
             }`}
           >
             {loading ? "Submitting..." : "Submit Assignment"}
