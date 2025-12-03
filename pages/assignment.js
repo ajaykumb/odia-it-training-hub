@@ -10,8 +10,14 @@ export default function Assignment() {
   const [name, setName] = useState("");
   const [liveStudentId, setLiveStudentId] = useState(null);
 
-  const [answers, setAnswers] = useState({ q1: "", q2: "", q3: "" });
-  const [questions, setQuestions] = useState({ q1: "", q2: "", q3: "" });
+  // ❌ OLD (fixed)
+  // const [answers, setAnswers] = useState({ q1: "", q2: "", q3: "" });
+  // const [questions, setQuestions] = useState({ q1: "", q2: "", q3: "" });
+
+  // ✅ NEW — dynamic
+  const [questions, setQuestions] = useState({});
+  const [answers, setAnswers] = useState({});
+
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -21,28 +27,35 @@ export default function Assignment() {
 
   const videoRef = useRef(null);
 
-  // ✅ RESET FOR NEW ATTEMPT
+  // RESET
   useEffect(() => {
     localStorage.removeItem("examEndTime");
     localStorage.removeItem("assignmentDraft");
   }, []);
 
-  // ✅ LOAD QUESTIONS
+  // ✅ LOAD QUESTIONS FROM GOOGLE SHEET
   useEffect(() => {
     const loadQuestions = async () => {
       try {
         const res = await fetch(GOOGLE_SHEET_CSV_URL + "&t=" + Date.now());
         const text = await res.text();
         const rows = text.split("\n").map((r) => r.split(","));
+
         const qObj = {};
+        const ansObj = {};
 
         for (let i = 1; i < rows.length; i++) {
-          const key = rows[i][0]?.trim();
-          const value = rows[i][1]?.trim();
-          if (key && value) qObj[key] = value;
+          const key = rows[i][0]?.trim();     // q1, q2, q3 ...
+          const value = rows[i][1]?.trim();   // question text
+          if (key && value) {
+            qObj[key] = value;
+            ansObj[key] = "";
+          }
         }
 
         setQuestions(qObj);
+        setAnswers(ansObj);
+
       } catch {
         setError("Failed to load questions.");
       }
@@ -51,7 +64,7 @@ export default function Assignment() {
     loadQuestions();
   }, []);
 
-  // ✅ AUTO SAVE DRAFT
+  // AUTO SAVE DRAFT
   useEffect(() => {
     const saved = localStorage.getItem("assignmentDraft");
     if (saved) setAnswers(JSON.parse(saved));
@@ -61,7 +74,7 @@ export default function Assignment() {
     localStorage.setItem("assignmentDraft", JSON.stringify(answers));
   }, [answers]);
 
-  // ✅ PREVENT REFRESH WARNING
+  // PREVENT REFRESH
   useEffect(() => {
     const warn = (e) => {
       e.preventDefault();
@@ -71,7 +84,7 @@ export default function Assignment() {
     return () => window.removeEventListener("beforeunload", warn);
   }, []);
 
-  // ✅ CAMERA INIT
+  // CAMERA INIT
   useEffect(() => {
     navigator.mediaDevices
       .getUserMedia({ video: true })
@@ -87,7 +100,7 @@ export default function Assignment() {
       });
   }, []);
 
-  // ✅ STABLE LIVE STUDENT ID (DEBOUNCED)
+  // STUDENT ID STABILIZER
   useEffect(() => {
     if (!name.trim()) return;
 
@@ -103,7 +116,7 @@ export default function Assignment() {
     return () => clearTimeout(timeout);
   }, [name]);
 
-  // ✅ PUSH LIVE STUDENT TO RTDB (CLEAN)
+  // LIVE STUDENT ENTRY
   useEffect(() => {
     if (!cameraOn || !liveStudentId) return;
 
@@ -118,11 +131,11 @@ export default function Assignment() {
     onDisconnect(liveRef).remove();
 
     return () => {
-      set(liveRef, null); // ✅ clean old entries
+      set(liveRef, null);
     };
   }, [cameraOn, liveStudentId]);
 
-  // ✅ 30 MINUTE TIMER WITH AUTO SUBMIT
+  // TIMER LOGIC
   useEffect(() => {
     let endTime = localStorage.getItem("examEndTime");
 
@@ -149,23 +162,21 @@ export default function Assignment() {
     return () => clearInterval(timer);
   }, [submitted]);
 
-  // ✅ REMOVE LIVE AFTER SUBMIT
+  // REMOVE LIVE
   const removeLive = async () => {
     if (liveStudentId) {
       await set(ref(rtdb, `liveStudents/${liveStudentId}`), null);
     }
   };
 
-  // ✅ AUTO SUBMIT
+  // AUTO SUBMIT
   const autoSubmit = async () => {
     if (!name.trim()) return;
 
     try {
-      const safeName = liveStudentId;
-
       await addDoc(collection(db, "assignments"), {
         name,
-        safeName,
+        safeName: liveStudentId,
         answers,
         cameraVerified: cameraOn,
         autoSubmitted: true,
@@ -183,7 +194,7 @@ export default function Assignment() {
     }
   };
 
-  // ✅ MANUAL SUBMIT
+  // MANUAL SUBMIT
   const handleSubmit = async () => {
     if (!name.trim()) {
       setError("Please enter your name");
@@ -199,11 +210,9 @@ export default function Assignment() {
     setError("");
 
     try {
-      const safeName = liveStudentId;
-
       await addDoc(collection(db, "assignments"), {
         name,
-        safeName,
+        safeName: liveStudentId,
         answers,
         cameraVerified: true,
         autoSubmitted: false,
@@ -270,7 +279,7 @@ export default function Assignment() {
               <textarea
                 className="w-full p-3 border rounded mt-2"
                 rows="4"
-                value={answers[key]}
+                value={answers[key] || ""}
                 onChange={(e) =>
                   setAnswers({ ...answers, [key]: e.target.value })
                 }
