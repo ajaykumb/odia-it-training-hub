@@ -1,4 +1,3 @@
-// pages/admin/all-answers.js
 import { useEffect, useState, useMemo } from "react";
 import { db, auth, rtdb } from "../../utils/firebaseConfig";
 import {
@@ -8,6 +7,7 @@ import {
   onSnapshot,
   query,
   orderBy,
+  setDoc
 } from "firebase/firestore";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { useRouter } from "next/router";
@@ -16,10 +16,15 @@ import { ref, onValue } from "firebase/database";
 export default function AllAnswers() {
   const [answers, setAnswers] = useState([]);
   const [liveStudents, setLiveStudents] = useState({});
-  const [filter, setFilter] = useState("all"); // all | manual | auto
+  const [filter, setFilter] = useState("all");
+
+  // ⭐ New states for Teacher Live Control
+  const [className, setClassName] = useState("");
+  const [meetingUrl, setMeetingUrl] = useState("");
+
   const router = useRouter();
 
-  // ✅ AUTH + FIRESTORE SUBMISSIONS (REALTIME SAFE)
+  // AUTH + SUBMISSIONS
   useEffect(() => {
     const unsubAuth = onAuthStateChanged(auth, (user) => {
       if (!user) {
@@ -27,7 +32,6 @@ export default function AllAnswers() {
         return;
       }
 
-      // order by submittedAt desc; works when submittedAt is serverTimestamp
       const q = query(collection(db, "assignments"), orderBy("submittedAt", "desc"));
 
       const unsubSnap = onSnapshot(
@@ -38,12 +42,9 @@ export default function AllAnswers() {
             ...d.data(),
           }));
 
-          console.log("ADMIN LIVE DATA:", arr); // debug
           setAnswers(arr);
         },
-        (err) => {
-          console.error("Snapshot error:", err);
-        }
+        (err) => console.error(err)
       );
 
       return () => unsubSnap();
@@ -52,39 +53,24 @@ export default function AllAnswers() {
     return () => unsubAuth();
   }, [router]);
 
-  // ✅ REALTIME LIVE STUDENTS
+  // LIVE STUDENTS (RTDB)
   useEffect(() => {
     const liveRef = ref(rtdb, "liveStudents");
-    const off = onValue(liveRef, (snap) => {
-      setLiveStudents(snap.val() || {});
-    }, (err) => {
-      console.warn("RTDB onValue error:", err);
-    });
-
-    return () => {
-      // onValue doesn't return unsubscribe; it's removed by passing null callback - but here we rely on component unmount
-    };
+    onValue(liveRef, (snap) => setLiveStudents(snap.val() || {}));
   }, []);
 
-  // ✅ FILTER LOGIC
+  // FILTER LOGIC
   const filteredAnswers = useMemo(() => {
-    if (filter === "auto") {
-      return answers.filter((a) => a.autoSubmitted === true);
-    }
-    if (filter === "manual") {
-      return answers.filter((a) => a.autoSubmitted === false);
-    }
+    if (filter === "auto") return answers.filter((a) => a.autoSubmitted);
+    if (filter === "manual") return answers.filter((a) => !a.autoSubmitted);
     return answers;
   }, [answers, filter]);
 
-  // ✅ DATE FORMAT (handles Firestore Timestamp and JS Date)
+  // DATE FORMAT
   const formatDate = (d) => {
     if (!d) return "N/A";
-    // Firestore serverTimestamp => object with toDate()
     if (typeof d?.toDate === "function") return d.toDate().toLocaleString();
-    // Firestore legacy object with seconds
     if (d.seconds) return new Date(d.seconds * 1000).toLocaleString();
-    // raw JS Date or ISO string
     try {
       return new Date(d).toLocaleString();
     } catch {
@@ -92,37 +78,107 @@ export default function AllAnswers() {
     }
   };
 
-  // ✅ DELETE
+  // DELETE SUBMISSION
   const handleDelete = async (id) => {
-    const confirmDelete = window.confirm("Delete this submission?");
-    if (!confirmDelete) return;
+    const ok = window.confirm("Delete this submission?");
+    if (!ok) return;
 
-    try {
-      await deleteDoc(doc(db, "assignments", id));
-      setAnswers((prev) => prev.filter((i) => i.id !== id));
-    } catch (err) {
-      console.error("Delete error:", err);
-      alert("Delete failed.");
-    }
+    await deleteDoc(doc(db, "assignments", id));
+    setAnswers((prev) => prev.filter((i) => i.id !== id));
+  };
+
+  // ⭐ TEACHER LIVE CLASS CONTROLS
+  const startLiveClass = async () => {
+    if (!className.trim()) return alert("Please enter class name");
+
+    await setDoc(doc(db, "liveClass", "current"), {
+      isLive: true,
+      className,
+      meetingUrl: meetingUrl.trim() || "https://meet.jit.si/OdiaITTrainingHubLiveClass",
+      startedAt: Date.now(),
+    });
+
+    alert("Live class started!");
+  };
+
+  const stopLiveClass = async () => {
+    await setDoc(doc(db, "liveClass", "current"), {
+      isLive: false,
+      className: "",
+      meetingUrl: "",
+      endedAt: Date.now(),
+    });
+
+    alert("Live class stopped.");
+  };
+
+  const joinAsTeacher = () => {
+    const url = meetingUrl.trim() || "https://meet.jit.si/OdiaITTrainingHubLiveClass";
+    window.open(url, "_blank");
   };
 
   return (
     <main className="p-6 max-w-6xl mx-auto">
+
       {/* HEADER */}
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">🔴 LIVE STUDENT MONITORING</h1>
+        <h1 className="text-3xl font-bold">Admin Dashboard</h1>
         <button className="bg-red-600 text-white px-4 py-2 rounded" onClick={() => signOut(auth)}>
           Logout
         </button>
       </div>
 
-      {/* LIVE STUDENTS SECTION */}
+      {/* ⭐ NEW SECTION — TEACHER LIVE CLASS CONTROL */}
+      <div className="bg-white shadow-lg rounded-xl p-6 mb-10 border">
+        <h2 className="text-2xl font-bold mb-4 text-blue-700">🎥 Teacher Live Class Control</h2>
+
+        <input
+          className="w-full p-3 border rounded mb-4"
+          placeholder="Enter Class Name (Example: Green Batch SQL)"
+          value={className}
+          onChange={(e) => setClassName(e.target.value)}
+        />
+
+        <input
+          className="w-full p-3 border rounded mb-4"
+          placeholder="Paste Meeting URL (Google Meet / Zoom / Teams)"
+          value={meetingUrl}
+          onChange={(e) => setMeetingUrl(e.target.value)}
+        />
+
+        <button
+          onClick={startLiveClass}
+          className="w-full bg-green-600 text-white p-3 rounded-lg mb-3 hover:bg-green-700"
+        >
+          Start Live Class
+        </button>
+
+        <button
+          onClick={joinAsTeacher}
+          className="w-full bg-blue-600 text-white p-3 rounded-lg mb-3 hover:bg-blue-700"
+        >
+          Join as Teacher
+        </button>
+
+        <button
+          onClick={stopLiveClass}
+          className="w-full bg-red-600 text-white p-3 rounded-lg hover:bg-red-700"
+        >
+          Stop Live Class
+        </button>
+      </div>
+
+      {/* LIVE STUDENT MONITORING */}
       <div className="mb-10">
+        <h2 className="text-2xl font-bold mb-3">🔴 LIVE STUDENT MONITORING</h2>
+
         <p className="text-lg font-semibold mb-2">
           Live Students Connected: {Object.keys(liveStudents).length}
         </p>
 
-        {Object.keys(liveStudents).length === 0 && <p className="text-red-500">❌ No students are live right now.</p>}
+        {Object.keys(liveStudents).length === 0 && (
+          <p className="text-red-500">❌ No students are live right now.</p>
+        )}
 
         <div className="grid md:grid-cols-3 gap-4">
           {Object.entries(liveStudents).map(([id, s]) => (
@@ -151,7 +207,6 @@ export default function AllAnswers() {
 
             <p className="text-sm text-gray-600 mt-1">Submitted: {formatDate(s.submittedAt)}</p>
 
-            {/* BADGES */}
             <div className="mt-2 space-x-2">
               <span className={`px-2 py-1 text-xs rounded ${s.autoSubmitted ? "bg-orange-100 text-orange-700" : "bg-green-100 text-green-700"}`}>
                 {s.autoSubmitted ? "AUTO SUBMITTED" : "MANUAL SUBMITTED"}
@@ -162,7 +217,6 @@ export default function AllAnswers() {
               </span>
             </div>
 
-            {/* ANSWERS */}
             <div className="mt-4 space-y-1">
               {Object.entries(s.answers || {})
                 .sort((a, b) => {
@@ -177,7 +231,12 @@ export default function AllAnswers() {
                 ))}
             </div>
 
-            <button onClick={() => handleDelete(s.id)} className="bg-red-500 text-white w-full mt-4 py-2 rounded">Delete Submission</button>
+            <button
+              onClick={() => handleDelete(s.id)}
+              className="bg-red-500 text-white w-full mt-4 py-2 rounded"
+            >
+              Delete Submission
+            </button>
           </div>
         ))}
 
