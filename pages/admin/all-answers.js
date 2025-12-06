@@ -7,7 +7,10 @@ import {
   onSnapshot,
   query,
   orderBy,
-  setDoc
+  setDoc,
+  addDoc,
+  serverTimestamp,
+  updateDoc
 } from "firebase/firestore";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { useRouter } from "next/router";
@@ -18,9 +21,15 @@ export default function AllAnswers() {
   const [liveStudents, setLiveStudents] = useState({});
   const [filter, setFilter] = useState("all");
 
-  // ⭐ New states for Teacher Live Control
+  // ⭐ Teacher Live Control
   const [className, setClassName] = useState("");
   const [meetingUrl, setMeetingUrl] = useState("");
+
+  // ⭐ CHAT STATES
+  const [chatUsers, setChatUsers] = useState([]);
+  const [selectedStudent, setSelectedStudent] = useState(null);
+  const [messages, setMessages] = useState([]);
+  const [reply, setReply] = useState("");
 
   const router = useRouter();
 
@@ -117,6 +126,51 @@ export default function AllAnswers() {
     window.open(url, "_blank");
   };
 
+  // ⭐ LOAD CHAT USERS
+  useEffect(() => {
+    const q = query(collection(db, "chats"), orderBy("updatedAt", "desc"));
+
+    const unsub = onSnapshot(q, (snap) => {
+      const arr = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      setChatUsers(arr);
+    });
+
+    return () => unsub();
+  }, []);
+
+  // ⭐ LOAD MESSAGES WHEN STUDENT IS SELECTED
+  useEffect(() => {
+    if (!selectedStudent) return;
+
+    const msgRef = collection(db, "chats", selectedStudent, "messages");
+    const q = query(msgRef, orderBy("timestamp", "asc"));
+
+    const unsub = onSnapshot(q, (snap) => {
+      const arr = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      setMessages(arr);
+    });
+
+    return () => unsub();
+  }, [selectedStudent]);
+
+  // ⭐ SEND TEACHER MESSAGE
+  const sendTeacherReply = async () => {
+    if (!reply.trim()) return;
+
+    await addDoc(collection(db, "chats", selectedStudent, "messages"), {
+      sender: "teacher",
+      text: reply.trim(),
+      timestamp: serverTimestamp(),
+      seenByTeacher: true,
+    });
+
+    await updateDoc(doc(db, "chats", selectedStudent), {
+      updatedAt: serverTimestamp(),
+    });
+
+    setReply("");
+  };
+
   return (
     <main className="p-6 max-w-6xl mx-auto">
 
@@ -128,20 +182,20 @@ export default function AllAnswers() {
         </button>
       </div>
 
-      {/* ⭐ NEW SECTION — TEACHER LIVE CLASS CONTROL */}
+      {/* ⭐ TEACHER LIVE CLASS CONTROL */}
       <div className="bg-white shadow-lg rounded-xl p-6 mb-10 border">
         <h2 className="text-2xl font-bold mb-4 text-blue-700">🎥 Teacher Live Class Control</h2>
 
         <input
           className="w-full p-3 border rounded mb-4"
-          placeholder="Enter Class Name (Example: Green Batch SQL)"
+          placeholder="Enter Class Name"
           value={className}
           onChange={(e) => setClassName(e.target.value)}
         />
 
         <input
           className="w-full p-3 border rounded mb-4"
-          placeholder="Paste Meeting URL (Google Meet / Zoom / Teams)"
+          placeholder="Paste Meeting URL"
           value={meetingUrl}
           onChange={(e) => setMeetingUrl(e.target.value)}
         />
@@ -187,6 +241,85 @@ export default function AllAnswers() {
               <p className="text-green-600 font-semibold">LIVE 🎥</p>
             </div>
           ))}
+        </div>
+      </div>
+
+      {/* ⭐⭐⭐ CHAT SUPPORT PANEL — INSERTED HERE ⭐⭐⭐ */}
+      <div className="bg-white shadow-lg rounded-xl p-6 mb-10 border">
+        <h2 className="text-2xl font-bold mb-4 text-blue-700">💬 Student Chat Support</h2>
+
+        <div className="grid grid-cols-3 gap-6">
+
+          {/* STUDENT LIST */}
+          <div className="border rounded-lg p-4 h-[350px] overflow-y-auto">
+            <h3 className="font-bold mb-3">Students</h3>
+
+            {chatUsers.length === 0 && (
+              <p className="text-gray-500 text-sm">No student messages yet.</p>
+            )}
+
+            {chatUsers.map((u) => (
+              <div
+                key={u.id}
+                className={`p-2 mb-2 rounded cursor-pointer ${
+                  selectedStudent === u.id ? "bg-blue-100" : "bg-gray-100"
+                }`}
+                onClick={() => setSelectedStudent(u.id)}
+              >
+                <p className="font-semibold">{u.id}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* CHAT WINDOW */}
+          <div className="col-span-2 border rounded-lg p-4 flex flex-col h-[350px]">
+
+            <h3 className="font-bold mb-3">
+              {selectedStudent ? `Chat with ${selectedStudent}` : "Select a student"}
+            </h3>
+
+            {/* MESSAGES */}
+            <div className="flex-1 overflow-y-auto bg-gray-50 p-3 rounded mb-3">
+              {!selectedStudent && (
+                <p className="text-gray-500 text-center mt-10">Select a student to read messages.</p>
+              )}
+
+              {messages.map((m) => (
+                <div
+                  key={m.id}
+                  className={`mb-3 flex ${
+                    m.sender === "teacher" ? "justify-end" : "justify-start"
+                  }`}
+                >
+                  <div
+                    className={`px-3 py-2 rounded-lg max-w-xs text-sm shadow ${
+                      m.sender === "teacher" ? "bg-blue-600 text-white" : "bg-gray-200"
+                    }`}
+                  >
+                    {m.text}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* INPUT */}
+            {selectedStudent && (
+              <div className="flex gap-2">
+                <input
+                  className="border rounded-lg flex-1 px-3 py-2"
+                  placeholder="Type your reply..."
+                  value={reply}
+                  onChange={(e) => setReply(e.target.value)}
+                />
+                <button
+                  onClick={sendTeacherReply}
+                  className="bg-blue-600 text-white px-4 py-2 rounded-lg"
+                >
+                  Send
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
