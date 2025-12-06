@@ -25,7 +25,7 @@ export default function ChatSupport() {
 
   const chatBoxRef = useRef(null);
 
-  // ✅ Load student ID from localStorage
+  // Get student UID from localStorage
   useEffect(() => {
     if (typeof window === "undefined") return;
 
@@ -40,18 +40,19 @@ export default function ChatSupport() {
     setStudentId(uid);
   }, [router]);
 
-  // ✅ Subscribe to messages
+  // Load chat messages
   useEffect(() => {
     if (!studentId) return;
 
     const chatDocRef = doc(db, "chats", studentId);
 
-    // Ensure the chat document exists
     setDoc(
       chatDocRef,
-      { updatedAt: serverTimestamp() },
+      {
+        updatedAt: serverTimestamp(),
+      },
       { merge: true }
-    );
+    ).catch(console.error);
 
     const msgRef = collection(db, "chats", studentId, "messages");
     const q = query(msgRef, orderBy("timestamp", "asc"));
@@ -63,7 +64,6 @@ export default function ChatSupport() {
         setMessages(arr);
         setLoading(false);
 
-        // auto-scroll
         setTimeout(() => {
           if (chatBoxRef.current) {
             chatBoxRef.current.scrollTop = chatBoxRef.current.scrollHeight;
@@ -79,14 +79,14 @@ export default function ChatSupport() {
     return () => unsub();
   }, [studentId]);
 
-  // ✅ Send message (FIXED VERSION)
+  // Send message
   const handleSend = async (e) => {
     e.preventDefault();
     if (!input.trim() || !studentId) return;
 
     try {
-      const chatDocRef = doc(db, "chats", studentId);
       const msgRef = collection(db, "chats", studentId, "messages");
+      const chatDocRef = doc(db, "chats", studentId);
 
       await addDoc(msgRef, {
         sender: "student",
@@ -107,66 +107,44 @@ export default function ChatSupport() {
   };
 
   const formatTime = (ts) =>
-    ts?.toDate
-      ? ts.toDate().toLocaleTimeString("en-IN", {
-          hour: "2-digit",
-          minute: "2-digit",
-        })
-      : "";
+    ts?.toDate ? ts.toDate().toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" }) : "";
 
   return (
     <main className="min-h-screen bg-gray-100 px-4 py-6 flex flex-col">
-
-      {/* TOP BAR */}
+      
       <div className="mb-4 flex items-center gap-3">
         <button
           onClick={() => router.push("/student-dashboard")}
-          className="text-blue-600 text-sm flex items-center gap-1"
+          className="text-blue-600 text-sm"
         >
           ← Back
         </button>
         <h1 className="text-xl font-bold text-gray-800">Chat Support</h1>
       </div>
 
-      {/* CHAT CARD */}
       <div className="max-w-3xl mx-auto flex-1 flex items-center">
         <div className="w-full bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col">
 
-          {/* HEADER */}
           <div className="bg-blue-600 text-white px-5 py-3">
             <div className="font-semibold">Instructor Chat</div>
-            <div className="text-xs opacity-90">
-              Ask doubts and get help from your mentor
-            </div>
+            <div className="text-xs opacity-90">Ask doubts anytime</div>
           </div>
 
-          {/* MESSAGES */}
           <div
             ref={chatBoxRef}
             className="flex-1 bg-white px-4 py-3 overflow-y-auto"
             style={{ minHeight: "320px" }}
           >
-            {loading && (
-              <p className="text-center text-gray-400 mt-10">
-                Loading conversation...
-              </p>
-            )}
+            {loading && <p className="text-center text-gray-400 mt-10">Loading...</p>}
 
             {!loading && messages.length === 0 && (
-              <p className="text-center text-gray-400 mt-10">
-                No messages yet. Say hi to your instructor!
-              </p>
+              <p className="text-center text-gray-400 mt-10">Say hi to start chat!</p>
             )}
 
             {messages.map((m) => {
               const isStudent = m.sender === "student";
               return (
-                <div
-                  key={m.id}
-                  className={`mb-3 flex ${
-                    isStudent ? "justify-end" : "justify-start"
-                  }`}
-                >
+                <div key={m.id} className={`mb-3 flex ${isStudent ? "justify-end" : "justify-start"}`}>
                   <div
                     className={`max-w-xs px-3 py-2 rounded-2xl text-sm shadow ${
                       isStudent
@@ -177,7 +155,6 @@ export default function ChatSupport() {
                     <div>{m.text}</div>
                     <div className="text-[10px] opacity-80 mt-1 text-right">
                       {formatTime(m.timestamp)}
-                      {!isStudent && " • Instructor"}
                     </div>
                   </div>
                 </div>
@@ -185,7 +162,6 @@ export default function ChatSupport() {
             })}
           </div>
 
-          {/* INPUT BAR */}
           <form
             onSubmit={handleSend}
             className="border-t bg-gray-50 px-4 py-3 flex items-center gap-3"
@@ -197,17 +173,12 @@ export default function ChatSupport() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
             />
-            <button
-              type="submit"
-              className="bg-blue-600 text-white px-5 py-2 rounded-lg text-sm font-semibold"
-            >
+            <button type="submit" className="bg-blue-600 text-white px-5 py-2 rounded-lg text-sm">
               Send
             </button>
           </form>
-
         </div>
       </div>
-
     </main>
   );
 }
