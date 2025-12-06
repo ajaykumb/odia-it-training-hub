@@ -7,7 +7,6 @@ import {
   ArrowRightOnRectangleIcon,
   ArrowLeftIcon,
   BellIcon,
-  VideoCameraIcon,
   ClipboardDocumentListIcon,
   ChartBarIcon,
 } from "@heroicons/react/24/outline";
@@ -94,9 +93,8 @@ export default function StudentDashboard() {
               <ClipboardDocumentListIcon className="w-5 h-5" /> Assignments
             </a>
 
-            <a className="flex items-center gap-3 hover:text-blue-600" href="#">
-              <VideoCameraIcon className="w-5 h-5" /> Video Lectures
-            </a>
+            {/* Removed Video Lectures */}
+            {/* Removed Next Class */}
 
             <a className="flex items-center gap-3 hover:text-blue-600" href="#">
               <ChartBarIcon className="w-5 h-5" /> Progress
@@ -146,11 +144,11 @@ export default function StudentDashboard() {
               <p className="text-green-700 font-bold text-3xl">{attendance}%</p>
             </div>
 
-            {/* ✅ Next Class REMOVED */}
+            {/* Next Class REMOVED */}
 
           </div>
 
-          {/* DASHBOARD CARDS (unchanged) */}
+          {/* DASHBOARD CARDS */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
 
             {/* Notes */}
@@ -160,15 +158,6 @@ export default function StudentDashboard() {
               <a href="/class-notes" className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700">
                 View Notes
               </a>
-            </div>
-
-            {/* Videos */}
-            <div className="bg-white shadow-lg rounded-2xl p-6 hover:shadow-xl transition">
-              <h3 className="text-xl font-semibold mb-2">Video Lectures</h3>
-              <p className="text-gray-500 mb-4">Watch recorded classes</p>
-              <button className="bg-gray-400 text-white px-4 py-2 rounded-lg cursor-not-allowed">
-                Coming Soon
-              </button>
             </div>
 
             {/* Assignments */}
