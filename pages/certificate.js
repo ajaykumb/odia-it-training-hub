@@ -1,12 +1,41 @@
+import { useEffect, useState } from "react";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../utils/firebaseConfig";
+
 import OdiaCertificate from "../components/OdiaCertificate";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 
 export default function CertificatePage() {
-  const studentName = "Student Name"; // Later pull from Firestore
-  const courseName = "Application & Production Support (6 Months)";
+  const [studentName, setStudentName] = useState("Loading...");
+  const [courseName, setCourseName] = useState("Application & Production Support (6 Months)");
   const date = new Date().toLocaleDateString("en-IN");
 
+  // 🔥 Fetch student name from Firestore
+  useEffect(() => {
+    const fetchStudent = async () => {
+      const uid = localStorage.getItem("studentUID"); // stored during login
+
+      if (!uid) {
+        setStudentName("Unknown Student");
+        return;
+      }
+
+      const ref = doc(db, "students", uid);
+      const snap = await getDoc(ref);
+
+      if (snap.exists()) {
+        const data = snap.data();
+        setStudentName(data.name || "No Name Found");
+      } else {
+        setStudentName("No Record Found");
+      }
+    };
+
+    fetchStudent();
+  }, []);
+
+  // PDF Download
   const downloadPDF = async () => {
     const certificate = document.getElementById("certificate");
 
