@@ -26,7 +26,7 @@ export default function OdiaCertificate({ studentName, courseName, date, certifi
         Certificate of Completion
       </h2>
 
-      {/* INTRO TEXT */}
+      {/* INTRO */}
       <p className="text-center text-lg text-gray-700 mt-8">
         This certificate is proudly presented to
       </p>
@@ -40,13 +40,13 @@ export default function OdiaCertificate({ studentName, courseName, date, certifi
         for successfully completing the course
       </p>
 
-      {/* COURSE NAME */}
+      {/* COURSE */}
       <h3 className="text-center text-2xl font-semibold text-blue-700 mt-3">
         {courseName}
       </h3>
 
-      {/* COMPLETION DATE + CERTIFICATE ID */}
-      <div className="text-center mt-10">
+      {/* COMPLETION DATE + CERT ID — moved UP */}
+      <div className="text-center mt-12">
         <p className="text-gray-700 text-lg">
           Completion Date: <strong>{date}</strong>
         </p>
@@ -55,13 +55,12 @@ export default function OdiaCertificate({ studentName, courseName, date, certifi
         </p>
       </div>
 
-      {/* ⭐ LEFT-SIDE SIGNATURE (NO OVERLAP, FIXED POSITION) */}
-      <div className="absolute bottom-16 left-20 text-center">
+      {/* ⭐ FINAL SIGNATURE — LEFT, at the VERY BOTTOM */}
+      <div className="absolute bottom-6 left-20 text-center">
 
-        {/* Signature Image */}
         <img
           src="/images/signature.png"
-          className="w-28 h-auto object-contain opacity-90"
+          className="w-32 h-auto object-contain opacity-90"
         />
 
         <p className="font-semibold text-gray-700 mt-1 text-lg">Instructor</p>
