@@ -1,3 +1,4 @@
+import "../styles/profile.css";
 import { useEffect, useState } from "react";
 import { auth, db, storage } from "../utils/firebaseConfig";
 import {
