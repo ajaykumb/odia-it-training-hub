@@ -1,6 +1,6 @@
 // 📁 components/OdiaCertificate.js
 
-export default function OdiaCertificate({ studentName, courseName, date }) {
+export default function OdiaCertificate({ studentName, courseName, date, certificateId }) {
   return (
     <div
       id="certificate"
@@ -17,6 +17,7 @@ export default function OdiaCertificate({ studentName, courseName, date }) {
         className="absolute top-10 left-1/2 -translate-x-1/2 w-24"
       />
 
+      {/* MAIN HEADING */}
       <h1 className="text-center text-4xl font-extrabold text-blue-900 mt-28">
         Odia IT Training Hub
       </h1>
@@ -29,7 +30,8 @@ export default function OdiaCertificate({ studentName, courseName, date }) {
         This certificate is proudly presented to
       </p>
 
-      <h2 className="text-center text-4xl font-bold text-blue-900 mt-4">
+      {/* STUDENT NAME */}
+      <h2 className="text-center text-4xl font-bold text-blue-900 mt-4 capitalize">
         {studentName}
       </h2>
 
@@ -37,20 +39,31 @@ export default function OdiaCertificate({ studentName, courseName, date }) {
         for successfully completing the course
       </p>
 
+      {/* COURSE NAME */}
       <h3 className="text-center text-2xl font-semibold text-blue-700 mt-3">
         {courseName}
       </h3>
 
-      <p className="text-center text-gray-600 mt-6">
+      {/* COMPLETION DATE */}
+      <p className="text-center text-gray-700 mt-6">
         Completion Date: <strong>{date}</strong>
       </p>
 
+      {/* ⭐ CERTIFICATE ID (NEW) */}
+      <p className="text-center text-gray-700 mt-1">
+        Certificate ID: <strong>{certificateId}</strong>
+      </p>
+
+      {/* SIGNATURE SECTION */}
       <div className="absolute bottom-14 left-0 right-0 flex justify-around px-16">
+
+        {/* Instructor Signature */}
         <div className="text-center">
           <img src="/images/signature.png" className="w-40 mx-auto" />
           <p className="font-semibold text-gray-700 mt-1">Instructor</p>
         </div>
 
+        {/* Director Signature */}
         <div className="text-center">
           <div className="w-40 mx-auto border-b-2 border-gray-500 mb-1"></div>
           <p className="font-semibold text-gray-700">Director</p>
