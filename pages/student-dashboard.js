@@ -12,7 +12,13 @@ import {
 } from "@heroicons/react/24/outline";
 
 import { db } from "../utils/firebaseConfig";
-import { doc, onSnapshot } from "firebase/firestore";
+import {
+  doc,
+  onSnapshot,
+  collection,
+  query,
+  orderBy,
+} from "firebase/firestore";
 
 export default function StudentDashboard() {
   const router = useRouter();
@@ -24,13 +30,22 @@ export default function StudentDashboard() {
   const [progress] = useState(70);
   const [attendance] = useState(85);
 
-  // Login check
+  // NEW: Announcements + Upcoming Class Info
+  const [announcements, setAnnouncements] = useState([]);
+  const [upcomingClass, setUpcomingClass] = useState(null);
+  const [countdown, setCountdown] = useState("");
+
+  // ================================
+  // LOGIN CHECK
+  // ================================
   useEffect(() => {
     const token = localStorage.getItem("studentToken");
     if (!token) router.push("/login");
   }, []);
 
-  // Live class listener
+  // ================================
+  // LIVE CLASS (EXISTING FEATURE)
+  // ================================
   useEffect(() => {
     const liveRef = doc(db, "liveClass", "current");
     const unsub = onSnapshot(liveRef, (snap) => {
@@ -44,6 +59,59 @@ export default function StudentDashboard() {
     return () => unsub();
   }, []);
 
+  // ================================
+  // NEW: Announcements Listener
+  // ================================
+  useEffect(() => {
+    const q = query(collection(db, "announcements"), orderBy("timestamp", "desc"));
+
+    const unsub = onSnapshot(q, (snap) => {
+      const list = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      setAnnouncements(list.slice(0, 3)); // show latest 3
+    });
+
+    return () => unsub();
+  }, []);
+
+  // ================================
+  // NEW: Upcoming Class Listener
+  // ================================
+  useEffect(() => {
+    const unsub = onSnapshot(doc(db, "liveClassStatus", "active"), (snap) => {
+      if (snap.exists()) {
+        setUpcomingClass(snap.data());
+      }
+    });
+
+    return () => unsub();
+  }, []);
+
+  // ================================
+  // NEW: Countdown Timer for Next Class
+  // ================================
+  useEffect(() => {
+    if (!upcomingClass?.nextClassTime) return;
+
+    const interval = setInterval(() => {
+      const diff = new Date(upcomingClass.nextClassTime) - new Date();
+      if (diff <= 0) {
+        setCountdown("Starting soon...");
+        return;
+      }
+
+      const hrs = Math.floor(diff / (1000 * 60 * 60));
+      const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const secs = Math.floor((diff % (1000 * 60)) / 1000);
+
+      setCountdown(`${hrs}h ${mins}m ${secs}s`);
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [upcomingClass]);
+
+  // ================================
+  // LOGOUT
+  // ================================
   const logout = () => {
     localStorage.removeItem("studentToken");
     router.push("/login");
@@ -93,8 +161,6 @@ export default function StudentDashboard() {
               <ClipboardDocumentListIcon className="w-5 h-5" /> Assignments
             </a>
 
-            {/* Removed Video Lectures */}
-
             <a className="flex items-center gap-3 hover:text-blue-600" href="#">
               <ChartBarIcon className="w-5 h-5" /> Progress
             </a>
@@ -130,6 +196,7 @@ export default function StudentDashboard() {
           {/* SUMMARY CARDS */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
 
+            {/* Progress */}
             <div className="bg-white shadow-md rounded-2xl p-6">
               <h3 className="text-xl font-bold mb-2">Course Progress</h3>
               <p className="text-blue-700 font-bold text-3xl">{progress}%</p>
@@ -138,19 +205,33 @@ export default function StudentDashboard() {
               </div>
             </div>
 
+            {/* Attendance */}
             <div className="bg-white shadow-md rounded-2xl p-6">
               <h3 className="text-xl font-bold mb-2">Attendance</h3>
               <p className="text-green-700 font-bold text-3xl">{attendance}%</p>
             </div>
 
-            {/* Next Class REMOVED */}
+            {/* ANNOUNCEMENTS CARD */}
+            <div className="bg-white shadow-md rounded-2xl p-6">
+              <h3 className="text-xl font-bold mb-3">Announcements</h3>
 
+              {announcements.length === 0 && (
+                <p className="text-gray-500">No announcements</p>
+              )}
+
+              {announcements.map((item) => (
+                <div key={item.id} className="border-b border-gray-200 pb-2 mb-2">
+                  <p className="font-semibold">{item.title}</p>
+                  <p className="text-gray-600 text-sm">{item.message}</p>
+                </div>
+              ))}
+            </div>
           </div>
 
           {/* DASHBOARD CARDS */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
 
-            {/* Notes */}
+            {/* NOTES */}
             <div className="bg-white shadow-lg rounded-2xl p-6 hover:shadow-xl transition">
               <h3 className="text-xl font-semibold mb-2">Videos and classes Notes</h3>
               <p className="text-gray-500 mb-4">Handwritten + PDFs</p>
@@ -159,7 +240,7 @@ export default function StudentDashboard() {
               </a>
             </div>
 
-            {/* Assignments */}
+            {/* ASSIGNMENTS */}
             <div className="bg-white shadow-lg rounded-2xl p-6 hover:shadow-xl transition">
               <h3 className="text-xl font-semibold mb-2">Assignments</h3>
               <p className="text-gray-500 mb-4">View and submit assignments</p>
@@ -168,9 +249,29 @@ export default function StudentDashboard() {
               </a>
             </div>
 
-            {/* Live Class */}
+            {/* UPCOMING CLASS (NEW) */}
             <div className="bg-white shadow-lg rounded-2xl p-6 hover:shadow-xl transition">
+              <h3 className="text-xl font-bold mb-2">Upcoming Class</h3>
+
+              {upcomingClass ? (
+                <>
+                  <p><strong>Topic:</strong> {upcomingClass.topic}</p>
+                  <p><strong>Teacher:</strong> {upcomingClass.teacher}</p>
+                  <p className="mt-2"><strong>Starts at:</strong> {upcomingClass.nextClassTime}</p>
+
+                  <div className="bg-blue-100 text-blue-700 px-3 py-2 rounded-lg mt-3 text-center font-semibold">
+                    {countdown}
+                  </div>
+                </>
+              ) : (
+                <p className="text-gray-500">No upcoming class</p>
+              )}
+            </div>
+
+            {/* LIVE CLASS */}
+            <div className="bg-white shadow-lg rounded-2xl p-6 hover:shadow-xl transition col-span-1 md:col-span-3">
               <h3 className="text-xl font-semibold mb-2">Live Class</h3>
+
               {isLive ? (
                 <>
                   <p className="text-green-700 mb-4 font-semibold">LIVE: {className}</p>
@@ -191,7 +292,7 @@ export default function StudentDashboard() {
               )}
             </div>
 
-            {/* Certificate */}
+            {/* CERTIFICATE */}
             <div className="bg-white shadow-lg rounded-2xl p-6 hover:shadow-xl transition">
               <h3 className="text-xl font-semibold mb-2">Your Certificate</h3>
               <p className="text-gray-500 mb-4">Download your course completion certificate</p>
@@ -203,7 +304,7 @@ export default function StudentDashboard() {
               </a>
             </div>
 
-            {/* Chat Support — NEW */}
+            {/* CHAT */}
             <div className="bg-white shadow-lg rounded-2xl p-6 hover:shadow-xl transition">
               <h3 className="text-xl font-semibold mb-2">Chat Support</h3>
               <p className="text-gray-500 mb-4">Talk to your instructor in real time</p>
