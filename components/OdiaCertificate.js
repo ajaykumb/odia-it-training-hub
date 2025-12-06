@@ -46,22 +46,22 @@ export default function OdiaCertificate({ studentName, courseName, date, certifi
       </h3>
 
       {/* COMPLETION DATE + CERT ID */}
-      <div className="text-center mt-8">
-        <p className="text-gray-700">
+      <div className="text-center mt-10">
+        <p className="text-gray-700 text-lg">
           Completion Date: <strong>{date}</strong>
         </p>
-        <p className="text-gray-700 mt-1">
+        <p className="text-gray-700 mt-1 text-lg">
           Certificate ID: <strong>{certificateId}</strong>
         </p>
       </div>
 
-      {/* ⭐ FINAL SIGNATURE SECTION — Centered */}
-      <div className="absolute bottom-10 left-0 right-0 flex flex-col items-center">
+      {/* ⭐ FINAL SIGNATURE SECTION — FIXED TO BOTTOM */}
+      <div className="absolute bottom-4 left-0 right-0 flex flex-col items-center">
 
-        {/* INSTRUCTOR SIGNATURE */}
+        {/* Instructor Signature */}
         <img
           src="/images/signature.png"
-          className="w-32 h-auto object-contain opacity-90"
+          className="w-28 h-auto object-contain opacity-90"
         />
 
         <p className="font-semibold text-gray-700 mt-1 text-lg">Instructor</p>
