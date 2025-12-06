@@ -10,10 +10,10 @@
   "dependencies": {
     "@heroicons/react": "^2.2.0",
     "firebase": "^12.6.0",
-    "next": "latest",
+    "next": "14.2.15",
     "nodemailer": "^6.9.0",
-    "react": "latest",
-    "react-dom": "latest",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
     "resend": "^3.0.0"
   },
   "devDependencies": {
