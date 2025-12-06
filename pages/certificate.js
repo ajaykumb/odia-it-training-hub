@@ -8,13 +8,13 @@ import html2canvas from "html2canvas";
 
 export default function CertificatePage() {
   const [studentName, setStudentName] = useState("Loading...");
-  const [courseName, setCourseName] = useState("Application & Production Support (6 Months)");
+  const courseName = "Application & Production Support (6 Months)";
   const date = new Date().toLocaleDateString("en-IN");
 
-  // 🔥 Fetch student name from Firestore
+  // ✔ Fetch student name from Firestore collection "students"
   useEffect(() => {
-    const fetchStudent = async () => {
-      const uid = localStorage.getItem("studentUID"); // stored during login
+    const fetchStudentData = async () => {
+      const uid = localStorage.getItem("studentUID");
 
       if (!uid) {
         setStudentName("Unknown Student");
@@ -25,14 +25,13 @@ export default function CertificatePage() {
       const snap = await getDoc(ref);
 
       if (snap.exists()) {
-        const data = snap.data();
-        setStudentName(data.name || "No Name Found");
+        setStudentName(snap.data().name || "No Name Found");
       } else {
-        setStudentName("No Record Found");
+        setStudentName("User Not Found");
       }
     };
 
-    fetchStudent();
+    fetchStudentData();
   }, []);
 
   // PDF Download
