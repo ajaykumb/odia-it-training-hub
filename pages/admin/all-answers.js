@@ -24,7 +24,6 @@ export default function AllAnswers() {
   const [className, setClassName] = useState("");
   const [meetingUrl, setMeetingUrl] = useState("");
 
-  // ⭐ CHAT STATES
   const [chatUsers, setChatUsers] = useState([]);
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [messages, setMessages] = useState([]);
@@ -32,7 +31,7 @@ export default function AllAnswers() {
 
   const router = useRouter();
 
-  // AUTH + SUBMISSIONS
+  // AUTH
   useEffect(() => {
     const unsubAuth = onAuthStateChanged(auth, (user) => {
       if (!user) {
@@ -42,18 +41,13 @@ export default function AllAnswers() {
 
       const q = query(collection(db, "assignments"), orderBy("submittedAt", "desc"));
 
-      const unsubSnap = onSnapshot(
-        q,
-        (snapshot) => {
-          const arr = snapshot.docs.map((d) => ({
-            id: d.id,
-            ...d.data(),
-          }));
-
-          setAnswers(arr);
-        },
-        (err) => console.error(err)
-      );
+      const unsubSnap = onSnapshot(q, (snapshot) => {
+        const arr = snapshot.docs.map((d) => ({
+          id: d.id,
+          ...d.data(),
+        }));
+        setAnswers(arr);
+      });
 
       return () => unsubSnap();
     });
@@ -61,51 +55,44 @@ export default function AllAnswers() {
     return () => unsubAuth();
   }, [router]);
 
-  // LIVE STUDENTS
+  // LIVE STUDENTS (Realtime DB)
   useEffect(() => {
     const liveRef = ref(rtdb, "liveStudents");
     onValue(liveRef, (snap) => setLiveStudents(snap.val() || {}));
   }, []);
 
-  // FILTER LOGIC
+  // FILTER
   const filteredAnswers = useMemo(() => {
     if (filter === "auto") return answers.filter((a) => a.autoSubmitted);
     if (filter === "manual") return answers.filter((a) => !a.autoSubmitted);
     return answers;
   }, [answers, filter]);
 
-  // DATE FORMAT
+  // FORMAT DATE
   const formatDate = (d) => {
     if (!d) return "N/A";
     if (typeof d?.toDate === "function") return d.toDate().toLocaleString();
     if (d.seconds) return new Date(d.seconds * 1000).toLocaleString();
-    try {
-      return new Date(d).toLocaleString();
-    } catch {
-      return String(d);
-    }
+    return new Date(d).toLocaleString();
   };
 
   // DELETE SUBMISSION
   const handleDelete = async (id) => {
     const ok = window.confirm("Delete this submission?");
     if (!ok) return;
-
     await deleteDoc(doc(db, "assignments", id));
     setAnswers((prev) => prev.filter((i) => i.id !== id));
   };
 
-  // ⭐ TEACHER LIVE CONTROLS
+  // LIVE CLASS CONTROLS
   const startLiveClass = async () => {
-    if (!className.trim()) return alert("Please enter class name");
-
+    if (!className.trim()) return alert("Enter class name");
     await setDoc(doc(db, "liveClass", "current"), {
       isLive: true,
       className,
       meetingUrl: meetingUrl.trim() || "https://meet.jit.si/OdiaITTrainingHubLiveClass",
       startedAt: Date.now(),
     });
-
     alert("Live class started!");
   };
 
@@ -116,7 +103,6 @@ export default function AllAnswers() {
       meetingUrl: "",
       endedAt: Date.now(),
     });
-
     alert("Live class stopped.");
   };
 
@@ -125,145 +111,141 @@ export default function AllAnswers() {
     window.open(url, "_blank");
   };
 
-  // ⭐ LOAD CHAT USERS
+  // LOAD CHAT USERS
   useEffect(() => {
     const q = query(collection(db, "chats"), orderBy("updatedAt", "desc"));
-
     const unsub = onSnapshot(q, (snap) => {
       const arr = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
       setChatUsers(arr);
     });
-
     return () => unsub();
   }, []);
 
-  // ⭐ LOAD MESSAGES
+  // LOAD CHAT MESSAGES
   useEffect(() => {
     if (!selectedStudent) return;
-
     const msgRef = collection(db, "chats", selectedStudent, "messages");
     const q = query(msgRef, orderBy("timestamp", "asc"));
-
     const unsub = onSnapshot(q, (snap) => {
       const arr = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
       setMessages(arr);
     });
-
     return () => unsub();
   }, [selectedStudent]);
 
-  // ⭐ SEND MESSAGE
+  // SEND TEACHER MESSAGE
   const sendTeacherReply = async () => {
     if (!reply.trim()) return;
-
     await addDoc(collection(db, "chats", selectedStudent, "messages"), {
       sender: "teacher",
       text: reply.trim(),
       timestamp: serverTimestamp(),
       seenByTeacher: true,
     });
-
     await updateDoc(doc(db, "chats", selectedStudent), {
       updatedAt: serverTimestamp(),
     });
-
     setReply("");
   };
 
   return (
-    <main className="p-6 max-w-6xl mx-auto">
+    <main className="p-6 max-w-7xl mx-auto">
 
       {/* HEADER */}
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-        <button className="bg-red-600 text-white px-4 py-2 rounded" onClick={() => signOut(auth)}>
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-4xl font-bold text-gray-800">Admin Dashboard</h1>
+        <button className="bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-lg shadow">
           Logout
         </button>
       </div>
 
-      {/* LIVE CLASS BLOCK */}
-      <div className="bg-white shadow-lg rounded-xl p-6 mb-10 border">
-        <h2 className="text-2xl font-bold mb-4 text-blue-700">🎥 Teacher Live Class Control</h2>
+      {/* LIVE CLASS */}
+      <section className="bg-white shadow-md rounded-xl p-6 mb-10 border">
+        <h2 className="text-2xl font-bold text-blue-600 mb-4">🎥 Live Class Control</h2>
 
-        <input
-          className="w-full p-3 border rounded mb-4"
-          placeholder="Enter Class Name"
-          value={className}
-          onChange={(e) => setClassName(e.target.value)}
-        />
+        <div className="grid md:grid-cols-2 gap-4">
+          <input
+            className="w-full p-3 border rounded-lg shadow-sm"
+            placeholder="Enter Class Name"
+            value={className}
+            onChange={(e) => setClassName(e.target.value)}
+          />
 
-        <input
-          className="w-full p-3 border rounded mb-4"
-          placeholder="Paste Meeting URL"
-          value={meetingUrl}
-          onChange={(e) => setMeetingUrl(e.target.value)}
-        />
+          <input
+            className="w-full p-3 border rounded-lg shadow-sm"
+            placeholder="Paste Meeting URL"
+            value={meetingUrl}
+            onChange={(e) => setMeetingUrl(e.target.value)}
+          />
+        </div>
 
-        <button onClick={startLiveClass} className="w-full bg-green-600 text-white p-3 rounded-lg mb-3">
-          Start Live Class
-        </button>
+        <div className="grid md:grid-cols-3 gap-4 mt-4">
+          <button className="bg-green-600 hover:bg-green-700 text-white p-3 rounded-lg shadow" onClick={startLiveClass}>
+            Start Live Class
+          </button>
 
-        <button onClick={joinAsTeacher} className="w-full bg-blue-600 text-white p-3 rounded-lg mb-3">
-          Join as Teacher
-        </button>
+          <button className="bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-lg shadow" onClick={joinAsTeacher}>
+            Join as Teacher
+          </button>
 
-        <button onClick={stopLiveClass} className="w-full bg-red-600 text-white p-3 rounded-lg">
-          Stop Live Class
-        </button>
-      </div>
+          <button className="bg-red-600 hover:bg-red-700 text-white p-3 rounded-lg shadow" onClick={stopLiveClass}>
+            Stop Live Class
+          </button>
+        </div>
+      </section>
 
-      {/* ⭐⭐⭐ CHAT SUPPORT PANEL ⭐⭐⭐ */}
-      <div className="bg-white shadow-lg rounded-xl p-6 mb-10 border">
-        <h2 className="text-2xl font-bold mb-4 text-blue-700">💬 Student Chat Support</h2>
+      {/* CHAT SUPPORT */}
+      <section className="bg-white shadow-md rounded-xl p-6 mb-10 border">
+        <h2 className="text-2xl font-bold text-blue-600 mb-4">💬 Student Chat Support</h2>
 
         <div className="grid grid-cols-3 gap-6">
 
           {/* STUDENT LIST */}
-          <div className="border rounded-lg p-4 h-[350px] overflow-y-auto">
-            <h3 className="font-bold mb-3">Students</h3>
+          <div className="border rounded-xl p-4 shadow-sm h-[350px] overflow-y-auto bg-gray-50">
+            <h3 className="font-bold mb-3 text-gray-700">Students</h3>
 
             {chatUsers.length === 0 && (
-              <p className="text-gray-500 text-sm">No student messages yet.</p>
+              <p className="text-gray-500 text-sm">No students yet.</p>
             )}
 
             {chatUsers.map((u) => (
               <div
                 key={u.id}
-                className={`p-2 mb-2 rounded cursor-pointer ${
-                  selectedStudent === u.id ? "bg-blue-100" : "bg-gray-100"
+                className={`p-3 mb-2 rounded-lg cursor-pointer shadow-sm border ${
+                  selectedStudent === u.id ? "bg-blue-100 border-blue-300" : "bg-white"
                 }`}
                 onClick={() => setSelectedStudent(u.id)}
               >
-                {/* ⭐ SHOW NAME IF EXISTS */}
-                <p className="font-semibold">
-                  {u.name ? `${u.name} (${u.id})` : u.id}
+                <p className="font-semibold text-gray-800">
+                  {u.name ? `${u.name}` : "Unknown Student"}
                 </p>
+                <p className="text-xs text-gray-500">{u.id}</p>
               </div>
             ))}
           </div>
 
           {/* CHAT WINDOW */}
-          <div className="col-span-2 border rounded-lg p-4 flex flex-col h-[350px]">
+          <div className="col-span-2 border rounded-xl p-4 shadow-sm flex flex-col bg-gray-50 h-[350px]">
 
-            <h3 className="font-bold mb-3">
+            <h3 className="font-bold text-gray-700 mb-3">
               {selectedStudent ? `Chat with ${selectedStudent}` : "Select a student"}
             </h3>
 
-            <div className="flex-1 overflow-y-auto bg-gray-50 p-3 rounded mb-3">
+            <div className="flex-1 overflow-y-auto bg-white rounded-lg p-3 shadow-inner mb-3">
               {!selectedStudent && (
-                <p className="text-gray-500 text-center mt-10">Select a student to read messages.</p>
+                <p className="text-gray-500 text-center mt-10">Select a student to start chat.</p>
               )}
 
               {messages.map((m) => (
                 <div
                   key={m.id}
-                  className={`mb-3 flex ${
-                    m.sender === "teacher" ? "justify-end" : "justify-start"
-                  }`}
+                  className={`mb-3 flex ${m.sender === "teacher" ? "justify-end" : "justify-start"}`}
                 >
                   <div
-                    className={`px-3 py-2 rounded-lg max-w-xs text-sm shadow ${
-                      m.sender === "teacher" ? "bg-blue-600 text-white" : "bg-gray-200"
+                    className={`px-3 py-2 rounded-lg shadow max-w-xs ${
+                      m.sender === "teacher"
+                        ? "bg-blue-600 text-white"
+                        : "bg-gray-200 text-gray-800"
                     }`}
                   >
                     {m.text}
@@ -275,14 +257,14 @@ export default function AllAnswers() {
             {selectedStudent && (
               <div className="flex gap-2">
                 <input
-                  className="border rounded-lg flex-1 px-3 py-2"
+                  className="border rounded-lg flex-1 px-3 py-2 shadow-sm"
                   placeholder="Type your reply..."
                   value={reply}
                   onChange={(e) => setReply(e.target.value)}
                 />
                 <button
                   onClick={sendTeacherReply}
-                  className="bg-blue-600 text-white px-4 py-2 rounded-lg"
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow"
                 >
                   Send
                 </button>
@@ -290,37 +272,52 @@ export default function AllAnswers() {
             )}
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* SUBMISSION FILTERS */}
-      <div className="flex gap-2 mb-6">
-        <button onClick={() => setFilter("all")} className={`px-4 py-2 rounded ${filter === "all" ? "bg-blue-600 text-white" : "bg-gray-200"}`}>
-          All
-        </button>
-        <button onClick={() => setFilter("manual")} className={`px-4 py-2 rounded ${filter === "manual" ? "bg-green-600 text-white" : "bg-gray-200"}`}>
-          Manual Only
-        </button>
-        <button onClick={() => setFilter("auto")} className={`px-4 py-2 rounded ${filter === "auto" ? "bg-orange-600 text-white" : "bg-gray-200"}`}>
-          Auto-Submitted Only
-        </button>
+      {/* FILTER BUTTONS */}
+      <div className="flex gap-3 mb-8">
+        {["all", "manual", "auto"].map((f) => (
+          <button
+            key={f}
+            onClick={() => setFilter(f)}
+            className={`px-5 py-2 rounded-lg shadow text-sm font-semibold ${
+              filter === f
+                ? f === "manual"
+                  ? "bg-green-600 text-white"
+                  : f === "auto"
+                  ? "bg-orange-600 text-white"
+                  : "bg-blue-600 text-white"
+                : "bg-gray-200 text-gray-700"
+            }`}
+          >
+            {f === "all" && "All"}
+            {f === "manual" && "Manual Only"}
+            {f === "auto" && "Auto-Submitted Only"}
+          </button>
+        ))}
       </div>
 
       {/* SUBMITTED STUDENTS */}
-      <h2 className="text-2xl font-bold mb-4">✅ SUBMITTED STUDENTS</h2>
+      <h2 className="text-2xl font-bold text-gray-800 mb-4">📄 Submitted Students</h2>
 
       <div className="grid md:grid-cols-2 gap-6">
         {filteredAnswers.map((s) => (
-          <div key={s.id} className="p-4 border rounded shadow bg-white">
-            <h2 className="font-bold text-xl">{s.name || s.safeName || s.id}</h2>
+          <div key={s.id} className="p-5 border rounded-xl shadow bg-white">
+            <h2 className="font-bold text-xl text-gray-800">{s.name || s.safeName || s.id}</h2>
+            <p className="text-sm text-gray-600 mt-1">
+              Submitted: {formatDate(s.submittedAt)}
+            </p>
 
-            <p className="text-sm text-gray-600 mt-1">Submitted: {formatDate(s.submittedAt)}</p>
-
-            <div className="mt-2 space-x-2">
-              <span className={`px-2 py-1 text-xs rounded ${s.autoSubmitted ? "bg-orange-100 text-orange-700" : "bg-green-100 text-green-700"}`}>
+            <div className="mt-3 flex gap-3 flex-wrap">
+              <span className={`px-3 py-1 text-xs rounded-full font-semibold shadow-sm ${
+                s.autoSubmitted ? "bg-orange-100 text-orange-700" : "bg-green-100 text-green-700"
+              }`}>
                 {s.autoSubmitted ? "AUTO SUBMITTED" : "MANUAL SUBMITTED"}
               </span>
 
-              <span className={`px-2 py-1 text-xs rounded ${s.cameraVerified ? "bg-blue-100 text-blue-700" : "bg-red-100 text-red-700"}`}>
+              <span className={`px-3 py-1 text-xs rounded-full font-semibold shadow-sm ${
+                s.cameraVerified ? "bg-blue-100 text-blue-700" : "bg-red-100 text-red-700"
+              }`}>
                 Camera: {s.cameraVerified ? "ON" : "OFF"}
               </span>
             </div>
@@ -333,7 +330,7 @@ export default function AllAnswers() {
                   return na - nb;
                 })
                 .map(([k, v]) => (
-                  <p key={k}>
+                  <p key={k} className="text-gray-700">
                     <b>{k.toUpperCase()}:</b> {v || "-"}
                   </p>
                 ))}
@@ -341,14 +338,16 @@ export default function AllAnswers() {
 
             <button
               onClick={() => handleDelete(s.id)}
-              className="bg-red-500 text-white w-full mt-4 py-2 rounded"
+              className="bg-red-500 hover:bg-red-600 text-white w-full mt-4 py-2 rounded-lg shadow"
             >
               Delete Submission
             </button>
           </div>
         ))}
 
-        {filteredAnswers.length === 0 && <p>No submitted students found.</p>}
+        {filteredAnswers.length === 0 && (
+          <p className="text-gray-500">No submissions found.</p>
+        )}
       </div>
     </main>
   );
