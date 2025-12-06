@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore"; // Import getDoc
+import { doc, getDoc, collection, query, where, getDocs } from "firebase/firestore"; // UPDATED
 import { auth, db } from "../utils/firebaseConfig"; 
 
 export default function Login() {
@@ -17,43 +17,55 @@ export default function Login() {
     setLoading(true);
 
     try {
-      // 1. Authenticate the user
+      // 1️⃣ Authenticate the user (NO CHANGES)
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
-      // 2. Fetch user's approval status from Firestore
-      const studentDocRef = doc(db, "students", user.uid);
-      const studentDoc = await getDoc(studentDocRef);
-      
-      if (!studentDoc.exists()) {
-        // This case should ideally not happen if signup succeeded, but is a safe guard
-        throw new Error("User data not found in database."); 
+      // ⭐ 2️⃣ NEW: Find the matching student record by email (Firestore document)
+      const q = query(collection(db, "students"), where("email", "==", email));
+      const snap = await getDocs(q);
+
+      if (snap.empty) {
+        throw new Error("Student record not found in Firestore.");
       }
 
-      const studentData = studentDoc.data();
-      
-      // 3. Check for approval status
+      const studentDoc = snap.docs[0];       // Correct Firestore record
+      const studentData = studentDoc.data(); // Student info
+      const studentId = studentDoc.id;       // REAL Firestore ID
+
+      // 3️⃣ Check approval (YOUR ORIGINAL LOGIC, UNTOUCHED)
       if (!studentData.isApproved) {
-        // Redirect to pending page
         router.push("/pending-approval");
-        return; // Stop execution
+        return;
       }
 
-      // 4. Success handling (Approved user)
+      // 4️⃣ Save your original login session token (UNCHANGED)
       localStorage.setItem("studentToken", "VALID_USER");
+
+      // ⭐ 5️⃣ NEW: Save Firestore UID so certificate can display correct name
+      localStorage.setItem("studentUID", studentId);
+
+      // 6️⃣ Redirect to dashboard (UNCHANGED)
       router.push("/student-dashboard");
+
     } catch (err) {
       console.error("Login error:", err.code, err.message);
+
       let errorMessage = "Invalid Student ID or Password.";
-      
-      if (err.message && err.message.includes("User data not found")) {
-         errorMessage = "User data is incomplete. Please contact support.";
-      } else if (err.code === "auth/user-not-found" || err.code === "auth/wrong-password" || err.code === "auth/invalid-credential") {
+
+      if (err.code === "auth/user-not-found" || 
+          err.code === "auth/wrong-password" || 
+          err.code === "auth/invalid-credential") 
+      {
         errorMessage = "Invalid Student ID or Password.";
-      } else if (err.code === "auth/invalid-email") {
+      } 
+      else if (err.code === "auth/invalid-email") {
         errorMessage = "Please enter a valid email address.";
+      } 
+      else if (err.message.includes("Student record not found")) {
+        errorMessage = "No matching student record found. Contact support.";
       }
-      
+
       setError(errorMessage);
     } finally {
       setLoading(false);
@@ -67,7 +79,6 @@ export default function Login() {
     >
       <div className="bg-white bg-opacity-90 backdrop-blur-xl shadow-xl rounded-2xl p-10 w-full max-w-md">
 
-        {/* Back Link */}
         <a href="/" className="text-blue-700 text-sm mb-4 inline-block">
           ← Back to Main Site
         </a>
@@ -108,7 +119,7 @@ export default function Login() {
 
           <button
             className={`w-full text-white py-3 rounded transition text-lg font-semibold ${
-                loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
+              loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
             }`}
             disabled={loading}
           >
@@ -116,15 +127,13 @@ export default function Login() {
           </button>
         </form>
 
-        {/* New Signup Link */}
         <p className="text-center text-gray-600 mt-4 text-sm">
-            Don't have an account? 
-            <a href="/signup" className="text-blue-700 font-semibold ml-1 hover:underline">
-                Sign Up Now
-            </a>
+          Don't have an account?
+          <a href="/signup" className="text-blue-700 font-semibold ml-1 hover:underline">
+            Sign Up Now
+          </a>
         </p>
 
-        {/* Footer */}
         <p className="text-center text-gray-500 text-xs mt-6">
           © 2022 Odia IT Training Hub • All Rights Reserved
         </p>
