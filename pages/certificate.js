@@ -8,18 +8,32 @@ import html2canvas from "html2canvas";
 
 export default function CertificatePage() {
   const [studentName, setStudentName] = useState("Loading...");
+  const [certificateId, setCertificateId] = useState("Loading...");
+
   const courseName = "Application & Production Support (6 Months)";
   const date = new Date().toLocaleDateString("en-IN");
 
-  // ✔ Fetch student name from Firestore collection "students"
+  // ⭐ Generate Certificate ID: CERT-2025-33QKUKT2ODDV
+  const generateCertificateId = (uid) => {
+    if (!uid) return "CERT-UNKNOWN";
+    const year = new Date().getFullYear();
+    const shortId = uid.substring(0, 12).toUpperCase(); // 12 chars
+    return `CERT-${year}-${shortId}`;
+  };
+
+  // ✔ Fetch student info + generate certificate ID
   useEffect(() => {
     const fetchStudentData = async () => {
       const uid = localStorage.getItem("studentUID");
 
       if (!uid) {
         setStudentName("Unknown Student");
+        setCertificateId("CERT-UNKNOWN");
         return;
       }
+
+      // ⭐ Set certificate ID
+      setCertificateId(generateCertificateId(uid));
 
       const ref = doc(db, "students", uid);
       const snap = await getDoc(ref);
@@ -52,15 +66,22 @@ export default function CertificatePage() {
 
   return (
     <main className="min-h-screen bg-gray-100 py-10">
-      <h1 className="text-center text-3xl font-bold text-blue-700 mb-10">
+
+      <h1 className="text-center text-3xl font-bold text-blue-700 mb-2">
         Your Course Certificate
       </h1>
+
+      {/* ⭐ SHOW CERTIFICATE ID ON SCREEN */}
+      <p className="text-center text-gray-700 mb-6 text-lg">
+        Certificate ID: <strong>{certificateId}</strong>
+      </p>
 
       <div className="flex flex-col items-center gap-8">
         <OdiaCertificate
           studentName={studentName}
           courseName={courseName}
           date={date}
+          certificateId={certificateId}   // ⭐ Pass ID to component
         />
 
         <button
