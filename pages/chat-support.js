@@ -19,20 +19,18 @@ export default function ChatSupport() {
   const router = useRouter();
 
   const [studentId, setStudentId] = useState(null);
-  const [studentName, setStudentName] = useState("");
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(true);
 
   const chatBoxRef = useRef(null);
 
-  // 🔥 Load student identity
+  // ✅ Get student UID from localStorage
   useEffect(() => {
     if (typeof window === "undefined") return;
 
     const token = localStorage.getItem("studentToken");
     const uid = localStorage.getItem("studentUID");
-    const name = localStorage.getItem("studentName");
 
     if (!token || !uid) {
       router.push("/login");
@@ -40,16 +38,19 @@ export default function ChatSupport() {
     }
 
     setStudentId(uid);
-    setStudentName(name || "Unknown Student");
   }, [router]);
 
-  // 🔥 Create / Update chat document + Load messages
+  // ✅ Load chat messages + Save student name
   useEffect(() => {
     if (!studentId) return;
 
     const chatDocRef = doc(db, "chats", studentId);
 
-    // ⭐ Always store student's name in chat doc
+    // ⭐ GET STUDENT NAME FROM LOCAL STORAGE
+    const studentName =
+      localStorage.getItem("studentName") || "Unknown Student";
+
+    // ⭐ UPDATE CHAT DOCUMENT WITH STUDENT NAME
     setDoc(
       chatDocRef,
       {
@@ -59,6 +60,7 @@ export default function ChatSupport() {
       { merge: true }
     ).catch(console.error);
 
+    // Load messages
     const msgRef = collection(db, "chats", studentId, "messages");
     const q = query(msgRef, orderBy("timestamp", "asc"));
 
@@ -69,6 +71,7 @@ export default function ChatSupport() {
         setMessages(arr);
         setLoading(false);
 
+        // Auto scroll to bottom
         setTimeout(() => {
           if (chatBoxRef.current) {
             chatBoxRef.current.scrollTop = chatBoxRef.current.scrollHeight;
@@ -82,9 +85,9 @@ export default function ChatSupport() {
     );
 
     return () => unsub();
-  }, [studentId, studentName]);
+  }, [studentId]);
 
-  // 🔥 Send message
+  // ✅ Send student message
   const handleSend = async (e) => {
     e.preventDefault();
     if (!input.trim() || !studentId) return;
@@ -112,11 +115,15 @@ export default function ChatSupport() {
   };
 
   const formatTime = (ts) =>
-    ts?.toDate ? ts.toDate().toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" }) : "";
+    ts?.toDate
+      ? ts.toDate().toLocaleTimeString("en-IN", {
+          hour: "2-digit",
+          minute: "2-digit",
+        })
+      : "";
 
   return (
     <main className="min-h-screen bg-gray-100 px-4 py-6 flex flex-col">
-      
       <div className="mb-4 flex items-center gap-3">
         <button
           onClick={() => router.push("/student-dashboard")}
@@ -129,27 +136,37 @@ export default function ChatSupport() {
 
       <div className="max-w-3xl mx-auto flex-1 flex items-center">
         <div className="w-full bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col">
-
+          {/* HEADER */}
           <div className="bg-blue-600 text-white px-5 py-3">
             <div className="font-semibold">Instructor Chat</div>
             <div className="text-xs opacity-90">Ask doubts anytime</div>
           </div>
 
+          {/* MESSAGES WINDOW */}
           <div
             ref={chatBoxRef}
             className="flex-1 bg-white px-4 py-3 overflow-y-auto"
             style={{ minHeight: "320px" }}
           >
-            {loading && <p className="text-center text-gray-400 mt-10">Loading...</p>}
+            {loading && (
+              <p className="text-center text-gray-400 mt-10">Loading...</p>
+            )}
 
             {!loading && messages.length === 0 && (
-              <p className="text-center text-gray-400 mt-10">Say hi to start chat!</p>
+              <p className="text-center text-gray-400 mt-10">
+                Say hi to start chat!
+              </p>
             )}
 
             {messages.map((m) => {
               const isStudent = m.sender === "student";
               return (
-                <div key={m.id} className={`mb-3 flex ${isStudent ? "justify-end" : "justify-start"}`}>
+                <div
+                  key={m.id}
+                  className={`mb-3 flex ${
+                    isStudent ? "justify-end" : "justify-start"
+                  }`}
+                >
                   <div
                     className={`max-w-xs px-3 py-2 rounded-2xl text-sm shadow ${
                       isStudent
@@ -167,6 +184,7 @@ export default function ChatSupport() {
             })}
           </div>
 
+          {/* INPUT BOX */}
           <form
             onSubmit={handleSend}
             className="border-t bg-gray-50 px-4 py-3 flex items-center gap-3"
@@ -178,7 +196,10 @@ export default function ChatSupport() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
             />
-            <button type="submit" className="bg-blue-600 text-white px-5 py-2 rounded-lg text-sm">
+            <button
+              type="submit"
+              className="bg-blue-600 text-white px-5 py-2 rounded-lg text-sm"
+            >
               Send
             </button>
           </form>
