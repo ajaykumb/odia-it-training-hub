@@ -94,7 +94,6 @@ export default function StudentDashboard() {
             </a>
 
             {/* Removed Video Lectures */}
-            {/* Removed Next Class */}
 
             <a className="flex items-center gap-3 hover:text-blue-600" href="#">
               <ChartBarIcon className="w-5 h-5" /> Progress
@@ -201,6 +200,18 @@ export default function StudentDashboard() {
                 className="bg-purple-600 text-white px-4 py-2 rounded-lg shadow hover:bg-purple-700"
               >
                 View Certificate
+              </a>
+            </div>
+
+            {/* Chat Support — NEW */}
+            <div className="bg-white shadow-lg rounded-2xl p-6 hover:shadow-xl transition">
+              <h3 className="text-xl font-semibold mb-2">Chat Support</h3>
+              <p className="text-gray-500 mb-4">Talk to your instructor in real time</p>
+              <a
+                href="/chat-support"
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700"
+              >
+                Open Chat
               </a>
             </div>
 
