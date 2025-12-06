@@ -17,7 +17,7 @@ export default function OdiaCertificate({ studentName, courseName, date, certifi
         className="absolute top-10 left-1/2 -translate-x-1/2 w-24"
       />
 
-      {/* MAIN HEADING */}
+      {/* MAIN TITLE */}
       <h1 className="text-center text-4xl font-extrabold text-blue-900 mt-28">
         Odia IT Training Hub
       </h1>
@@ -26,7 +26,7 @@ export default function OdiaCertificate({ studentName, courseName, date, certifi
         Certificate of Completion
       </h2>
 
-      {/* INTRO */}
+      {/* TEXT */}
       <p className="text-center text-lg text-gray-700 mt-8">
         This certificate is proudly presented to
       </p>
@@ -45,25 +45,23 @@ export default function OdiaCertificate({ studentName, courseName, date, certifi
         {courseName}
       </h3>
 
-      {/* COMPLETION DATE + CERTIFICATE ID — moved UP */}
-      <div className="text-center mt-10 mb-4">
+      {/* 📌 DATE + CERTIFICATE ID (Moved UP significantly) */}
+      <div className="absolute bottom-32 left-1/2 -translate-x-1/2 text-center">
         <p className="text-gray-700 text-lg">
           Completion Date: <strong>{date}</strong>
         </p>
-        <p className="text-gray-700 mt-1 text-lg">
+
+        <p className="text-gray-700 text-lg mt-1">
           Certificate ID: <strong>{certificateId}</strong>
         </p>
       </div>
 
-      {/* ⭐ SIGNATURE (small + clean + left aligned) */}
-      <div className="absolute bottom-10 left-20 text-center">
-
-        {/* Smaller Signature Image */}
+      {/* SIGNATURE */}
+      <div className="absolute bottom-20 left-20 text-center">
         <img
           src="/images/signature.png"
-          className="w-24 h-auto object-contain opacity-90"
+          className="w-20 h-auto object-contain opacity-90"
         />
-
         <p className="font-semibold text-gray-700 mt-1 text-lg">Instructor</p>
       </div>
 
