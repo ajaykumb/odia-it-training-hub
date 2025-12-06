@@ -22,14 +22,16 @@ export default function StudentDashboard() {
   const [meetingUrl, setMeetingUrl] = useState("");
   const [className, setClassName] = useState("");
 
-  const [progress] = useState(70);   // placeholder
-  const [attendance] = useState(85); // placeholder
+  const [progress] = useState(70);
+  const [attendance] = useState(85);
 
+  // Login check
   useEffect(() => {
     const token = localStorage.getItem("studentToken");
     if (!token) router.push("/login");
   }, []);
 
+  // Live class listener
   useEffect(() => {
     const liveRef = doc(db, "liveClass", "current");
     const unsub = onSnapshot(liveRef, (snap) => {
@@ -49,8 +51,7 @@ export default function StudentDashboard() {
   };
 
   const joinLiveClass = () => {
-    const url =
-      meetingUrl || "https://meet.jit.si/OdiaITTrainingHubLiveClass";
+    const url = meetingUrl || "https://meet.jit.si/OdiaITTrainingHubLiveClass";
     window.open(url, "_blank");
   };
 
@@ -66,11 +67,7 @@ export default function StudentDashboard() {
               Odia IT Training Hub — LMS
             </h1>
           </div>
-
-          <a
-            href="/notifications"
-            className="relative text-gray-700 hover:text-blue-700"
-          >
+          <a href="/notifications" className="text-gray-700 hover:text-blue-700">
             <BellIcon className="w-7 h-7" />
           </a>
         </div>
@@ -81,26 +78,35 @@ export default function StudentDashboard() {
 
         {/* SIDEBAR */}
         <aside className="w-64 bg-white/80 backdrop-blur-md border-r border-gray-200 shadow-xl p-6 space-y-5">
-          <h2 className="text-2xl font-bold text-blue-700 mb-5">
-            Student Panel
-          </h2>
+          <h2 className="text-2xl font-bold text-blue-700 mb-5">Student Panel</h2>
 
           <nav className="space-y-4 text-gray-700">
+
             <a className="flex items-center gap-3 hover:text-blue-600" href="#">
               <HomeIcon className="w-5 h-5" /> Dashboard
             </a>
+
             <a className="flex items-center gap-3 hover:text-blue-600" href="/class-notes">
               <BookOpenIcon className="w-5 h-5" /> Class Notes
             </a>
+
             <a className="flex items-center gap-3 hover:text-blue-600" href="/assignment">
               <ClipboardDocumentListIcon className="w-5 h-5" /> Assignments
             </a>
+
             <a className="flex items-center gap-3 hover:text-blue-600" href="#">
               <VideoCameraIcon className="w-5 h-5" /> Video Lectures
             </a>
+
             <a className="flex items-center gap-3 hover:text-blue-600" href="#">
               <ChartBarIcon className="w-5 h-5" /> Progress
             </a>
+
+            {/* 🎓 NEW CERTIFICATE MENU */}
+            <a className="flex items-center gap-3 hover:text-blue-600" href="/certificate">
+              🎓 Certificate
+            </a>
+
             <a className="flex items-center gap-3 hover:text-blue-600" href="/profile">
               <UserIcon className="w-5 h-5" /> Profile
             </a>
@@ -147,7 +153,7 @@ export default function StudentDashboard() {
             </div>
           </div>
 
-          {/* MAIN DASHBOARD CARDS */}
+          {/* DASHBOARD CARDS */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
 
             {/* Notes */}
@@ -180,7 +186,6 @@ export default function StudentDashboard() {
             {/* Live Class */}
             <div className="bg-white shadow-lg rounded-2xl p-6 hover:shadow-xl transition">
               <h3 className="text-xl font-semibold mb-2">Live Class</h3>
-
               {isLive ? (
                 <>
                   <p className="text-green-700 mb-4 font-semibold">LIVE: {className}</p>
@@ -199,6 +204,18 @@ export default function StudentDashboard() {
                   </button>
                 </>
               )}
+            </div>
+
+            {/* 🎓 CERTIFICATE CARD */}
+            <div className="bg-white shadow-lg rounded-2xl p-6 hover:shadow-xl transition">
+              <h3 className="text-xl font-semibold mb-2">Your Certificate</h3>
+              <p className="text-gray-500 mb-4">Download your course completion certificate</p>
+              <a
+                href="/certificate"
+                className="bg-purple-600 text-white px-4 py-2 rounded-lg shadow hover:bg-purple-700"
+              >
+                View Certificate
+              </a>
             </div>
 
           </div>
