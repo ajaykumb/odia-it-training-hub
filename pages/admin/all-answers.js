@@ -21,7 +21,6 @@ export default function AllAnswers() {
   const [liveStudents, setLiveStudents] = useState({});
   const [filter, setFilter] = useState("all");
 
-  // ⭐ Teacher Live Control
   const [className, setClassName] = useState("");
   const [meetingUrl, setMeetingUrl] = useState("");
 
@@ -62,7 +61,7 @@ export default function AllAnswers() {
     return () => unsubAuth();
   }, [router]);
 
-  // LIVE STUDENTS (RTDB)
+  // LIVE STUDENTS
   useEffect(() => {
     const liveRef = ref(rtdb, "liveStudents");
     onValue(liveRef, (snap) => setLiveStudents(snap.val() || {}));
@@ -96,7 +95,7 @@ export default function AllAnswers() {
     setAnswers((prev) => prev.filter((i) => i.id !== id));
   };
 
-  // ⭐ TEACHER LIVE CLASS CONTROLS
+  // ⭐ TEACHER LIVE CONTROLS
   const startLiveClass = async () => {
     if (!className.trim()) return alert("Please enter class name");
 
@@ -138,7 +137,7 @@ export default function AllAnswers() {
     return () => unsub();
   }, []);
 
-  // ⭐ LOAD MESSAGES WHEN STUDENT IS SELECTED
+  // ⭐ LOAD MESSAGES
   useEffect(() => {
     if (!selectedStudent) return;
 
@@ -153,7 +152,7 @@ export default function AllAnswers() {
     return () => unsub();
   }, [selectedStudent]);
 
-  // ⭐ SEND TEACHER MESSAGE
+  // ⭐ SEND MESSAGE
   const sendTeacherReply = async () => {
     if (!reply.trim()) return;
 
@@ -182,7 +181,7 @@ export default function AllAnswers() {
         </button>
       </div>
 
-      {/* ⭐ TEACHER LIVE CLASS CONTROL */}
+      {/* LIVE CLASS BLOCK */}
       <div className="bg-white shadow-lg rounded-xl p-6 mb-10 border">
         <h2 className="text-2xl font-bold mb-4 text-blue-700">🎥 Teacher Live Class Control</h2>
 
@@ -200,51 +199,20 @@ export default function AllAnswers() {
           onChange={(e) => setMeetingUrl(e.target.value)}
         />
 
-        <button
-          onClick={startLiveClass}
-          className="w-full bg-green-600 text-white p-3 rounded-lg mb-3 hover:bg-green-700"
-        >
+        <button onClick={startLiveClass} className="w-full bg-green-600 text-white p-3 rounded-lg mb-3">
           Start Live Class
         </button>
 
-        <button
-          onClick={joinAsTeacher}
-          className="w-full bg-blue-600 text-white p-3 rounded-lg mb-3 hover:bg-blue-700"
-        >
+        <button onClick={joinAsTeacher} className="w-full bg-blue-600 text-white p-3 rounded-lg mb-3">
           Join as Teacher
         </button>
 
-        <button
-          onClick={stopLiveClass}
-          className="w-full bg-red-600 text-white p-3 rounded-lg hover:bg-red-700"
-        >
+        <button onClick={stopLiveClass} className="w-full bg-red-600 text-white p-3 rounded-lg">
           Stop Live Class
         </button>
       </div>
 
-      {/* LIVE STUDENT MONITORING */}
-      <div className="mb-10">
-        <h2 className="text-2xl font-bold mb-3">🔴 LIVE STUDENT MONITORING</h2>
-
-        <p className="text-lg font-semibold mb-2">
-          Live Students Connected: {Object.keys(liveStudents).length}
-        </p>
-
-        {Object.keys(liveStudents).length === 0 && (
-          <p className="text-red-500">❌ No students are live right now.</p>
-        )}
-
-        <div className="grid md:grid-cols-3 gap-4">
-          {Object.entries(liveStudents).map(([id, s]) => (
-            <div key={id} className="border p-4 rounded shadow bg-green-50">
-              <p className="font-bold">{s.name}</p>
-              <p className="text-green-600 font-semibold">LIVE 🎥</p>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* ⭐⭐⭐ CHAT SUPPORT PANEL — INSERTED HERE ⭐⭐⭐ */}
+      {/* ⭐⭐⭐ CHAT SUPPORT PANEL ⭐⭐⭐ */}
       <div className="bg-white shadow-lg rounded-xl p-6 mb-10 border">
         <h2 className="text-2xl font-bold mb-4 text-blue-700">💬 Student Chat Support</h2>
 
@@ -266,7 +234,10 @@ export default function AllAnswers() {
                 }`}
                 onClick={() => setSelectedStudent(u.id)}
               >
-                <p className="font-semibold">{u.id}</p>
+                {/* ⭐ SHOW NAME IF EXISTS */}
+                <p className="font-semibold">
+                  {u.name ? `${u.name} (${u.id})` : u.id}
+                </p>
               </div>
             ))}
           </div>
@@ -278,7 +249,6 @@ export default function AllAnswers() {
               {selectedStudent ? `Chat with ${selectedStudent}` : "Select a student"}
             </h3>
 
-            {/* MESSAGES */}
             <div className="flex-1 overflow-y-auto bg-gray-50 p-3 rounded mb-3">
               {!selectedStudent && (
                 <p className="text-gray-500 text-center mt-10">Select a student to read messages.</p>
@@ -302,7 +272,6 @@ export default function AllAnswers() {
               ))}
             </div>
 
-            {/* INPUT */}
             {selectedStudent && (
               <div className="flex gap-2">
                 <input
@@ -323,11 +292,17 @@ export default function AllAnswers() {
         </div>
       </div>
 
-      {/* FILTER BUTTONS */}
+      {/* SUBMISSION FILTERS */}
       <div className="flex gap-2 mb-6">
-        <button onClick={() => setFilter("all")} className={`px-4 py-2 rounded ${filter === "all" ? "bg-blue-600 text-white" : "bg-gray-200"}`}>All</button>
-        <button onClick={() => setFilter("manual")} className={`px-4 py-2 rounded ${filter === "manual" ? "bg-green-600 text-white" : "bg-gray-200"}`}>Manual Only</button>
-        <button onClick={() => setFilter("auto")} className={`px-4 py-2 rounded ${filter === "auto" ? "bg-orange-600 text-white" : "bg-gray-200"}`}>Auto-Submitted Only</button>
+        <button onClick={() => setFilter("all")} className={`px-4 py-2 rounded ${filter === "all" ? "bg-blue-600 text-white" : "bg-gray-200"}`}>
+          All
+        </button>
+        <button onClick={() => setFilter("manual")} className={`px-4 py-2 rounded ${filter === "manual" ? "bg-green-600 text-white" : "bg-gray-200"}`}>
+          Manual Only
+        </button>
+        <button onClick={() => setFilter("auto")} className={`px-4 py-2 rounded ${filter === "auto" ? "bg-orange-600 text-white" : "bg-gray-200"}`}>
+          Auto-Submitted Only
+        </button>
       </div>
 
       {/* SUBMITTED STUDENTS */}
