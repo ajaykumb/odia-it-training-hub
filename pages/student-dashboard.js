@@ -102,7 +102,6 @@ export default function StudentDashboard() {
               <ChartBarIcon className="w-5 h-5" /> Progress
             </a>
 
-            {/* 🎓 NEW CERTIFICATE MENU */}
             <a className="flex items-center gap-3 hover:text-blue-600" href="/certificate">
               🎓 Certificate
             </a>
@@ -147,13 +146,11 @@ export default function StudentDashboard() {
               <p className="text-green-700 font-bold text-3xl">{attendance}%</p>
             </div>
 
-            <div className="bg-white shadow-md rounded-2xl p-6">
-              <h3 className="text-xl font-bold mb-2">Next Class</h3>
-              <p className="text-gray-600">{isLive ? className : "No class scheduled"}</p>
-            </div>
+            {/* ✅ Next Class REMOVED */}
+
           </div>
 
-          {/* DASHBOARD CARDS */}
+          {/* DASHBOARD CARDS (unchanged) */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
 
             {/* Notes */}
@@ -206,7 +203,7 @@ export default function StudentDashboard() {
               )}
             </div>
 
-            {/* 🎓 CERTIFICATE CARD */}
+            {/* Certificate */}
             <div className="bg-white shadow-lg rounded-2xl p-6 hover:shadow-xl transition">
               <h3 className="text-xl font-semibold mb-2">Your Certificate</h3>
               <p className="text-gray-500 mb-4">Download your course completion certificate</p>
