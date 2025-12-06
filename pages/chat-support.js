@@ -20,22 +20,19 @@ export default function ChatSupport() {
 
   const [studentId, setStudentId] = useState(null);
   const [studentName, setStudentName] = useState("");
-  const [studentEmail, setStudentEmail] = useState("");
-
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(true);
 
   const chatBoxRef = useRef(null);
 
-  // Load student info from localStorage
+  // 🔥 Load student identity
   useEffect(() => {
     if (typeof window === "undefined") return;
 
     const token = localStorage.getItem("studentToken");
     const uid = localStorage.getItem("studentUID");
-    const name = localStorage.getItem("studentName") || "Student";
-    const email = localStorage.getItem("studentEmail") || "";
+    const name = localStorage.getItem("studentName");
 
     if (!token || !uid) {
       router.push("/login");
@@ -43,27 +40,24 @@ export default function ChatSupport() {
     }
 
     setStudentId(uid);
-    setStudentName(name);
-    setStudentEmail(email);
+    setStudentName(name || "Unknown Student");
   }, [router]);
 
-  // Load messages + create chat doc with student profile
+  // 🔥 Create / Update chat document + Load messages
   useEffect(() => {
     if (!studentId) return;
 
     const chatDocRef = doc(db, "chats", studentId);
 
-    // Always update chat doc with student info
+    // ⭐ Always store student's name in chat doc
     setDoc(
       chatDocRef,
       {
-        updatedAt: serverTimestamp(),
         name: studentName,
-        email: studentEmail,
-        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
       },
       { merge: true }
-    );
+    ).catch(console.error);
 
     const msgRef = collection(db, "chats", studentId, "messages");
     const q = query(msgRef, orderBy("timestamp", "asc"));
@@ -79,7 +73,7 @@ export default function ChatSupport() {
           if (chatBoxRef.current) {
             chatBoxRef.current.scrollTop = chatBoxRef.current.scrollHeight;
           }
-        }, 80);
+        }, 100);
       },
       (err) => {
         console.error("Chat listen error:", err);
@@ -88,12 +82,12 @@ export default function ChatSupport() {
     );
 
     return () => unsub();
-  }, [studentId, studentName, studentEmail]);
+  }, [studentId, studentName]);
 
-  // Send message
+  // 🔥 Send message
   const handleSend = async (e) => {
     e.preventDefault();
-    if (!input.trim()) return;
+    if (!input.trim() || !studentId) return;
 
     try {
       const msgRef = collection(db, "chats", studentId, "messages");
@@ -118,12 +112,11 @@ export default function ChatSupport() {
   };
 
   const formatTime = (ts) =>
-    ts?.toDate
-      ? ts.toDate().toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })
-      : "";
+    ts?.toDate ? ts.toDate().toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" }) : "";
 
   return (
     <main className="min-h-screen bg-gray-100 px-4 py-6 flex flex-col">
+      
       <div className="mb-4 flex items-center gap-3">
         <button
           onClick={() => router.push("/student-dashboard")}
@@ -136,12 +129,12 @@ export default function ChatSupport() {
 
       <div className="max-w-3xl mx-auto flex-1 flex items-center">
         <div className="w-full bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col">
+
           <div className="bg-blue-600 text-white px-5 py-3">
             <div className="font-semibold">Instructor Chat</div>
             <div className="text-xs opacity-90">Ask doubts anytime</div>
           </div>
 
-          {/* CHAT BOX */}
           <div
             ref={chatBoxRef}
             className="flex-1 bg-white px-4 py-3 overflow-y-auto"
@@ -155,12 +148,8 @@ export default function ChatSupport() {
 
             {messages.map((m) => {
               const isStudent = m.sender === "student";
-
               return (
-                <div
-                  key={m.id}
-                  className={`mb-3 flex ${isStudent ? "justify-end" : "justify-start"}`}
-                >
+                <div key={m.id} className={`mb-3 flex ${isStudent ? "justify-end" : "justify-start"}`}>
                   <div
                     className={`max-w-xs px-3 py-2 rounded-2xl text-sm shadow ${
                       isStudent
@@ -178,7 +167,6 @@ export default function ChatSupport() {
             })}
           </div>
 
-          {/* INPUT BOX */}
           <form
             onSubmit={handleSend}
             className="border-t bg-gray-50 px-4 py-3 flex items-center gap-3"
@@ -190,7 +178,6 @@ export default function ChatSupport() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
             />
-
             <button type="submit" className="bg-blue-600 text-white px-5 py-2 rounded-lg text-sm">
               Send
             </button>
