@@ -153,7 +153,7 @@ export default function StudentDashboard() {
 
             {/* Notes */}
             <div className="bg-white shadow-lg rounded-2xl p-6 hover:shadow-xl transition">
-              <h3 className="text-xl font-semibold mb-2">Class Notes</h3>
+              <h3 className="text-xl font-semibold mb-2">Videos and classes Notes</h3>
               <p className="text-gray-500 mb-4">Handwritten + PDFs</p>
               <a href="/class-notes" className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700">
                 View Notes
