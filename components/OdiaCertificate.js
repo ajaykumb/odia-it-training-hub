@@ -26,6 +26,7 @@ export default function OdiaCertificate({ studentName, courseName, date, certifi
         Certificate of Completion
       </h2>
 
+      {/* INTRO TEXT */}
       <p className="text-center text-lg text-gray-700 mt-8">
         This certificate is proudly presented to
       </p>
@@ -44,35 +45,26 @@ export default function OdiaCertificate({ studentName, courseName, date, certifi
         {courseName}
       </h3>
 
-      {/* COMPLETION DATE */}
-      <p className="text-center text-gray-700 mt-6">
-        Completion Date: <strong>{date}</strong>
-      </p>
+      {/* COMPLETION DATE + CERT ID */}
+      <div className="text-center mt-8">
+        <p className="text-gray-700">
+          Completion Date: <strong>{date}</strong>
+        </p>
+        <p className="text-gray-700 mt-1">
+          Certificate ID: <strong>{certificateId}</strong>
+        </p>
+      </div>
 
-      {/* CERTIFICATE ID */}
-      <p className="text-center text-gray-700 mt-1">
-        Certificate ID: <strong>{certificateId}</strong>
-      </p>
+      {/* ⭐ FINAL SIGNATURE SECTION — Centered */}
+      <div className="absolute bottom-10 left-0 right-0 flex flex-col items-center">
 
-      {/* ⭐ SIGNATURE SECTION FIXED (moved lower, no overlap) */}
-      <div className="absolute bottom-6 left-0 right-0 flex justify-around px-20">
+        {/* INSTRUCTOR SIGNATURE */}
+        <img
+          src="/images/signature.png"
+          className="w-32 h-auto object-contain opacity-90"
+        />
 
-        {/* Instructor Signature */}
-        <div className="text-center">
-          <img
-            src="/images/signature.png"
-            className="w-28 h-auto mx-auto object-contain opacity-90"
-            style={{ marginBottom: "-5px" }}
-          />
-          <p className="font-semibold text-gray-700 mt-1">Instructor</p>
-        </div>
-
-        {/* Director Signature */}
-        <div className="text-center">
-          <div className="w-40 mx-auto border-b-2 border-gray-500 mb-1"></div>
-          <p className="font-semibold text-gray-700">Director</p>
-        </div>
-
+        <p className="font-semibold text-gray-700 mt-1 text-lg">Instructor</p>
       </div>
     </div>
   );
