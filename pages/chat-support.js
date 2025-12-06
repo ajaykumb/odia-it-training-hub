@@ -1,49 +1,86 @@
-import { useEffect, useState, useRef } from "react";
-import { db } from "../utils/firebaseConfig";
+// pages/chat-support.js
+
+import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/router";
 import {
-  doc,
-  setDoc,
-  addDoc,
   collection,
+  doc,
+  onSnapshot,
   query,
   orderBy,
-  onSnapshot,
+  addDoc,
+  serverTimestamp,
+  setDoc,
+  updateDoc,
 } from "firebase/firestore";
+import { db } from "../utils/firebaseConfig";
 
 export default function ChatSupport() {
-  const [studentId, setStudentId] = useState("");
+  const router = useRouter();
+
+  const [studentId, setStudentId] = useState(null);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
-  const bottomRef = useRef(null);
+  const [loading, setLoading] = useState(true);
 
-  // Load student UID
+  const chatBoxRef = useRef(null);
+
+  // ✅ Load student ID from localStorage
   useEffect(() => {
-    const id = localStorage.getItem("studentUID");
-    if (id) setStudentId(id);
-  }, []);
+    if (typeof window === "undefined") return;
 
-  // Load chat messages
+    const token = localStorage.getItem("studentToken");
+    const uid = localStorage.getItem("studentUID");
+
+    if (!token || !uid) {
+      router.push("/login");
+      return;
+    }
+
+    setStudentId(uid);
+  }, [router]);
+
+  // ✅ Subscribe to messages
   useEffect(() => {
     if (!studentId) return;
 
+    const chatDocRef = doc(db, "chats", studentId);
+
+    // Ensure the chat document exists
+    setDoc(
+      chatDocRef,
+      { updatedAt: serverTimestamp() },
+      { merge: true }
+    );
+
     const msgRef = collection(db, "chats", studentId, "messages");
-    const q = query(msgRef, orderBy("createdAt", "asc"));
+    const q = query(msgRef, orderBy("timestamp", "asc"));
 
-    const unsub = onSnapshot(q, (snap) => {
-      const arr = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-      setMessages(arr);
+    const unsub = onSnapshot(
+      q,
+      (snap) => {
+        const arr = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+        setMessages(arr);
+        setLoading(false);
 
-      // Auto scroll
-      setTimeout(() => {
-        bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-      }, 200);
-    });
+        // auto-scroll
+        setTimeout(() => {
+          if (chatBoxRef.current) {
+            chatBoxRef.current.scrollTop = chatBoxRef.current.scrollHeight;
+          }
+        }, 100);
+      },
+      (err) => {
+        console.error("Chat listen error:", err);
+        setLoading(false);
+      }
+    );
 
     return () => unsub();
   }, [studentId]);
 
-  // Send Message
-  const sendMessage = async (e) => {
+  // ✅ Send message (FIXED VERSION)
+  const handleSend = async (e) => {
     e.preventDefault();
     if (!input.trim() || !studentId) return;
 
@@ -51,77 +88,126 @@ export default function ChatSupport() {
       const chatDocRef = doc(db, "chats", studentId);
       const msgRef = collection(db, "chats", studentId, "messages");
 
-      // Create main chat doc
-      await setDoc(
-        chatDocRef,
-        {
-          studentId,
-          updatedAt: Date.now(),
-        },
-        { merge: true }
-      );
-
-      // Add message
       await addDoc(msgRef, {
-        text: input,
         sender: "student",
-        createdAt: Date.now(),
+        text: input.trim(),
+        timestamp: serverTimestamp(),
+        seenByTeacher: false,
+      });
+
+      await updateDoc(chatDocRef, {
+        updatedAt: serverTimestamp(),
       });
 
       setInput("");
     } catch (err) {
-      console.error("Send message error:", err);
-      alert("Unable to send message.");
+      console.error("Error sending message:", err);
+      alert("Unable to send message. Please try again.");
     }
   };
 
+  const formatTime = (ts) =>
+    ts?.toDate
+      ? ts.toDate().toLocaleTimeString("en-IN", {
+          hour: "2-digit",
+          minute: "2-digit",
+        })
+      : "";
+
   return (
-    <main className="min-h-screen flex flex-col bg-gray-100">
+    <main className="min-h-screen bg-gray-100 px-4 py-6 flex flex-col">
 
-      {/* HEADER */}
-      <header className="bg-blue-700 text-white p-4 text-center text-xl font-bold shadow">
-        Student Chat Support
-      </header>
-
-      <div className="flex-1 max-w-2xl mx-auto w-full p-4 bg-white shadow-md mt-6 rounded-xl flex flex-col">
-
-        {/* Messages List */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-4">
-
-          {messages.map((msg) => (
-            <div
-              key={msg.id}
-              className={`max-w-xs p-3 rounded-lg text-white ${
-                msg.sender === "student"
-                  ? "bg-blue-600 self-end"
-                  : "bg-gray-500 self-start"
-              }`}
-            >
-              {msg.text}
-            </div>
-          ))}
-
-          <div ref={bottomRef} />
-        </div>
-
-        {/* Input Field */}
-        <form onSubmit={sendMessage} className="p-4 flex gap-2 border-t bg-gray-50">
-          <input
-            type="text"
-            className="flex-1 border p-3 rounded-lg"
-            placeholder="Type your message..."
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-          />
-
-          <button
-            type="submit"
-            className="bg-blue-700 hover:bg-blue-800 text-white px-5 py-2 rounded-lg shadow"
-          >
-            Send
-          </button>
-        </form>
+      {/* TOP BAR */}
+      <div className="mb-4 flex items-center gap-3">
+        <button
+          onClick={() => router.push("/student-dashboard")}
+          className="text-blue-600 text-sm flex items-center gap-1"
+        >
+          ← Back
+        </button>
+        <h1 className="text-xl font-bold text-gray-800">Chat Support</h1>
       </div>
+
+      {/* CHAT CARD */}
+      <div className="max-w-3xl mx-auto flex-1 flex items-center">
+        <div className="w-full bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col">
+
+          {/* HEADER */}
+          <div className="bg-blue-600 text-white px-5 py-3">
+            <div className="font-semibold">Instructor Chat</div>
+            <div className="text-xs opacity-90">
+              Ask doubts and get help from your mentor
+            </div>
+          </div>
+
+          {/* MESSAGES */}
+          <div
+            ref={chatBoxRef}
+            className="flex-1 bg-white px-4 py-3 overflow-y-auto"
+            style={{ minHeight: "320px" }}
+          >
+            {loading && (
+              <p className="text-center text-gray-400 mt-10">
+                Loading conversation...
+              </p>
+            )}
+
+            {!loading && messages.length === 0 && (
+              <p className="text-center text-gray-400 mt-10">
+                No messages yet. Say hi to your instructor!
+              </p>
+            )}
+
+            {messages.map((m) => {
+              const isStudent = m.sender === "student";
+              return (
+                <div
+                  key={m.id}
+                  className={`mb-3 flex ${
+                    isStudent ? "justify-end" : "justify-start"
+                  }`}
+                >
+                  <div
+                    className={`max-w-xs px-3 py-2 rounded-2xl text-sm shadow ${
+                      isStudent
+                        ? "bg-blue-600 text-white rounded-br-none"
+                        : "bg-gray-200 text-gray-900 rounded-bl-none"
+                    }`}
+                  >
+                    <div>{m.text}</div>
+                    <div className="text-[10px] opacity-80 mt-1 text-right">
+                      {formatTime(m.timestamp)}
+                      {!isStudent && " • Instructor"}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* INPUT BAR */}
+          <form
+            onSubmit={handleSend}
+            className="border-t bg-gray-50 px-4 py-3 flex items-center gap-3"
+          >
+            <input
+              type="text"
+              className="flex-1 border rounded-lg px-3 py-2 text-sm"
+              placeholder="Type your message..."
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+            />
+            <button
+              type="submit"
+              className="bg-blue-600 text-white px-5 py-2 rounded-lg text-sm font-semibold"
+            >
+              Send
+            </button>
+          </form>
+
+        </div>
+      </div>
+
     </main>
   );
 }
