@@ -6,30 +6,32 @@ import {
   UserIcon,
   ArrowRightOnRectangleIcon,
   ArrowLeftIcon,
+  BellIcon,
+  VideoCameraIcon,
+  ClipboardDocumentListIcon,
+  ChartBarIcon,
 } from "@heroicons/react/24/outline";
 
-// ✅ FIREBASE IMPORTS (LIVE STATUS ONLY)
-import { db } from "../utils/firebaseConfig";   // ✅ adjust path if needed
+import { db } from "../utils/firebaseConfig";
 import { doc, onSnapshot } from "firebase/firestore";
 
 export default function StudentDashboard() {
   const router = useRouter();
 
-  // ✅ LIVE CLASS STATES
   const [isLive, setIsLive] = useState(false);
   const [meetingUrl, setMeetingUrl] = useState("");
   const [className, setClassName] = useState("");
 
-  // ✅ LOGIN CHECK (YOUR ORIGINAL CODE)
+  const [progress] = useState(70);   // placeholder
+  const [attendance] = useState(85); // placeholder
+
   useEffect(() => {
     const token = localStorage.getItem("studentToken");
     if (!token) router.push("/login");
   }, []);
 
-  // ✅ LISTEN TO LIVE CLASS STATUS FROM FIRESTORE
   useEffect(() => {
     const liveRef = doc(db, "liveClass", "current");
-
     const unsub = onSnapshot(liveRef, (snap) => {
       if (snap.exists()) {
         const data = snap.data();
@@ -38,17 +40,14 @@ export default function StudentDashboard() {
         setClassName(data.className);
       }
     });
-
     return () => unsub();
   }, []);
 
-  // ✅ LOGOUT (YOUR ORIGINAL)
   const logout = () => {
     localStorage.removeItem("studentToken");
     router.push("/login");
   };
 
-  // ✅ JOIN LIVE CLASS (NO ATTENDANCE)
   const joinLiveClass = () => {
     const url =
       meetingUrl || "https://meet.jit.si/OdiaITTrainingHubLiveClass";
@@ -56,141 +55,146 @@ export default function StudentDashboard() {
   };
 
   return (
-    <main className="relative min-h-screen">
-      {/* Blue Background */}
-      <div className="absolute inset-0 -z-10 bg-gradient-to-br from-blue-400 via-blue-300 to-blue-100 overflow-hidden">
-        <div className="wave wave1"></div>
-        <div className="wave wave2"></div>
-        <div className="wave wave3"></div>
-      </div>
+    <main className="relative min-h-screen bg-gradient-to-br from-blue-300 to-blue-100">
 
-      {/* Main Layout */}
-      <div className="flex min-h-screen flex-col md:flex-row">
-        {/* Sidebar */}
-        <aside className="w-full md:w-64 bg-white/90 backdrop-blur-md border-r border-gray-200 shadow-xl p-6">
-          <h2 className="text-2xl font-bold mb-8 text-blue-700">
+      {/* FIXED HEADER */}
+      <header className="fixed top-0 left-0 w-full bg-white/70 backdrop-blur-md shadow-md z-50">
+        <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-3">
+          <div className="flex items-center gap-3">
+            <img src="/images/logo.png" className="h-10 w-10" />
+            <h1 className="text-xl font-bold text-blue-800">
+              Odia IT Training Hub — LMS
+            </h1>
+          </div>
+
+          <a
+            href="/notifications"
+            className="relative text-gray-700 hover:text-blue-700"
+          >
+            <BellIcon className="w-7 h-7" />
+          </a>
+        </div>
+      </header>
+
+      {/* SIDEBAR + CONTENT */}
+      <div className="flex pt-20 min-h-screen">
+
+        {/* SIDEBAR */}
+        <aside className="w-64 bg-white/80 backdrop-blur-md border-r border-gray-200 shadow-xl p-6 space-y-5">
+          <h2 className="text-2xl font-bold text-blue-700 mb-5">
             Student Panel
           </h2>
 
           <nav className="space-y-4 text-gray-700">
-
             <a className="flex items-center gap-3 hover:text-blue-600" href="#">
               <HomeIcon className="w-5 h-5" /> Dashboard
             </a>
-
             <a className="flex items-center gap-3 hover:text-blue-600" href="/class-notes">
               <BookOpenIcon className="w-5 h-5" /> Class Notes
             </a>
-
-            <a className="flex items-center gap-3 hover:text-blue-600" href="#">
-              <UserIcon className="w-5 h-5" /> Profile
+            <a className="flex items-center gap-3 hover:text-blue-600" href="/assignment">
+              <ClipboardDocumentListIcon className="w-5 h-5" /> Assignments
             </a>
-
-            <a className="flex items-center gap-3 hover:text-blue-600" href="/notifications">
-              🔔 Notifications
+            <a className="flex items-center gap-3 hover:text-blue-600" href="#">
+              <VideoCameraIcon className="w-5 h-5" /> Video Lectures
+            </a>
+            <a className="flex items-center gap-3 hover:text-blue-600" href="#">
+              <ChartBarIcon className="w-5 h-5" /> Progress
+            </a>
+            <a className="flex items-center gap-3 hover:text-blue-600" href="/profile">
+              <UserIcon className="w-5 h-5" /> Profile
             </a>
 
             <button
               onClick={logout}
-              className="flex items-center gap-3 mt-6 text-red-600 hover:text-red-700"
+              className="flex items-center gap-3 text-red-600 hover:text-red-700 mt-6"
             >
               <ArrowRightOnRectangleIcon className="w-5 h-5" />
               Logout
             </button>
 
-            <a
-              href="/"
-              className="flex items-center gap-3 mt-6 text-blue-600 hover:text-blue-800 font-medium"
-            >
+            <a href="/" className="flex items-center gap-3 text-blue-600 hover:text-blue-800">
               <ArrowLeftIcon className="w-5 h-5" /> Back to Main Site
             </a>
-
-            <button className="flex items-center gap-3 mt-6 hover:text-blue-600">
-              🌙 Dark Mode
-            </button>
           </nav>
         </aside>
 
-        {/* Main Content Area */}
-        <section className="flex-1 p-6 md:p-12">
-          <h1 className="text-4xl font-bold text-white drop-shadow-lg mb-10">
-            Welcome to Odia IT Training Hub Dashboard
+        {/* MAIN CONTENT */}
+        <section className="flex-1 p-10">
+          <h1 className="text-4xl font-bold text-blue-900 mb-10 drop-shadow">
+            Welcome to Your Dashboard
           </h1>
 
+          {/* SUMMARY CARDS */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+
+            <div className="bg-white shadow-md rounded-2xl p-6">
+              <h3 className="text-xl font-bold mb-2">Course Progress</h3>
+              <p className="text-blue-700 font-bold text-3xl">{progress}%</p>
+              <div className="bg-gray-200 h-2 mt-3 rounded-full">
+                <div className="bg-blue-600 h-2 rounded-full" style={{ width: `${progress}%` }}></div>
+              </div>
+            </div>
+
+            <div className="bg-white shadow-md rounded-2xl p-6">
+              <h3 className="text-xl font-bold mb-2">Attendance</h3>
+              <p className="text-green-700 font-bold text-3xl">{attendance}%</p>
+            </div>
+
+            <div className="bg-white shadow-md rounded-2xl p-6">
+              <h3 className="text-xl font-bold mb-2">Next Class</h3>
+              <p className="text-gray-600">{isLive ? className : "No class scheduled"}</p>
+            </div>
+          </div>
+
+          {/* MAIN DASHBOARD CARDS */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
 
-            {/* Card 1 */}
-            <div className="bg-white/80 backdrop-blur-md p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all border border-gray-200">
-              <h3 className="text-xl font-semibold mb-2 text-gray-900">
-                Class Notes
-              </h3>
-              <p className="mb-4 text-gray-600">
-                Access all your handwritten and PDF class notes.
-              </p>
-              <a
-                href="/class-notes"
-                className="inline-block bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700 transition"
-              >
+            {/* Notes */}
+            <div className="bg-white shadow-lg rounded-2xl p-6 hover:shadow-xl transition">
+              <h3 className="text-xl font-semibold mb-2">Class Notes</h3>
+              <p className="text-gray-500 mb-4">Handwritten + PDFs</p>
+              <a href="/class-notes" className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700">
                 View Notes
               </a>
             </div>
 
-            {/* Card 2 */}
-            <div className="bg-white/80 backdrop-blur-md p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all border border-gray-200">
-              <h3 className="text-xl font-semibold mb-2 text-gray-900">
-                Video Lectures
-              </h3>
-              <p className="mb-4 text-gray-600">
-                Watch recorded videos of your classes.
-              </p>
+            {/* Videos */}
+            <div className="bg-white shadow-lg rounded-2xl p-6 hover:shadow-xl transition">
+              <h3 className="text-xl font-semibold mb-2">Video Lectures</h3>
+              <p className="text-gray-500 mb-4">Watch recorded classes</p>
               <button className="bg-gray-400 text-white px-4 py-2 rounded-lg cursor-not-allowed">
                 Coming Soon
               </button>
             </div>
 
-            {/* Card 3 */}
-            <div className="bg-white/80 backdrop-blur-md p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all border border-gray-200">
-              <h3 className="text-xl font-semibold mb-2 text-gray-900">
-                Assignments
-              </h3>
-              <p className="mb-4 text-gray-600">
-                View and submit class assignments.
-              </p>
-              <a
-                href="/assignment"
-                className="inline-block bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700 transition"
-              >
+            {/* Assignments */}
+            <div className="bg-white shadow-lg rounded-2xl p-6 hover:shadow-xl transition">
+              <h3 className="text-xl font-semibold mb-2">Assignments</h3>
+              <p className="text-gray-500 mb-4">View and submit assignments</p>
+              <a href="/assignment" className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700">
                 View Assignments
               </a>
             </div>
 
-            {/* ✅ Card 4 - Live Class (NEW) */}
-            <div className="bg-white/80 backdrop-blur-md p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all border border-gray-200">
-              <h3 className="text-xl font-semibold mb-2 text-gray-900">
-                Live Class
-              </h3>
+            {/* Live Class */}
+            <div className="bg-white shadow-lg rounded-2xl p-6 hover:shadow-xl transition">
+              <h3 className="text-xl font-semibold mb-2">Live Class</h3>
 
               {isLive ? (
                 <>
-                  <p className="mb-4 text-green-700 font-medium">
-                    Class is LIVE: {className}
-                  </p>
+                  <p className="text-green-700 mb-4 font-semibold">LIVE: {className}</p>
                   <button
                     onClick={joinLiveClass}
-                    className="bg-green-600 text-white px-4 py-2 rounded-lg shadow hover:bg-green-700 transition"
+                    className="bg-green-600 text-white px-4 py-2 rounded-lg shadow hover:bg-green-700"
                   >
-                    Join Live Class
+                    Join Now
                   </button>
                 </>
               ) : (
                 <>
-                  <p className="mb-4 text-red-600">
-                    No live class right now.
-                  </p>
-                  <button
-                    disabled
-                    className="bg-gray-400 text-white px-4 py-2 rounded-lg cursor-not-allowed"
-                  >
+                  <p className="text-red-500 mb-4">No live class now</p>
+                  <button className="bg-gray-400 text-white px-4 py-2 rounded-lg cursor-not-allowed">
                     Waiting for Teacher
                   </button>
                 </>
@@ -200,46 +204,6 @@ export default function StudentDashboard() {
           </div>
         </section>
       </div>
-
-      {/* Footer */}
-      <footer className="bg-gray-900 text-gray-300 text-center py-6">
-        © 2022 Odia IT Training Hub. All rights reserved.
-      </footer>
-
-      {/* Waves Animation */}
-      <style jsx>{`
-        .wave {
-          position: absolute;
-          width: 200%;
-          height: 150px;
-          left: -50%;
-          background: rgba(255, 255, 255, 0.3);
-          border-radius: 100%;
-          animation: drift 6s infinite linear;
-        }
-        .wave1 {
-          bottom: 0;
-          animation-duration: 8s;
-        }
-        .wave2 {
-          bottom: 20px;
-          opacity: 0.6;
-          animation-duration: 12s;
-        }
-        .wave3 {
-          bottom: 40px;
-          opacity: 0.4;
-          animation-duration: 16s;
-        }
-        @keyframes drift {
-          from {
-            transform: translateX(0) rotate(0deg);
-          }
-          to {
-            transform: translateX(50px) rotate(360deg);
-          }
-        }
-      `}</style>
     </main>
   );
 }
