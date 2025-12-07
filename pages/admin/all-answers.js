@@ -56,20 +56,45 @@ export default function AllAnswers() {
     return () => unsub();
   }, []);
 
-  // ADD ANNOUNCEMENT
+  // ---------------------------------------------------
+  // ADD ANNOUNCEMENT + SEND EMAIL TO ALL APPROVED USERS
+  // ---------------------------------------------------
   const saveAnnouncement = async () => {
     if (!annTitle.trim() || !annMessage.trim()) {
       alert("Please fill all fields");
       return;
     }
 
+    // 1️⃣ Save Announcement to Firestore (existing logic)
     await addDoc(collection(db, "announcements"), {
       title: annTitle,
       message: annMessage,
       timestamp: Date.now(),
     });
 
-    alert("Announcement added!");
+    // 2️⃣ Send Email to all approved students (NEW)
+    try {
+      const res = await fetch("/api/send-announcement", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: annTitle,
+          message: annMessage,
+        }),
+      });
+
+      const result = await res.json();
+
+      if (result.success) {
+        alert(`📨 Announcement added + Email sent to ${result.sent} students!`);
+      } else {
+        alert("Announcement saved but email sending failed.");
+      }
+    } catch (error) {
+      console.error("EMAIL ERROR:", error);
+      alert("Announcement saved but email sending failed.");
+    }
+
     setAnnTitle("");
     setAnnMessage("");
   };
