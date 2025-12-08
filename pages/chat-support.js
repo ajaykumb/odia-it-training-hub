@@ -151,7 +151,7 @@ export default function ChatSupport() {
         >
           ← Back
         </button>
-        <h1 className="text-xl font-bold text-gray-800">Chat Support</h1>
+        <h1 className="text-xl font-bold text-gray-800">IT Training Hub Chat Support</h1>
       </div>
 
       <div className="max-w-3xl mx-auto flex-1 flex items-center">
