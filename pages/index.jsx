@@ -96,7 +96,7 @@ export default function Home() {
             Learn IT in <span className="text-yellow-300">Odia</span> — <br className='hidden md:block' /> Real-Time, Hands-On Training
           </h2>
           <p className="text-2xl mb-10 max-w-3xl mx-auto">
-            Upskill with practical training designed for freshers & working professionals, delivered in **Odia and English**.
+            Upskill with practical training designed for freshers & working professionals, delivered in Odia,English & Hindi.
           </p>
           <a
             href="#contact"
@@ -250,20 +250,6 @@ export default function Home() {
         </p>
       </div>
 
-      {/* Live Class Card */}
-      <div className="bg-gray-50 p-6 rounded-xl shadow-lg border-l-8 border-green-600 hover:shadow-2xl hover:scale-[1.02] transition-all">
-        <img
-          src="/images/portal-liveclass.png"
-          alt="Live Class Preview"
-          className="rounded-lg shadow-md mb-5"
-          onError={(e) => (e.target.src = 'https://placehold.co/600x350/059669/ffffff?text=Live+Classes')}
-        />
-        <h4 className="text-xl font-bold text-green-700 mb-2">Live Classes & Recordings</h4>
-        <p className="text-gray-600">
-          Join live classes instantly and watch recordings anytime at your convenience.
-        </p>
-      </div>
-
       {/* Notes & Materials */}
       <div className="bg-gray-50 p-6 rounded-xl shadow-lg border-l-8 border-yellow-500 hover:shadow-2xl hover:scale-[1.02] transition-all">
         <img
@@ -303,20 +289,6 @@ export default function Home() {
         <h4 className="text-xl font-bold text-red-700 mb-2">Support Ticket System</h4>
         <p className="text-gray-600">
           Raise any issue and get real-time help from mentors with dedicated support.
-        </p>
-      </div>
-
-      {/* Progress Tracking */}
-      <div className="bg-gray-50 p-6 rounded-xl shadow-lg border-l-8 border-indigo-600 hover:shadow-2xl hover:scale-[1.02] transition-all">
-        <img
-          src="/images/portal-progress.png"
-          alt="Progress Preview"
-          className="rounded-lg shadow-md mb-5"
-          onError={(e) => (e.target.src = 'https://placehold.co/600x350/4338ca/ffffff?text=Progress')}
-        />
-        <h4 className="text-xl font-bold text-indigo-700 mb-2">Progress Tracking</h4>
-        <p className="text-gray-600">
-          Visual progress charts show your learning journey and completion percentage.
         </p>
       </div>
 
