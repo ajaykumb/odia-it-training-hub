@@ -158,6 +158,62 @@ export default function Home() {
           </div>
         </div>
       </section>
+      {/* --- */}
+
+{/* 🧾 Buy Control-M Job Scheduling Notes Section */}
+<section id="notes" className="py-20 bg-white">
+  <div className="max-w-6xl mx-auto px-6 text-center">
+    
+    <h3 className="text-4xl font-extrabold text-blue-700 mb-10">
+      Buy Control-M Job Scheduling Notes
+    </h3>
+
+    <div className="bg-gray-100 p-8 rounded-xl shadow-xl max-w-xl mx-auto">
+
+      {/* ⭐ Cover Thumbnail */}
+      <img
+        src="/images/controlm-thumbnail.png"
+        alt="Control-M Notes Cover"
+        className="w-full rounded-lg shadow-lg mb-6 hover:scale-105 transition-transform duration-300"
+        onError={(e) => {
+          e.target.src = "https://placehold.co/600x350/1e40af/ffffff?text=Control-M+Notes"; 
+          e.target.className += " rounded-lg";
+        }}
+      />
+
+      <h4 className="text-2xl font-bold mb-3">
+        Control-M End-to-End Job Scheduling Notes (With Screenshots)
+      </h4>
+
+      <p className="text-lg text-gray-700 mb-6">
+        Complete Control-M batch job creation, dependency setup, monitoring,
+        and troubleshooting workflow — <strong>₹100 only</strong>
+      </p>
+
+      {/* 💰 Pay via UPI Button */}
+      <a
+        href="upi://pay?pa=juliousjena@ybl&pn=Odia%20IT%20Training%20Hub&am=100&cu=INR"
+        className="block bg-green-600 text-white px-6 py-3 rounded-lg font-bold text-xl hover:bg-green-700 transition mb-6"
+      >
+        Pay via UPI (₹100)
+      </a>
+
+      <p className="text-gray-600 mb-4">
+        After payment, click the button below to download the notes.
+      </p>
+
+      {/* 📥 Download Button */}
+      <a
+        href="/api/download-notes"
+        className="block bg-blue-700 text-white px-6 py-3 rounded-lg font-bold text-xl hover:bg-blue-800 transition"
+      >
+        Download Control-M Notes (PDF)
+      </a>
+
+    </div>
+  </div>
+</section>
+
       
       {/* --- */}
 
