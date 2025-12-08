@@ -221,6 +221,110 @@ export default function Home() {
 
       {/* --- */}
 
+      {/* 🎓 Student Portal Preview Section (Add-on Feature Only) */}
+<section id="portal-preview" className="py-20 bg-white">
+  <div className="max-w-7xl mx-auto px-6">
+
+    {/* Title */}
+    <h3 className="text-4xl font-extrabold text-blue-700 text-center mb-6">
+      Student Portal Preview
+    </h3>
+    <p className="text-xl text-gray-600 text-center mb-14 max-w-3xl mx-auto">
+      A quick look at the real-time dashboard our students use every day for classes, materials, and assignments.
+    </p>
+
+    {/* Cards Grid */}
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+
+      {/* Dashboard Card */}
+      <div className="bg-gray-50 p-6 rounded-xl shadow-lg border-l-8 border-blue-600 hover:shadow-2xl hover:scale-[1.02] transition-all">
+        <img
+          src="/images/portal-dashboard.png"
+          alt="Dashboard Preview"
+          className="rounded-lg shadow-md mb-5"
+          onError={(e) => (e.target.src = 'https://placehold.co/600x350/1e40af/ffffff?text=Dashboard')}
+        />
+        <h4 className="text-xl font-bold text-blue-800 mb-2">Dashboard Overview</h4>
+        <p className="text-gray-600">
+          Clean, simple, and organized — track your classes, progress, and notifications instantly.
+        </p>
+      </div>
+
+      {/* Live Class Card */}
+      <div className="bg-gray-50 p-6 rounded-xl shadow-lg border-l-8 border-green-600 hover:shadow-2xl hover:scale-[1.02] transition-all">
+        <img
+          src="/images/portal-liveclass.png"
+          alt="Live Class Preview"
+          className="rounded-lg shadow-md mb-5"
+          onError={(e) => (e.target.src = 'https://placehold.co/600x350/059669/ffffff?text=Live+Classes')}
+        />
+        <h4 className="text-xl font-bold text-green-700 mb-2">Live Classes & Recordings</h4>
+        <p className="text-gray-600">
+          Join live classes instantly and watch recordings anytime at your convenience.
+        </p>
+      </div>
+
+      {/* Notes & Materials */}
+      <div className="bg-gray-50 p-6 rounded-xl shadow-lg border-l-8 border-yellow-500 hover:shadow-2xl hover:scale-[1.02] transition-all">
+        <img
+          src="/images/portal-materials.png"
+          alt="Study Materials Preview"
+          className="rounded-lg shadow-md mb-5"
+          onError={(e) => (e.target.src = 'https://placehold.co/600x350/facc15/000000?text=Materials')}
+        />
+        <h4 className="text-xl font-bold text-yellow-600 mb-2">Study Materials</h4>
+        <p className="text-gray-600">
+          Access structured notes, PDFs, assignments, and project files all in one place.
+        </p>
+      </div>
+
+      {/* Assignments */}
+      <div className="bg-gray-50 p-6 rounded-xl shadow-lg border-l-8 border-purple-600 hover:shadow-2xl hover:scale-[1.02] transition-all">
+        <img
+          src="/images/portal-assignments.png"
+          alt="Assignments Preview"
+          className="rounded-lg shadow-md mb-5"
+          onError={(e) => (e.target.src = 'https://placehold.co/600x350/7c3aed/ffffff?text=Assignments')}
+        />
+        <h4 className="text-xl font-bold text-purple-700 mb-2">Assignments & Tests</h4>
+        <p className="text-gray-600">
+          Submit tasks, take quizzes, and receive instructor feedback directly in your portal.
+        </p>
+      </div>
+
+      {/* Support Ticket */}
+      <div className="bg-gray-50 p-6 rounded-xl shadow-lg border-l-8 border-red-600 hover:shadow-2xl hover:scale-[1.02] transition-all">
+        <img
+          src="/images/portal-support.png"
+          alt="Support Preview"
+          className="rounded-lg shadow-md mb-5"
+          onError={(e) => (e.target.src = 'https://placehold.co/600x350/d97706/ffffff?text=Support')}
+        />
+        <h4 className="text-xl font-bold text-red-700 mb-2">Support Ticket System</h4>
+        <p className="text-gray-600">
+          Raise any issue and get real-time help from mentors with dedicated support.
+        </p>
+      </div>
+
+      {/* Progress Tracking */}
+      <div className="bg-gray-50 p-6 rounded-xl shadow-lg border-l-8 border-indigo-600 hover:shadow-2xl hover:scale-[1.02] transition-all">
+        <img
+          src="/images/portal-progress.png"
+          alt="Progress Preview"
+          className="rounded-lg shadow-md mb-5"
+          onError={(e) => (e.target.src = 'https://placehold.co/600x350/4338ca/ffffff?text=Progress')}
+        />
+        <h4 className="text-xl font-bold text-indigo-700 mb-2">Progress Tracking</h4>
+        <p className="text-gray-600">
+          Visual progress charts show your learning journey and completion percentage.
+        </p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+{/* --- */}
 
       {/* ✅ Placement Section - Trust Building with Numbers and Success Color */}
       <section id="placement" className="py-20 bg-green-700 text-white text-center">
