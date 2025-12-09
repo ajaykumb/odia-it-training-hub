@@ -420,6 +420,25 @@ export default function Home() {
 
       {/* --- */}
 
+      {/* 📞 Floating WhatsApp Chat Button */}
+<a
+  href="https://wa.me/919437401378?text=Hi%20Sir,%20I%20want%20to%20know%20about%20your%20IT%20training%20courses."
+  target="_blank"
+  rel="noopener noreferrer"
+  className="fixed bottom-6 right-6 bg-green-500 hover:bg-green-600 text-white px-5 py-3 rounded-full shadow-xl flex items-center space-x-2 animate-bounce z-50 cursor-pointer"
+>
+  <img 
+    src="/images/whatsapp.ico"
+    alt="WhatsApp"
+    className="w-7 h-7"
+    onError={(e) => {
+      e.target.onerror = null;
+      e.target.src = "https://placehold.co/40x40/25d366/ffffff?text=W";
+    }}
+  />
+  <span className="font-bold text-lg">Chat Now</span>
+</a>
+
       {/* 📄 Footer */}
       <footer className="bg-gray-900 text-gray-400 text-center py-8">
         <div className="max-w-6xl mx-auto px-6">
