@@ -321,27 +321,37 @@ export default function Home() {
       
       {/* --- */}
 
-      {/* 🎥 Intro Video Section */}
-<section id="intro-video" className="py-20 bg-gray-100">
+     {/* 🎥 Intro Video Section */}
+<section id="intro-video" className="py-24 bg-gradient-to-b from-gray-100 via-white to-gray-100">
   <div className="max-w-5xl mx-auto px-6 text-center">
-    <h3 className="text-4xl font-extrabold text-blue-700 mb-6">
+    
+    <h3 className="text-4xl font-extrabold text-blue-700 mb-4">
       Why Join Odia IT Training Hub?
     </h3>
-    <p className="text-xl text-gray-600 mb-10">
+
+    <p className="text-xl text-gray-600 mb-12">
       Watch this short 53-second video to see how we help you launch your IT career.
     </p>
 
-    <div className="relative w-full" style={{ paddingTop: "56.25%" }}>
-      <iframe
-        className="absolute top-0 left-0 w-full h-full rounded-xl shadow-xl border-4 border-blue-600"
-        src="https://www.youtube.com/embed/H2_rO9GC2ac"
-        title="Odia IT Training Hub Intro Video"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-        allowFullScreen
-      ></iframe>
+    {/* Video Card Container */}
+    <div className="bg-white rounded-2xl shadow-2xl border border-gray-200 p-4 md:p-6 mx-auto max-w-4xl hover:shadow-blue-200 transition-all duration-300">
+      
+      {/* Responsive Video */}
+      <div className="relative w-full rounded-xl overflow-hidden" style={{ paddingTop: "56.25%" }}>
+        <iframe
+          className="absolute top-0 left-0 w-full h-full rounded-xl"
+          src="https://www.youtube.com/embed/H2_rO9GC2ac"
+          title="Odia IT Training Hub Intro Video"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+        ></iframe>
+      </div>
+
     </div>
+
   </div>
 </section>
+
 
 {/* --- */}
 
