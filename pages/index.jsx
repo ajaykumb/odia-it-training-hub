@@ -321,6 +321,30 @@ export default function Home() {
       
       {/* --- */}
 
+      {/* 🎥 Intro Video Section */}
+<section id="intro-video" className="py-20 bg-gray-100">
+  <div className="max-w-5xl mx-auto px-6 text-center">
+    <h3 className="text-4xl font-extrabold text-blue-700 mb-6">
+      Why Join Odia IT Training Hub?
+    </h3>
+    <p className="text-xl text-gray-600 mb-10">
+      Watch this short 53-second video to see how we help you launch your IT career.
+    </p>
+
+    <div className="relative w-full" style={{ paddingTop: "56.25%" }}>
+      <iframe
+        className="absolute top-0 left-0 w-full h-full rounded-xl shadow-xl border-4 border-blue-600"
+        src="https://www.youtube.com/embed/H2_rO9GC2ac"
+        title="Odia IT Training Hub Intro Video"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowFullScreen
+      ></iframe>
+    </div>
+  </div>
+</section>
+
+{/* --- */}
+
       {/* 📞 Contact Section - Clean Form with Clear Contact Info */}
       <section id="contact" className="py-20 bg-white">
         <div className="max-w-6xl mx-auto px-6">
