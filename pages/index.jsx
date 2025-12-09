@@ -1,9 +1,6 @@
 import { BoltIcon, AcademicCapIcon, MapPinIcon, GlobeAltIcon, UsersIcon, CheckCircleIcon, ArrowRightIcon, StarIcon, LightBulbIcon, PhoneIcon } from '@heroicons/react/24/solid'; // Added StarIcon, LightBulbIcon, PhoneIcon for flashier design
-import { useState } from "react";
 
 export default function Home() {
-  const [unlockDownload, setUnlockDownload] = useState(false);
-const [loading, setLoading] = useState(false);
   // Use icons for courses to make them more visually appealing
   const courses = [
     { title: "Oracle SQL & PL/SQL", icon: <BoltIcon className="w-6 h-6 text-yellow-500" /> },
@@ -300,104 +297,6 @@ const [loading, setLoading] = useState(false);
 
 {/* --- */}
 
-{/* 🧾 Buy Control-M Job Scheduling Notes Section */}
-<section id="notes" className="py-20 bg-white">
-  <div className="max-w-6xl mx-auto px-6 text-center">
-
-    <h3 className="text-4xl font-extrabold text-blue-700 mb-10">
-      Buy Control-M Job Scheduling Notes
-    </h3>
-
-    <div className="bg-gray-100 p-8 rounded-xl shadow-xl max-w-xl mx-auto">
-
-      {/* ⭐ Cover Thumbnail */}
-      <img
-        src="/images/controlm-thumbnail.png"
-        alt="Control-M Notes Cover"
-        className="w-full rounded-lg shadow-lg mb-6 hover:scale-105 transition-transform duration-300"
-        onError={(e) => {
-          e.target.src =
-            "https://placehold.co/600x350/1e40af/ffffff?text=Control-M+Notes";
-        }}
-      />
-
-      <h4 className="text-2xl font-bold mb-3">
-        Control-M End-to-End Job Scheduling Notes (With Screenshots)
-      </h4>
-
-      <p className="text-lg text-gray-700 mb-6">
-        Complete Control-M batch job scheduling, dependencies, job flow execution,
-        monitoring & troubleshooting — <strong>₹100 only</strong>
-      </p>
-
-      {/* 🖥️ Desktop Payment Option — QR Code */}
-      <div className="bg-white p-4 rounded-lg shadow-md mb-6">
-        <h4 className="text-xl font-bold text-gray-800 mb-3">
-          Scan QR to Pay (Desktop Users)
-        </h4>
-
-        <img
-          src="https://chart.googleapis.com/chart?cht=qr&chs=300x300&chl=upi://pay?pa=juliousjena@ybl&pn=Odia%20IT%20Training%20Hub&am=100&cu=INR"
-          alt="UPI QR Code"
-          className="mx-auto w-48 h-48 border rounded-lg shadow"
-        />
-
-        <p className="text-gray-600 mt-3">
-          Scan with Google Pay / PhonePe / Paytm to pay ₹100
-        </p>
-
-        <button
-          onClick={() => setUnlockDownload(true)}
-          className="mt-4 w-full bg-purple-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-purple-700 transition"
-        >
-          I Have Paid — Unlock Download
-        </button>
-      </div>
-
-      {/* 📱 Mobile UPI Payment Button */}
-      <a
-        href="upi://pay?pa=juliousjena@ybl&pn=Odia%20IT%20Training%20Hub&am=100&cu=INR"
-        onClick={() => {
-          setLoading(true); // Show loading text
-          setTimeout(() => {
-            setUnlockDownload(true); // Unlock download after delay
-            setLoading(false);
-          }, 4000); // 4-second delay
-        }}
-        className="block bg-green-600 text-white px-6 py-3 rounded-lg font-bold text-xl hover:bg-green-700 transition mb-4"
-      >
-        Pay via UPI (₹100)
-      </a>
-
-      {/* 🔵 Loading Message */}
-      {loading && (
-        <p className="text-blue-600 font-semibold mb-4 animate-pulse">
-          Opening UPI App… Please complete the payment…
-        </p>
-      )}
-
-      <p className="text-gray-600 mb-4">
-        After payment, click the button below to download.
-      </p>
-
-      {/* 📥 Download Button — Shows ONLY after payment */}
-      {unlockDownload && (
-        <a
-          href="/api/download-notes"
-          className="block bg-blue-700 text-white px-6 py-3 rounded-lg font-bold text-xl hover:bg-blue-800 transition"
-        >
-          Download Control-M Notes (PDF)
-        </a>
-      )}
-
-    </div>
-  </div>
-</section>
-
-
-
-      
-{/* --- */}
       {/* ✅ Placement Section - Trust Building with Numbers and Success Color */}
       <section id="placement" className="py-20 bg-green-700 text-white text-center">
         <div className="max-w-4xl mx-auto px-6">
