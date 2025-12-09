@@ -330,14 +330,38 @@ const [loading, setLoading] = useState(false);
         monitoring & troubleshooting — <strong>₹100 only</strong>
       </p>
 
-      {/* 💰 Pay via UPI Button */}
+      {/* 🖥️ Desktop Payment Option — QR Code */}
+      <div className="bg-white p-4 rounded-lg shadow-md mb-6">
+        <h4 className="text-xl font-bold text-gray-800 mb-3">
+          Scan QR to Pay (Desktop Users)
+        </h4>
+
+        <img
+          src="https://chart.googleapis.com/chart?cht=qr&chs=300x300&chl=upi://pay?pa=juliousjena@ybl&pn=Odia%20IT%20Training%20Hub&am=100&cu=INR"
+          alt="UPI QR Code"
+          className="mx-auto w-48 h-48 border rounded-lg shadow"
+        />
+
+        <p className="text-gray-600 mt-3">
+          Scan with Google Pay / PhonePe / Paytm to pay ₹100
+        </p>
+
+        <button
+          onClick={() => setUnlockDownload(true)}
+          className="mt-4 w-full bg-purple-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-purple-700 transition"
+        >
+          I Have Paid — Unlock Download
+        </button>
+      </div>
+
+      {/* 📱 Mobile UPI Payment Button */}
       <a
         href="upi://pay?pa=juliousjena@ybl&pn=Odia%20IT%20Training%20Hub&am=100&cu=INR"
         onClick={() => {
           setLoading(true); // Show loading text
           setTimeout(() => {
             setUnlockDownload(true); // Unlock download after delay
-            setLoading(false); // Hide loading text
+            setLoading(false);
           }, 4000); // 4-second delay
         }}
         className="block bg-green-600 text-white px-6 py-3 rounded-lg font-bold text-xl hover:bg-green-700 transition mb-4"
@@ -356,7 +380,7 @@ const [loading, setLoading] = useState(false);
         After payment, click the button below to download.
       </p>
 
-      {/* 📥 Download Button — Shows ONLY after UPI click */}
+      {/* 📥 Download Button — Shows ONLY after payment */}
       {unlockDownload && (
         <a
           href="/api/download-notes"
@@ -369,6 +393,7 @@ const [loading, setLoading] = useState(false);
     </div>
   </div>
 </section>
+
 
 
       
