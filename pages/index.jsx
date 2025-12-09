@@ -1,6 +1,9 @@
 import { BoltIcon, AcademicCapIcon, MapPinIcon, GlobeAltIcon, UsersIcon, CheckCircleIcon, ArrowRightIcon, StarIcon, LightBulbIcon, PhoneIcon } from '@heroicons/react/24/solid'; // Added StarIcon, LightBulbIcon, PhoneIcon for flashier design
+import { useState } from "react";
 
 export default function Home() {
+  const [unlockDownload, setUnlockDownload] = useState(false);
+const [loading, setLoading] = useState(false);
   // Use icons for courses to make them more visually appealing
   const courses = [
     { title: "Oracle SQL & PL/SQL", icon: <BoltIcon className="w-6 h-6 text-yellow-500" /> },
