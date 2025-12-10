@@ -193,12 +193,12 @@ export default function Home() {
 
       <p className="text-xl text-gray-700 leading-relaxed mb-8 max-w-lg">
         In our coaching center, you will practice real production issues exactly like in top IT companies.
-        We provide hands-on training on how L1 and L2 engineers analyze logs, find root causes, fix issues, and close tickets professionally.
+        We provide hands-on training on how L1 and L2 engineers analyze logs,find root causes, fix issues, and close tickets professionally.
       </p>
 
       <p className="text-lg text-gray-600 leading-relaxed mb-10 max-w-lg">
-        These real industry tickets — provided directly in our classes — will help you speak confidently in interviews,
-        solve real-time problems in your job, and perform like an experienced IT engineer from Day 1.
+        These real industry tickets provided directly in our classes will help you speak confidently in interviews,
+        solve real-time problems in your job, and perform like an experienced IT engineer from Day one.
       </p>
 
       <a 
