@@ -192,15 +192,13 @@ export default function Home() {
       </h3>
 
       <p className="text-xl text-gray-700 leading-relaxed mb-8 max-w-lg">
-        Practice **real production issues** exactly like in top IT companies.  
-        Learn how L1 & L2 support engineers **analyze, troubleshoot, and resolve** 
-        critical incidents with confidence.
+        In our coaching center, you will practice real production issues exactly like in top IT companies.
+        We provide hands-on training on how L1 and L2 engineers analyze logs, find root causes, fix issues, and close tickets professionally.
       </p>
 
       <p className="text-lg text-gray-600 leading-relaxed mb-10 max-w-lg">
-        These real industry tickets help you speak confidently in interviews,
-        handle live issues on your first job, and perform like an **experienced engineer** 
-        from Day 1.
+        These real industry tickets — provided directly in our classes — will help you speak confidently in interviews,
+        solve real-time problems in your job, and perform like an experienced IT engineer from Day 1.
       </p>
 
       <a 
