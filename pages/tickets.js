@@ -41,7 +41,7 @@ export default function Tickets() {
         </div>
       </section>
 
-      {/* 📊 ANALYTICS DASHBOARD */}
+      {/* ANALYTICS DASHBOARD */}
       <section className="max-w-6xl mx-auto px-6 py-12 mt-10">
         <h2 className="text-3xl font-extrabold text-blue-700 mb-6 text-center">
           📊 Ticket Analytics Dashboard
@@ -182,10 +182,9 @@ export default function Tickets() {
       </Section>
 
       {/* ---------------- SYLLABUS SECTION ---------------- */}
-
       <SyllabusSection />
 
-      {/* INTERVIEW PREP */}
+      {/* ---------------- INTERVIEW PREP SECTION ---------------- */}
       <InterviewSection />
 
       {/* Footer */}
