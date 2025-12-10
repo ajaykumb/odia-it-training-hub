@@ -19,6 +19,7 @@ export default function Tickets() {
         <div className="absolute inset-0 opacity-10"></div>
 
         <h1 className="text-5xl font-extrabold mb-4">Real-Time IT Ticket Simulator</h1>
+
         <p className="text-xl max-w-3xl mx-auto opacity-90 leading-relaxed">
           Practice real production issues handled by L1 & L2 engineers in top MNCs.
           Learn troubleshooting exactly the way real IT teams solve incidents.
@@ -112,7 +113,8 @@ export default function Tickets() {
         </div>
       </section>
 
-      {/* CATEGORY COMPONENT */}
+      {/* ---------------- TICKET SECTIONS ---------------- */}
+
       <Section id="SQL" title="SQL & PL/SQL Tickets">
         <Ticket title="SQL Query Running Slow" tools="🗄 SQL | ⚡ Performance"
           border="border-blue-600"
@@ -131,7 +133,6 @@ export default function Tickets() {
         />
       </Section>
 
-      {/* LINUX */}
       <Section id="Linux" title="Linux & Shell Scripting Tickets">
         <Ticket title="File Not Found Issue" tools="🐧 Linux | 📂 File System"
           border="border-yellow-600"
@@ -150,7 +151,6 @@ export default function Tickets() {
         />
       </Section>
 
-      {/* AUTOSYS */}
       <Section id="Autosys" title="Autosys Tickets">
         <Ticket title="Autosys Job Failure (Exit Code 255)" tools="❗ Autosys | 🗄 Database"
           border="border-red-500"
@@ -161,7 +161,6 @@ export default function Tickets() {
         />
       </Section>
 
-      {/* CONTROL-M */}
       <Section id="Control-M" title="Control-M Tickets">
         <Ticket title="Control-M Job Hung" tools="📅 Control-M | 🗄 DB"
           border="border-purple-600"
@@ -172,7 +171,6 @@ export default function Tickets() {
         />
       </Section>
 
-      {/* SPLUNK */}
       <Section id="Splunk" title="Splunk Monitoring Tickets">
         <Ticket title="High Error Count Alert" tools="🔍 Splunk | 📈 Monitoring"
           border="border-orange-500"
@@ -183,7 +181,11 @@ export default function Tickets() {
         />
       </Section>
 
-      {/* Interview Section */}
+      {/* ---------------- SYLLABUS SECTION ---------------- */}
+
+      <SyllabusSection />
+
+      {/* INTERVIEW PREP */}
       <InterviewSection />
 
       {/* Footer */}
@@ -195,7 +197,7 @@ export default function Tickets() {
   );
 }
 
-/* ---------------- THINGS BELOW ARE UI COMPONENTS ---------------- */
+/* ---------------- COMPONENTS ---------------- */
 
 function Section({ id, title, children }) {
   return (
@@ -226,6 +228,121 @@ function Ticket({ title, tools, border, symptoms, log, rootCause, resolution }) 
     </div>
   );
 }
+
+/* ---------------- SYLLABUS SECTION ---------------- */
+
+function SyllabusSection() {
+  return (
+    <section className="py-20 bg-white mt-10">
+      <div className="max-w-6xl mx-auto px-6">
+
+        <h2 className="text-4xl font-extrabold text-blue-700 mb-10 text-center">
+          📘 Complete Syllabus – Job Ready Training
+        </h2>
+
+        <div className="space-y-6">
+
+          <Syllabus title="SQL & PL/SQL Syllabus">
+            <ul className="list-disc ml-6 space-y-2 text-gray-700">
+              <li>Basic to Advanced SQL Queries</li>
+              <li>Joins, Subqueries, Analytical Functions</li>
+              <li>Indexes, Performance Tuning Concepts</li>
+              <li>PL/SQL Functions, Procedures, Packages, Cursors</li>
+              <li>Real-time Debugging & RCA</li>
+            </ul>
+          </Syllabus>
+
+          <Syllabus title="Linux & Shell Scripting Syllabus">
+            <ul className="list-disc ml-6 space-y-2 text-gray-700">
+              <li>Linux Commands & Permissions</li>
+              <li>Shell Script Programming</li>
+              <li>Automation Using CRON</li>
+              <li>Log Reading & Issue Debugging</li>
+            </ul>
+          </Syllabus>
+
+          <Syllabus title="Autosys Job Scheduling Syllabus">
+            <ul className="list-disc ml-6 space-y-2 text-gray-700">
+              <li>Autosys Architecture</li>
+              <li>JIL Creation</li>
+              <li>Job Monitoring & Troubleshooting</li>
+            </ul>
+          </Syllabus>
+
+          <Syllabus title="Control-M Scheduling Syllabus">
+            <ul className="list-disc ml-6 space-y-2 text-gray-700">
+              <li>Job Dependencies</li>
+              <li>SLA & Forecasting</li>
+              <li>Job Rerun & Failure Fixing</li>
+            </ul>
+          </Syllabus>
+
+          <Syllabus title="Splunk Monitoring Syllabus">
+            <ul className="list-disc ml-6 space-y-2 text-gray-700">
+              <li>SPL Queries</li>
+              <li>Dashboards & Alerts</li>
+              <li>Log Debugging</li>
+            </ul>
+          </Syllabus>
+
+          <Syllabus title="Dynatrace Syllabus">
+            <ul className="list-disc ml-6 space-y-2 text-gray-700">
+              <li>Performance Monitoring</li>
+              <li>API Tracing</li>
+              <li>Error & RCA Analysis</li>
+            </ul>
+          </Syllabus>
+
+          <Syllabus title="API Debugging & JSON Syllabus">
+            <ul className="list-disc ml-6 space-y-2 text-gray-700">
+              <li>REST API Basics</li>
+              <li>Postman Usage</li>
+              <li>500, 400 Error Fixing</li>
+            </ul>
+          </Syllabus>
+
+          <Syllabus title="ETL (Informatica) Syllabus">
+            <ul className="list-disc ml-6 space-y-2 text-gray-700">
+              <li>ETL Mapping</li>
+              <li>Workflows & Sessions</li>
+              <li>Error Handling</li>
+            </ul>
+          </Syllabus>
+
+          <Syllabus title="AWS Cloud (Support Level) Syllabus">
+            <ul className="list-disc ml-6 space-y-2 text-gray-700">
+              <li>S3, EC2, IAM</li>
+              <li>CloudWatch Logs</li>
+              <li>Access Issues Troubleshooting</li>
+            </ul>
+          </Syllabus>
+
+          <Syllabus title="Java (Core) Syllabus">
+            <ul className="list-disc ml-6 space-y-2 text-gray-700">
+              <li>OOP Basics</li>
+              <li>Exception Handling</li>
+              <li>Error Debugging (NPE, etc.)</li>
+            </ul>
+          </Syllabus>
+
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Syllabus({ title, children }) {
+  return (
+    <details className="bg-white p-6 rounded-xl shadow border-l-8 border-blue-600">
+      <summary className="cursor-pointer text-xl font-bold text-blue-700">
+        {title}
+      </summary>
+      <div className="mt-4">{children}</div>
+    </details>
+  );
+}
+
+/* ---------------- INTERVIEW PREP SECTION ---------------- */
 
 function InterviewSection() {
   return (
@@ -258,6 +375,7 @@ function InterviewSection() {
               <li>Communicating updates to stakeholders</li>
             </ul>
           </div>
+
         </div>
       </div>
     </section>
