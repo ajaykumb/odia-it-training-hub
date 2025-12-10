@@ -158,6 +158,220 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* 👉 REAL-TIME TICKET SIMULATOR SECTION */}
+      <section id="ticket-simulator" className="py-20 bg-gradient-to-br from-gray-100 to-gray-200">
+        <div className="max-w-6xl mx-auto px-6">
+
+          <h3 className="text-4xl font-extrabold text-blue-700 mb-4 text-center">
+            Real-Time IT Ticket Simulator
+          </h3>
+
+          <p className="text-xl text-gray-700 text-center mb-12 max-w-3xl mx-auto">
+            Practice real production issues exactly like in IT companies. 
+            Learn how L1 & L2 engineers analyze, troubleshoot, and resolve critical incidents.
+          </p>
+
+          {/* Grid of Tickets */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+
+            {/* Ticket 1 - Autosys Job Failure */}
+            <div className="bg-white shadow-xl p-6 rounded-xl border-l-8 border-red-500 hover:scale-[1.02] transition cursor-pointer">
+              <h4 className="text-2xl font-bold text-red-600">⚠️ Autosys Job Failure</h4>
+              <p className="text-gray-600 mt-2">Job <strong>ABC_DAILY_LOAD</strong> failed with Exit Code 255.</p>
+
+              <details className="mt-4">
+                <summary className="cursor-pointer font-semibold text-blue-600">View Issue Details</summary>
+                <div className="mt-3 text-gray-700 space-y-2">
+                  <p><strong>Symptoms:</strong> Downstream jobs not triggered, SLA breach risk.</p>
+                  <p><strong>Log Snippet:</strong> ORA-00942: Table or view does not exist.</p>
+                  <p><strong>Root Cause:</strong> Missing table in production schema after deployment.</p>
+                  <p><strong>Resolution:</strong> Synced missing table from UAT, re-granted privileges & re-ran job successfully.</p>
+                </div>
+              </details>
+            </div>
+
+            {/* Ticket 2 - SQL Performance Issue */}
+            <div className="bg-white shadow-xl p-6 rounded-xl border-l-8 border-blue-500 hover:scale-[1.02] transition cursor-pointer">
+              <h4 className="text-2xl font-bold text-blue-600">🐢 SQL Performance Issue</h4>
+              <p className="text-gray-600 mt-2">Report generation taking <strong>24 minutes</strong> instead of <strong>2 minutes</strong>.</p>
+
+              <details className="mt-4">
+                <summary className="cursor-pointer font-semibold text-blue-600">View Issue Details</summary>
+                <div className="mt-3 text-gray-700 space-y-2">
+                  <p><strong>Symptoms:</strong> Application timeout, users complaining of slowness.</p>
+                  <p><strong>Log Snippet:</strong> Full table scan on 5M row transaction table.</p>
+                  <p><strong>Root Cause:</strong> Missing index + inefficient WHERE clause with functions.</p>
+                  <p><strong>Resolution:</strong> Added composite index, rewrote query using proper predicates, performance improved to 3 seconds.</p>
+                </div>
+              </details>
+            </div>
+
+            {/* Ticket 3 - Application Log Errors */}
+            <div className="bg-white shadow-xl p-6 rounded-xl border-l-8 border-yellow-500 hover:scale-[1.02] transition cursor-pointer">
+              <h4 className="text-2xl font-bold text-yellow-600">📄 Application Log Errors</h4>
+              <p className="text-gray-600 mt-2">Users unable to submit forms on production.</p>
+
+              <details className="mt-4">
+                <summary className="cursor-pointer font-semibold text-blue-600">View Issue Details</summary>
+                <div className="mt-3 text-gray-700 space-y-2">
+                  <p><strong>Symptoms:</strong> HTTP 500 error after clicking Submit.</p>
+                  <p><strong>Log Snippet:</strong> <code>NullPointerException at ServiceImpl.java:88</code></p>
+                  <p><strong>Root Cause:</strong> Missing mandatory JSON field from frontend in specific scenario.</p>
+                  <p><strong>Resolution:</strong> Added backend null checks, updated frontend payload, redeployed fixed build.</p>
+                </div>
+              </details>
+            </div>
+
+            {/* Ticket 4 - ITIL Incident Handling */}
+            <div className="bg-white shadow-xl p-6 rounded-xl border-l-8 border-green-600 hover:scale-[1.02] transition cursor-pointer">
+              <h4 className="text-2xl font-bold text-green-600">📝 ITIL Incident Handling</h4>
+              <p className="text-gray-600 mt-2">P1 Incident – Entire application is down during business hours.</p>
+
+              <details className="mt-4">
+                <summary className="cursor-pointer font-semibold text-blue-600">View Issue Details</summary>
+                <div className="mt-3 text-gray-700 space-y-2">
+                  <p><strong>Symptoms:</strong> All users unable to login, monitoring alerts fired.</p>
+                  <p><strong>Log Snippet:</strong> Database connection timeout, "could not connect to listener".</p>
+                  <p><strong>Root Cause:</strong> Database listener service crashed due to OS patching.</p>
+                  <p><strong>Resolution:</strong> Engaged DB team, restarted listener, validated services, updated incident timeline & RCA in ITIL tool.</p>
+                </div>
+              </details>
+            </div>
+
+            {/* Ticket 5 - Control-M Job Failure */}
+            <div className="bg-white shadow-xl p-6 rounded-xl border-l-8 border-indigo-600 hover:scale-[1.02] transition cursor-pointer">
+              <h4 className="text-2xl font-bold text-indigo-600">📆 Control-M Job Failure</h4>
+              <p className="text-gray-600 mt-2">Control-M job missed SLA and is stuck in "Executing" state.</p>
+
+              <details className="mt-4">
+                <summary className="cursor-pointer font-semibold text-blue-600">View Issue Details</summary>
+                <div className="mt-3 text-gray-700 space-y-2">
+                  <p><strong>Symptoms:</strong> Job not completing, downstream jobs waiting.</p>
+                  <p><strong>Log Snippet:</strong> "Agent communication error".</p>
+                  <p><strong>Root Cause:</strong> Control-M agent service stopped on target server.</p>
+                  <p><strong>Resolution:</strong> Restarted agent, performed test job, forced complete or reran job as per SOP.</p>
+                </div>
+              </details>
+            </div>
+
+            {/* Ticket 6 - Shell Script Debugging */}
+            <div className="bg-white shadow-xl p-6 rounded-xl border-l-8 border-orange-500 hover:scale-[1.02] transition cursor-pointer">
+              <h4 className="text-2xl font-bold text-orange-500">💻 Shell Script Error Debugging</h4>
+              <p className="text-gray-600 mt-2">Shell script exiting with code 1 during file processing.</p>
+
+              <details className="mt-4">
+                <summary className="cursor-pointer font-semibold text-blue-600">View Issue Details</summary>
+                <div className="mt-3 text-gray-700 space-y-2">
+                  <p><strong>Symptoms:</strong> Batch load not completed, partial data in target table.</p>
+                  <p><strong>Log Snippet:</strong> <code>syntax error near unexpected token `done'</code></p>
+                  <p><strong>Root Cause:</strong> Missing <code>do</code> keyword in <code>for</code> loop, wrong file path variable.</p>
+                  <p><strong>Resolution:</strong> Fixed script syntax, added error handling & logging, validated on lower environment.</p>
+                </div>
+              </details>
+            </div>
+
+            {/* Ticket 7 - File Not Found / Permission Denied */}
+            <div className="bg-white shadow-xl p-6 rounded-xl border-l-8 border-pink-500 hover:scale-[1.02] transition cursor-pointer">
+              <h4 className="text-2xl font-bold text-pink-500">📂 File Not Found / Permission Denied</h4>
+              <p className="text-gray-600 mt-2">Batch job failing while reading input file from Unix directory.</p>
+
+              <details className="mt-4">
+                <summary className="cursor-pointer font-semibold text-blue-600">View Issue Details</summary>
+                <div className="mt-3 text-gray-700 space-y-2">
+                  <p><strong>Symptoms:</strong> <code>No such file or directory</code> or <code>Permission denied</code> errors.</p>
+                  <p><strong>Root Cause:</strong> Wrong directory path OR missing read permission for batch user.</p>
+                  <p><strong>Resolution:</strong> Corrected file path, applied proper Unix permissions (<code>chown</code>, <code>chmod</code>), revalidated job.</p>
+                </div>
+              </details>
+            </div>
+
+            {/* Ticket 8 - API Failure Issue */}
+            <div className="bg-white shadow-xl p-6 rounded-xl border-l-8 border-cyan-500 hover:scale-[1.02] transition cursor-pointer">
+              <h4 className="text-2xl font-bold text-cyan-500">🌐 API Failure Issue</h4>
+              <p className="text-gray-600 mt-2">Third-party API returning intermittent 502 / 504 errors.</p>
+
+              <details className="mt-4">
+                <summary className="cursor-pointer font-semibold text-blue-600">View Issue Details</summary>
+                <div className="mt-3 text-gray-700 space-y-2">
+                  <p><strong>Symptoms:</strong> Payment/status update not reflecting for some users.</p>
+                  <p><strong>Log Snippet:</strong> <code>HTTP 504 Gateway Timeout</code> from external API.</p>
+                  <p><strong>Root Cause:</strong> Network latency & lack of retry mechanism in code.</p>
+                  <p><strong>Resolution:</strong> Implemented retry logic, added circuit breaker config, coordinated with vendor team.</p>
+                </div>
+              </details>
+            </div>
+
+            {/* Ticket 9 - Splunk Alert Investigation */}
+            <div className="bg-white shadow-xl p-6 rounded-xl border-l-8 border-lime-500 hover:scale-[1.02] transition cursor-pointer">
+              <h4 className="text-2xl font-bold text-lime-600">📊 Splunk Alert Investigation</h4>
+              <p className="text-gray-600 mt-2">Automated alert triggered due to error spike in logs.</p>
+
+              <details className="mt-4">
+                <summary className="cursor-pointer font-semibold text-blue-600">View Issue Details</summary>
+                <div className="mt-3 text-gray-700 space-y-2">
+                  <p><strong>Symptoms:</strong> Splunk dashboard shows sudden increase in <code>ERROR</code> entries.</p>
+                  <p><strong>Root Cause:</strong> New release introduced extra logging for non-critical validation failures.</p>
+                  <p><strong>Resolution:</strong> Tuned Splunk query to exclude known benign errors, raised change request to downgrade log level.</p>
+                </div>
+              </details>
+            </div>
+
+            {/* Ticket 10 - Dynatrace Monitoring Issue */}
+            <div className="bg-white shadow-xl p-6 rounded-xl border-l-8 border-teal-500 hover:scale-[1.02] transition cursor-pointer">
+              <h4 className="text-2xl font-bold text-teal-600">📈 Dynatrace Performance Alert</h4>
+              <p className="text-gray-600 mt-2">Dynatrace flagged high response time for login API.</p>
+
+              <details className="mt-4">
+                <summary className="cursor-pointer font-semibold text-blue-600">View Issue Details</summary>
+                <div className="mt-3 text-gray-700 space-y-2">
+                  <p><strong>Symptoms:</strong> Response time above threshold, user login feels slow.</p>
+                  <p><strong>Root Cause:</strong> Slow downstream DB call + thread contention in app server.</p>
+                  <p><strong>Resolution:</strong> Analyzed hotspots in Dynatrace, optimized DB query, increased app server thread pool as per capacity plan.</p>
+                </div>
+              </details>
+            </div>
+
+            {/* Ticket 11 - ServiceNow Change Request */}
+            <div className="bg-white shadow-xl p-6 rounded-xl border-l-8 border-sky-500 hover:scale-[1.02] transition cursor-pointer">
+              <h4 className="text-2xl font-bold text-sky-600">🛠️ ServiceNow Change Request</h4>
+              <p className="text-gray-600 mt-2">Planned change to update batch job schedule across environments.</p>
+
+              <details className="mt-4">
+                <summary className="cursor-pointer font-semibold text-blue-600">View Issue Details</summary>
+                <div className="mt-3 text-gray-700 space-y-2">
+                  <p><strong>Activities:</strong> Raised CR, added impact analysis, rollback plan, and testing steps.</p>
+                  <p><strong>Risk:</strong> Wrong schedule could break daily data load.</p>
+                  <p><strong>Resolution:</strong> Performed lower env testing, implemented change in production during window, updated ServiceNow with results.</p>
+                </div>
+              </details>
+            </div>
+
+            {/* Ticket 12 - Batch Failure + Rollback */}
+            <div className="bg-white shadow-xl p-6 rounded-xl border-l-8 border-gray-700 hover:scale-[1.02] transition cursor-pointer">
+              <h4 className="text-2xl font-bold text-gray-800">🔄 Batch Failure & Rollback</h4>
+              <p className="text-gray-600 mt-2">Nightly batch corrupted partial data due to mid-run failure.</p>
+
+              <details className="mt-4">
+                <summary className="cursor-pointer font-semibold text-blue-600">View Issue Details</summary>
+                <div className="mt-3 text-gray-700 space-y-2">
+                  <p><strong>Symptoms:</strong> Mismatched totals & duplicate records in reporting tables.</p>
+                  <p><strong>Root Cause:</strong> No proper transaction handling & checkpoints in batch framework.</p>
+                  <p><strong>Resolution:</strong> Rolled back using backup table, re-ran batch with enhanced commit/rollback logic, added validation script.</p>
+                </div>
+              </details>
+            </div>
+
+          </div>
+
+          <p className="mt-10 text-center text-lg text-gray-700 font-semibold">
+            💼 These are the kind of real tickets you’ll practice in our training – 
+            so you can speak confidently in interviews and perform from Day 1 on the job.
+          </p>
+
+        </div>
+      </section>
+
       {/* --- */}
 
       {/* 🚀 New Batch Callout - Software Developer Focus (Flashier Version!) */}
