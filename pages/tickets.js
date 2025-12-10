@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 
 export default function Tickets() {
   return (
@@ -464,6 +464,7 @@ function ResumeBuilderSection() {
   });
 
   const [template, setTemplate] = useState("template1");
+  const previewRef = useRef(null);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -472,7 +473,7 @@ function ResumeBuilderSection() {
 
   const handleCopy = () => {
     const text = `
-${form.fullName.toUpperCase()}
+${(form.fullName || "").toUpperCase()}
 ${form.roleTitle}
 
 Contact: ${form.phone} | ${form.email}
@@ -521,6 +522,42 @@ Notice Period: ${form.noticePeriod}
     }
   };
 
+  const downloadPDF = async () => {
+    if (!previewRef.current) return;
+
+    const html2canvas = (await import("html2canvas")).default;
+    const jsPDF = (await import("jspdf")).default;
+
+    const element = previewRef.current;
+
+    const canvas = await html2canvas(element, {
+      scale: 2,
+      useCORS: true,
+    });
+
+    const imgData = canvas.toDataURL("image/png");
+    const pdf = new jsPDF("p", "mm", "a4");
+
+    const imgWidth = 210; // A4 width in mm
+    const pageHeight = 297;
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+    let heightLeft = imgHeight;
+    let position = 0;
+
+    pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+    heightLeft -= pageHeight;
+
+    while (heightLeft > 0) {
+      position = heightLeft - imgHeight;
+      pdf.addPage();
+      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+    }
+
+    pdf.save(`${form.fullName || "Resume"}.pdf`);
+  };
+
   return (
     <section className="py-20 bg-gray-50">
       <div className="max-w-6xl mx-auto px-6">
@@ -531,15 +568,15 @@ Notice Period: ${form.noticePeriod}
         <p className="text-center text-gray-600 max-w-2xl mx-auto mb-6">
           Fill your details below and get a professional{" "}
           <strong>IT Support / Production Support resume</strong> ready for
-          Naukri, LinkedIn, and HR calls. You can copy the text in one click
-          and choose between multiple templates.
+          Naukri, LinkedIn, and HR calls. Choose from 5 modern MNC-style
+          templates and download as PDF.
         </p>
 
         {/* Template Selector */}
-        <div className="flex justify-center gap-4 mb-8">
+        <div className="flex flex-wrap justify-center gap-3 mb-8">
           <button
             onClick={() => setTemplate("template1")}
-            className={`px-4 py-2 rounded-lg font-semibold ${
+            className={`px-4 py-2 rounded-lg text-sm font-semibold ${
               template === "template1"
                 ? "bg-blue-600 text-white"
                 : "bg-gray-200 text-gray-700"
@@ -550,7 +587,7 @@ Notice Period: ${form.noticePeriod}
 
           <button
             onClick={() => setTemplate("template2")}
-            className={`px-4 py-2 rounded-lg font-semibold ${
+            className={`px-4 py-2 rounded-lg text-sm font-semibold ${
               template === "template2"
                 ? "bg-blue-600 text-white"
                 : "bg-gray-200 text-gray-700"
@@ -561,13 +598,35 @@ Notice Period: ${form.noticePeriod}
 
           <button
             onClick={() => setTemplate("template3")}
-            className={`px-4 py-2 rounded-lg font-semibold ${
+            className={`px-4 py-2 rounded-lg text-sm font-semibold ${
               template === "template3"
                 ? "bg-blue-600 text-white"
                 : "bg-gray-200 text-gray-700"
             }`}
           >
             Template 3
+          </button>
+
+          <button
+            onClick={() => setTemplate("template4")}
+            className={`px-4 py-2 rounded-lg text-sm font-semibold ${
+              template === "template4"
+                ? "bg-blue-600 text-white"
+                : "bg-gray-200 text-gray-700"
+            }`}
+          >
+            Template 4
+          </button>
+
+          <button
+            onClick={() => setTemplate("template5")}
+            className={`px-4 py-2 rounded-lg text-sm font-semibold ${
+              template === "template5"
+                ? "bg-blue-600 text-white"
+                : "bg-gray-200 text-gray-700"
+            }`}
+          >
+            Template 5
           </button>
         </div>
 
@@ -792,15 +851,30 @@ Notice Period: ${form.noticePeriod}
             </div>
           </div>
 
-          {/* Right: Preview */}
-          <div className="bg-white rounded-2xl shadow-xl p-6 md:p-8 border border-gray-100 max-h-[700px] overflow-y-auto">
-            <h3 className="text-xl font-bold text-gray-800 mb-4">
-              👀 Live Resume Preview ({template})
-            </h3>
+          {/* Right: Preview + Download */}
+          <div>
+            <div
+              ref={previewRef}
+              className="bg-white rounded-2xl shadow-xl p-6 md:p-8 border border-gray-100"
+            >
+              <h3 className="text-xl font-bold text-gray-800 mb-4">
+                👀 Live Resume Preview ({template.toUpperCase()})
+              </h3>
 
-            {template === "template1" && <Template1 form={form} />}
-            {template === "template2" && <Template2 form={form} />}
-            {template === "template3" && <Template3 form={form} />}
+              {template === "template1" && <Template1 form={form} />}
+              {template === "template2" && <Template2 form={form} />}
+              {template === "template3" && <Template3 form={form} />}
+              {template === "template4" && <Template4 form={form} />}
+              {template === "template5" && <Template5 form={form} />}
+            </div>
+
+            <button
+              type="button"
+              onClick={downloadPDF}
+              className="w-full mt-4 bg-green-600 text-white font-semibold py-2 rounded-lg hover:bg-green-700 transition"
+            >
+              📄 Download as PDF
+            </button>
           </div>
         </div>
       </div>
@@ -809,6 +883,7 @@ Notice Period: ${form.noticePeriod}
 }
 
 /* ---------------- RESUME TEMPLATES & HELPERS ---------------- */
+/* All 5 templates are Modern Blue / MNC-ready */
 
 function Template1({ form }) {
   return (
@@ -817,23 +892,22 @@ function Template1({ form }) {
         <h2 className="text-3xl font-extrabold text-blue-700">
           {form.fullName || "Your Name"}
         </h2>
-        <p className="text-lg font-semibold">{form.roleTitle}</p>
-        <p className="text-gray-700">
+        <p className="text-lg font-semibold text-gray-800">
+          {form.roleTitle}
+        </p>
+        <p className="text-gray-700 text-sm">
           {form.location} | {form.phone} | {form.email}
         </p>
-        {form.linkedin && <p>LinkedIn: {form.linkedin}</p>}
+        {form.linkedin && (
+          <p className="text-gray-700 text-sm">LinkedIn: {form.linkedin}</p>
+        )}
       </div>
 
       <SectionBlock title="Profile Summary" text={form.summary} />
-
       <SectionBlock title="Skills" chips={form.skills} />
-
       <SectionBlock title="Tools & Technologies" chips={form.tools} />
-
       <ExperienceBlock form={form} />
-
       <SectionBlock title="Education" text={form.education} />
-
       <SectionBlock
         title="Other Details"
         text={`Total Experience: ${form.experience} Years\nNotice Period: ${form.noticePeriod}`}
@@ -842,89 +916,284 @@ function Template1({ form }) {
   );
 }
 
+/* Template 2 – Blue Header Bar (MNC CV style) */
 function Template2({ form }) {
   return (
-    <div className="text-gray-800 space-y-4 font-serif">
-      <h2 className="text-3xl font-bold">{form.fullName || "Your Name"}</h2>
-      <p className="text-lg italic">{form.roleTitle}</p>
-      <p>
-        {form.phone} | {form.email} | {form.location}
-      </p>
+    <div className="text-gray-900 text-sm space-y-4 border border-blue-100 rounded-lg">
+      <div className="bg-blue-700 text-white px-4 py-3 rounded-t-lg">
+        <h2 className="text-2xl font-bold">{form.fullName || "Your Name"}</h2>
+        <p className="text-sm">{form.roleTitle}</p>
+        <p className="text-xs mt-1">
+          {form.email} | {form.phone} | {form.location}
+        </p>
+        {form.linkedin && (
+          <p className="text-xs mt-1">LinkedIn: {form.linkedin}</p>
+        )}
+      </div>
 
-      <h3 className="text-xl font-bold mt-4">Summary</h3>
-      <p>{form.summary}</p>
-
-      <h3 className="text-xl font-bold mt-4">Skills</h3>
-      <p>{form.skills}</p>
-
-      <h3 className="text-xl font-bold mt-4">Tools</h3>
-      <p>{form.tools}</p>
-
-      <h3 className="text-xl font-bold mt-4">Experience</h3>
-      <p className="font-semibold">{form.currentCompany}</p>
-      <p className="italic">{form.currentRole}</p>
-      <pre className="whitespace-pre-wrap">{form.responsibilities}</pre>
-
-      <h3 className="text-xl font-bold mt-4">Education</h3>
-      <p>{form.education}</p>
-
-      <h3 className="text-xl font-bold mt-4">Other Details</h3>
-      <p>Total Experience: {form.experience} Years</p>
-      <p>Notice Period: {form.noticePeriod}</p>
+      <div className="px-4 pb-4 space-y-3">
+        <SectionBlock title="Profile Summary" text={form.summary} />
+        <SectionBlock title="Skills" chips={form.skills} />
+        <SectionBlock title="Tools & Technologies" chips={form.tools} />
+        <ExperienceBlock form={form} />
+        <SectionBlock title="Education" text={form.education} />
+      </div>
     </div>
   );
 }
 
+/* Template 3 – Two Column Modern Layout */
 function Template3({ form }) {
+  const skillsArray = (form.skills || "").split(",");
+  const toolsArray = (form.tools || "").split(",");
+
   return (
-    <div className="text-gray-900 text-sm leading-relaxed space-y-3">
-      <p className="text-xl font-bold">{form.fullName || "Your Name"}</p>
-      <p>{form.roleTitle}</p>
-      <p>
-        {form.email} | {form.phone} | {form.location}
-      </p>
+    <div className="text-gray-900 text-sm border border-blue-100 rounded-lg overflow-hidden">
+      <div className="bg-blue-50 px-4 py-3 border-b border-blue-100">
+        <h2 className="text-2xl font-bold text-blue-800">
+          {form.fullName || "Your Name"}
+        </h2>
+        <p className="font-semibold text-gray-800">{form.roleTitle}</p>
+        <p className="text-xs mt-1">
+          {form.location} | {form.phone} | {form.email}
+        </p>
+      </div>
 
-      <h4 className="font-bold mt-4">PROFILE SUMMARY</h4>
-      <p>{form.summary}</p>
+      <div className="grid grid-cols-3 gap-4 p-4">
+        {/* Left Column */}
+        <div className="col-span-1 space-y-3 border-r border-gray-200 pr-3">
+          <div>
+            <h4 className="font-bold text-gray-900 text-xs uppercase mb-1">
+              Skills
+            </h4>
+            <div className="flex flex-wrap">
+              {skillsArray.map(
+                (s, i) =>
+                  s.trim() && (
+                    <span
+                      key={i}
+                      className="bg-blue-100 text-blue-800 px-2 py-1 text-[10px] rounded-full mr-1 mb-1"
+                    >
+                      {s.trim()}
+                    </span>
+                  )
+              )}
+            </div>
+          </div>
 
-      <h4 className="font-bold">SKILLS</h4>
-      <p>{form.skills}</p>
+          <div>
+            <h4 className="font-bold text-gray-900 text-xs uppercase mb-1">
+              Tools
+            </h4>
+            <div className="flex flex-wrap">
+              {toolsArray.map(
+                (t, i) =>
+                  t.trim() && (
+                    <span
+                      key={i}
+                      className="bg-indigo-100 text-indigo-800 px-2 py-1 text-[10px] rounded-full mr-1 mb-1"
+                    >
+                      {t.trim()}
+                    </span>
+                  )
+              )}
+            </div>
+          </div>
 
-      <h4 className="font-bold">TOOLS & TECHNOLOGIES</h4>
-      <p>{form.tools}</p>
+          <div>
+            <h4 className="font-bold text-gray-900 text-xs uppercase mb-1">
+              Education
+            </h4>
+            <p className="text-xs leading-relaxed">{form.education}</p>
+          </div>
 
-      <h4 className="font-bold">EXPERIENCE</h4>
-      <p>{form.currentCompany}</p>
-      <p>{form.currentRole}</p>
-      <pre className="whitespace-pre-wrap">{form.responsibilities}</pre>
+          <div>
+            <h4 className="font-bold text-gray-900 text-xs uppercase mb-1">
+              Other
+            </h4>
+            <p className="text-xs">
+              Experience: {form.experience} Years
+              <br />
+              Notice Period: {form.noticePeriod}
+            </p>
+          </div>
+        </div>
 
-      <h4 className="font-bold">EDUCATION</h4>
-      <p>{form.education}</p>
-
-      <h4 className="font-bold">OTHER DETAILS</h4>
-      <p>Total Experience: {form.experience} Years</p>
-      <p>Notice Period: {form.noticePeriod}</p>
+        {/* Right Column */}
+        <div className="col-span-2 space-y-3">
+          <SectionBlock title="Profile Summary" text={form.summary} />
+          <ExperienceBlock form={form} />
+        </div>
+      </div>
     </div>
   );
 }
+
+/* Template 4 – Card Sections with Blue Accents */
+function Template4({ form }) {
+  return (
+    <div className="text-gray-900 text-sm space-y-4">
+      <div className="flex justify-between items-center border-b pb-3">
+        <div>
+          <h2 className="text-2xl font-bold text-blue-700">
+            {form.fullName || "Your Name"}
+          </h2>
+          <p className="font-semibold text-gray-800">{form.roleTitle}</p>
+        </div>
+        <div className="text-right text-xs text-gray-600">
+          <p>{form.phone}</p>
+          <p>{form.email}</p>
+          <p>{form.location}</p>
+          {form.linkedin && <p>{form.linkedin}</p>}
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 gap-3">
+        <div className="border border-blue-100 rounded-lg p-3">
+          <h4 className="font-bold text-blue-700 mb-1 text-sm">
+            Profile Summary
+          </h4>
+          <p className="leading-relaxed whitespace-pre-wrap">{form.summary}</p>
+        </div>
+
+        <div className="border border-blue-100 rounded-lg p-3">
+          <h4 className="font-bold text-blue-700 mb-1 text-sm">Skills</h4>
+          <SectionBlock chips={form.skills} />
+        </div>
+
+        <div className="border border-blue-100 rounded-lg p-3">
+          <h4 className="font-bold text-blue-700 mb-1 text-sm">
+            Tools & Technologies
+          </h4>
+          <SectionBlock chips={form.tools} />
+        </div>
+
+        <div className="border border-blue-100 rounded-lg p-3">
+          <h4 className="font-bold text-blue-700 mb-1 text-sm">
+            Experience
+          </h4>
+          <ExperienceBlock form={form} />
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          <div className="border border-blue-100 rounded-lg p-3">
+            <h4 className="font-bold text-blue-700 mb-1 text-sm">
+              Education
+            </h4>
+            <p className="text-xs">{form.education}</p>
+          </div>
+          <div className="border border-blue-100 rounded-lg p-3">
+            <h4 className="font-bold text-blue-700 mb-1 text-sm">
+              Other Details
+            </h4>
+            <p className="text-xs">
+              Experience: {form.experience} Years
+              <br />
+              Notice Period: {form.noticePeriod}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* Template 5 – Simple ATS-Friendly Blue Underlines */
+function Template5({ form }) {
+  return (
+    <div className="text-gray-900 text-sm space-y-3">
+      <div className="text-center border-b pb-3">
+        <h2 className="text-2xl font-bold text-blue-700">
+          {form.fullName || "Your Name"}
+        </h2>
+        <p className="font-semibold">{form.roleTitle}</p>
+        <p className="text-xs mt-1">
+          {form.email} | {form.phone} | {form.location}
+        </p>
+        {form.linkedin && (
+          <p className="text-xs mt-1">LinkedIn: {form.linkedin}</p>
+        )}
+      </div>
+
+      <div>
+        <h4 className="font-bold text-blue-700 border-b border-blue-200 mb-1">
+          Profile Summary
+        </h4>
+        <p className="leading-relaxed whitespace-pre-wrap">{form.summary}</p>
+      </div>
+
+      <div>
+        <h4 className="font-bold text-blue-700 border-b border-blue-200 mb-1">
+          Skills
+        </h4>
+        <p className="leading-relaxed whitespace-pre-wrap">{form.skills}</p>
+      </div>
+
+      <div>
+        <h4 className="font-bold text-blue-700 border-b border-blue-200 mb-1">
+          Tools & Technologies
+        </h4>
+        <p className="leading-relaxed whitespace-pre-wrap">{form.tools}</p>
+      </div>
+
+      <div>
+        <h4 className="font-bold text-blue-700 border-b border-blue-200 mb-1">
+          Experience
+        </h4>
+        <p className="font-semibold text-sm">{form.currentCompany}</p>
+        <p className="italic text-xs mb-1">{form.currentRole}</p>
+        <pre className="whitespace-pre-wrap text-xs">
+          {form.responsibilities}
+        </pre>
+      </div>
+
+      <div>
+        <h4 className="font-bold text-blue-700 border-b border-blue-200 mb-1">
+          Education
+        </h4>
+        <p className="text-xs">{form.education}</p>
+      </div>
+
+      <div>
+        <h4 className="font-bold text-blue-700 border-b border-blue-200 mb-1">
+          Other Details
+        </h4>
+        <p className="text-xs">
+          Experience: {form.experience} Years
+          <br />
+          Notice Period: {form.noticePeriod}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+/* Shared helpers */
 
 function SectionBlock({ title, text, chips }) {
   return (
     <div>
-      <h4 className="font-bold text-gray-900 mb-1">{title}</h4>
+      {title && (
+        <h4 className="font-bold text-gray-900 mb-1 text-sm">{title}</h4>
+      )}
 
-      {text && <p className="leading-relaxed whitespace-pre-wrap">{text}</p>}
+      {text && (
+        <p className="leading-relaxed whitespace-pre-wrap text-sm">{text}</p>
+      )}
 
       {chips && (
         <div className="flex flex-wrap">
-          {chips.split(",").map((item, i) => (
-            <span
-              key={i}
-              className="bg-blue-100 text-blue-800 px-2 py-1 text-xs rounded-full mr-2 mb-2"
-            >
-              {item.trim()}
-            </span>
-          ))}
+          {chips.split(",").map(
+            (item, i) =>
+              item.trim() && (
+                <span
+                  key={i}
+                  className="bg-blue-100 text-blue-800 px-2 py-1 text-[11px] rounded-full mr-2 mb-2"
+                >
+                  {item.trim()}
+                </span>
+              )
+          )}
         </div>
       )}
     </div>
@@ -934,10 +1203,11 @@ function SectionBlock({ title, text, chips }) {
 function ExperienceBlock({ form }) {
   return (
     <div>
-      <h4 className="font-bold text-gray-900 mb-1">Experience</h4>
-      <p className="font-semibold">{form.currentCompany}</p>
-      <p className="italic text-gray-700 mb-1">{form.currentRole}</p>
-      <pre className="whitespace-pre-wrap">{form.responsibilities}</pre>
+      <p className="font-semibold text-sm">{form.currentCompany}</p>
+      <p className="italic text-xs mb-1">{form.currentRole}</p>
+      <pre className="whitespace-pre-wrap text-xs">
+        {form.responsibilities}
+      </pre>
     </div>
   );
 }
