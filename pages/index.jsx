@@ -192,15 +192,14 @@ export default function Home() {
       </h3>
       
 <p className="text-xl text-gray-700 leading-relaxed mb-8 max-w-lg">
-  In our coaching center, you will practice <strong>real production issues</strong> just like in top IT companies.  
-  You’ll learn how L1 and L2 engineers <strong>analyze logs 🔍, identify root causes 🧠, apply fixes 🛠️, and close tickets professionally ✔️.</strong>
+  In our coaching center, you will work on <strong>real production issues</strong> exactly like those handled in top IT companies.  
+  You will learn the complete L1 and L2 workflow — how engineers <strong>analyze logs, identify root causes, apply fixes, and close tickets with industry-standard procedures.</strong>
 </p>
 
 <p className="text-lg text-gray-600 leading-relaxed mb-10 max-w-lg">
-  These <strong>real industry tickets</strong> — provided directly in our classes — will help you <strong>speak confidently in interviews 🎤</strong>,  
-  solve real-time issues in your job 💼, and perform like an <strong>experienced IT engineer from Day 1 🚀.</strong>
+  These <strong>authentic industry tickets</strong>, practiced directly in our classes, will help you <strong>communicate confidently in interviews</strong>,  
+  troubleshoot real-time issues in your job, and perform like an <strong>experienced IT engineer from Day 1.</strong>
 </p>
-
 
       <a 
         href="/tickets"
