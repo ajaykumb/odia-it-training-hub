@@ -190,16 +190,17 @@ export default function Home() {
         Real-Time IT<br />
         <span className="text-blue-900">Ticket Simulator</span>
       </h3>
+      
+<p className="text-xl text-gray-700 leading-relaxed mb-8 max-w-lg">
+  In our coaching center, you will practice <strong>real production issues</strong> just like in top IT companies.  
+  You’ll learn how L1 and L2 engineers <strong>analyze logs 🔍, identify root causes 🧠, apply fixes 🛠️, and close tickets professionally ✔️.</strong>
+</p>
 
-      <p className="text-xl text-gray-700 leading-relaxed mb-8 max-w-lg">
-        In our coaching center, you will practice real production issues exactly like in top IT companies.
-        We provide hands-on training on how L1 and L2 engineers analyze logs,find root causes, fix issues, and close tickets professionally.
-      </p>
+<p className="text-lg text-gray-600 leading-relaxed mb-10 max-w-lg">
+  These <strong>real industry tickets</strong> — provided directly in our classes — will help you <strong>speak confidently in interviews 🎤</strong>,  
+  solve real-time issues in your job 💼, and perform like an <strong>experienced IT engineer from Day 1 🚀.</strong>
+</p>
 
-      <p className="text-lg text-gray-600 leading-relaxed mb-10 max-w-lg">
-        These real industry tickets provided directly in our classes will help you speak confidently in interviews,
-        solve real-time problems in your job, and perform like an experienced IT engineer from Day one.
-      </p>
 
       <a 
         href="/tickets"
