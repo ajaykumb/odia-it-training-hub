@@ -16,8 +16,7 @@ export default function Tickets() {
 
       {/* HERO SECTION */}
       <section className="py-20 bg-gradient-to-br from-blue-800 to-indigo-900 text-white text-center relative overflow-hidden">
-        <div className="absolute inset-0 opacity-10">
-        </div>
+        <div className="absolute inset-0 opacity-10"></div>
 
         <h1 className="text-5xl font-extrabold mb-4">Real-Time IT Ticket Simulator</h1>
         <p className="text-xl max-w-3xl mx-auto opacity-90 leading-relaxed">
@@ -27,7 +26,7 @@ export default function Tickets() {
 
         <div className="mt-10 flex flex-wrap justify-center gap-4">
           {[
-            "SQL", "Linux", "Autosys", "Control-M", "Splunk", "Dynatrace", 
+            "SQL", "Linux", "Autosys", "Control-M", "Splunk", "Dynatrace",
             "Java", "API", "ETL", "AWS", "Shell Script"
           ].map((cat) => (
             <a
@@ -41,14 +40,86 @@ export default function Tickets() {
         </div>
       </section>
 
+      {/* 📊 ANALYTICS DASHBOARD */}
+      <section className="max-w-6xl mx-auto px-6 py-12 mt-10">
+        <h2 className="text-3xl font-extrabold text-blue-700 mb-6 text-center">
+          📊 Ticket Analytics Dashboard
+        </h2>
+
+        {/* FIRST ROW */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+          <div className="bg-white p-6 rounded-xl shadow-xl border-l-8 border-blue-600">
+            <p className="text-gray-500 font-semibold">Total Tickets</p>
+            <h3 className="text-4xl font-extrabold text-blue-700 mt-2">12</h3>
+          </div>
+
+          <div className="bg-white p-6 rounded-xl shadow-xl border-l-8 border-green-600">
+            <p className="text-gray-500 font-semibold">Categories Covered</p>
+            <h3 className="text-4xl font-extrabold text-green-700 mt-2">11</h3>
+          </div>
+
+          <div className="bg-white p-6 rounded-xl shadow-xl border-l-8 border-purple-600">
+            <p className="text-gray-500 font-semibold">Tools & Technologies</p>
+            <h3 className="text-4xl font-extrabold text-purple-700 mt-2">14+</h3>
+          </div>
+
+        </div>
+
+        {/* SECOND ROW */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+
+          <div className="bg-white p-6 rounded-xl shadow-xl border-l-8 border-yellow-500">
+            <h3 className="text-xl font-bold text-gray-800 mb-2">🔥 Most Common Issue Type</h3>
+            <p className="text-gray-700">Application Errors & Job Failures</p>
+            <p className="text-gray-500 text-sm mt-2">Based on real industry experience</p>
+          </div>
+
+          <div className="bg-white p-6 rounded-xl shadow-xl border-l-8 border-red-500">
+            <h3 className="text-xl font-bold text-gray-800 mb-2">⚡ Ticket Difficulty Levels</h3>
+
+            <ul className="text-gray-700 space-y-1">
+              <li>🟢 Beginner – 4 Tickets</li>
+              <li>🟡 Intermediate – 5 Tickets</li>
+              <li>🔴 Advanced – 3 Tickets</li>
+            </ul>
+
+            <p className="text-sm text-gray-500 mt-2">
+              Balanced to prepare you for L1 & L2 job roles
+            </p>
+          </div>
+
+        </div>
+
+        {/* THIRD ROW */}
+        <div className="bg-white p-6 rounded-xl shadow-xl border-l-8 border-indigo-600 mt-8">
+          <h3 className="text-xl font-bold text-gray-800 mb-3">📁 Tools Covered in These Tickets</h3>
+
+          <div className="flex flex-wrap gap-3">
+            {[
+              "SQL", "PL/SQL", "Linux", "Shell Script", "Autosys",
+              "Control-M", "Splunk", "Dynatrace", "API Debugging",
+              "Java", "ETL", "AWS", "Grafana", "ITIL"
+            ].map((tool) => (
+              <span
+                key={tool}
+                className="px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-semibold shadow"
+              >
+                {tool}
+              </span>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* CATEGORY COMPONENT */}
       <Section id="SQL" title="SQL & PL/SQL Tickets">
         <Ticket title="SQL Query Running Slow" tools="🗄 SQL | ⚡ Performance"
-          border="border-blue-600" 
+          border="border-blue-600"
           symptoms="Report taking 20 minutes instead of 30 seconds."
           log="Full table scan detected."
           rootCause="Missing index on STATUS column."
-          resolution="Created index → Query improved dramatically." 
+          resolution="Created index → Query improved dramatically."
         />
 
         <Ticket title="ORA-00001 Unique Constraint Error" tools="🗄 SQL | ❌ Constraint"
