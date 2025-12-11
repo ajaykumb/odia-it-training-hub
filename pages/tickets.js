@@ -438,8 +438,8 @@ function InterviewSection() {
   );
 }
 
-/* ---------------- RESUME EDITOR — Resume.io EXACT FORMAT ---------------- */
 
+/* ---------------- RESUME EDITOR with 10 Templates + PDF/DOC Download ---------------- */
 function ResumeIOLayout() {
   const [form, setForm] = useState({
     fullName: "",
@@ -458,173 +458,638 @@ function ResumeIOLayout() {
     declaration: "",
   });
 
-  const handleInput = (key, val) => setForm({ ...form, [key]: val });
+  const [selectedTemplate, setSelectedTemplate] = useState("template1");
+  const previewRef = useRef(null);
 
+  const handleInput = (key, val) =>
+    setForm((p) => ({ ...p, [key]: val }));
+
+  // Helpers for rendering lists safely
+  const safeArray = (arr) =>
+    Array.isArray(arr) ? arr.filter(Boolean).map((s) => s.trim()) : [];
+
+  /* ---------------- PDF Download ---------------- */
+  const downloadPDF = async () => {
+    if (!previewRef.current) return alert("Preview not ready.");
+
+    try {
+      // dynamic import so build won't break on server-side
+      const html2canvasModule = await import("html2canvas");
+      const jsPDFModule = await import("jspdf");
+      const html2canvas = html2canvasModule.default;
+      const { default: jsPDF } = jsPDFModule;
+
+      // increase scale for better quality
+      const canvas = await html2canvas(previewRef.current, {
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+      });
+
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF("p", "mm", "a4");
+      const pageWidth = 210; // mm
+      const pageHeight = 297; // mm
+      const imgWidth = pageWidth;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+      let position = 0;
+      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+
+      let heightLeft = imgHeight - pageHeight;
+      while (heightLeft > 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
+
+      const filename = `${(form.fullName || "Resume").replace(/\s+/g, "_")}.pdf`;
+      pdf.save(filename);
+    } catch (err) {
+      console.error(err);
+      alert("PDF generation failed. Please open the console for details.");
+    }
+  };
+
+  /* ---------------- DOC Download (.doc via HTML) ----------------
+     This creates an HTML document and downloads with application/msword.
+     Word will open the HTML and preserve styles inline.
+  */
+  const downloadDOC = () => {
+    if (!previewRef.current) return alert("Preview not ready.");
+
+    const header = `
+      <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+      <head><meta charset="utf-8"><title>Resume</title></head><body>
+    `;
+
+    // Use outerHTML for the preview; inline minimal styling for Word compatibility
+    const previewHtml = previewRef.current.outerHTML;
+    const footer = "</body></html>";
+
+    const html = header + previewHtml + footer;
+    const blob = new Blob(["\ufeff", html], { type: "application/msword" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${(form.fullName || "Resume").replace(/\s+/g, "_")}.doc`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  /* ---------------- Template renderer (10 templates) ---------------- */
+  const TemplateRenderer = ({ which }) => {
+    // common values
+    const skills = safeArray(form.skills);
+    const languages = safeArray(form.languages);
+
+    switch (which) {
+      /* 1 — Modern Blue (two-column left skills) */
+      case "template1":
+        return (
+          <div className="text-gray-900 bg-white p-8" ref={previewRef}>
+            <div className="grid grid-cols-3 gap-6">
+              <div className="col-span-1 pr-4 border-r">
+                <h3 className="text-xl font-bold text-blue-700 mb-2">Key Skills</h3>
+                <ul className="list-disc ml-5 text-sm space-y-1">
+                  {skills.map((s,i)=> <li key={i}>{s}</li>)}
+                </ul>
+
+                <h3 className="text-xl font-bold text-blue-700 mt-6 mb-2">Languages</h3>
+                <ul className="list-disc ml-5 text-sm space-y-1">
+                  {languages.map((l,i)=> <li key={i}>{l}</li>)}
+                </ul>
+              </div>
+
+              <div className="col-span-2">
+                <h1 className="text-3xl font-extrabold text-blue-700">{form.fullName || "YOUR NAME"}</h1>
+                <p className="uppercase text-sm font-semibold text-gray-700">{form.roleTitle}</p>
+                <div className="my-4 border-b-4 w-24 border-blue-600"></div>
+
+                <div className="text-sm text-gray-700">
+                  <p><strong>Phone:</strong> {form.phone}</p>
+                  <p><strong>Email:</strong> {form.email}</p>
+                  <p><strong>Location:</strong> {form.location}</p>
+                </div>
+
+                <section className="mt-6">
+                  <h4 className="font-bold">Profile Summary</h4>
+                  <p className="whitespace-pre-line">{form.summary}</p>
+                </section>
+
+                <section className="mt-4">
+                  <h4 className="font-bold">Work Experience</h4>
+                  <p className="whitespace-pre-line">{form.workExperience}</p>
+                </section>
+
+                <section className="mt-4">
+                  <h4 className="font-bold">Education</h4>
+                  <p className="whitespace-pre-line">{form.education}</p>
+                </section>
+
+                <section className="mt-4">
+                  <h4 className="font-bold">Project Description</h4>
+                  <p className="whitespace-pre-line">{form.projectDesc}</p>
+                </section>
+
+                <section className="mt-4">
+                  <h4 className="font-bold">Roles & Responsibilities</h4>
+                  <p className="whitespace-pre-line">{form.responsibilities}</p>
+                </section>
+
+                <section className="mt-4">
+                  <h4 className="font-bold">Declaration</h4>
+                  <p className="whitespace-pre-line">{form.declaration}</p>
+                </section>
+              </div>
+            </div>
+          </div>
+        );
+
+      /* 2 — ATS Minimal (single column, simple headings) */
+      case "template2":
+        return (
+          <div className="bg-white p-8 text-black" ref={previewRef}>
+            <h1 className="text-2xl font-bold">{form.fullName || "YOUR NAME"}</h1>
+            <p className="text-sm text-gray-700">{form.roleTitle}</p>
+            <p className="text-xs text-gray-600 mt-1">{form.email} | {form.phone} | {form.location}</p>
+
+            <hr className="my-4" />
+            <h3 className="font-bold">Profile Summary</h3>
+            <p className="whitespace-pre-line">{form.summary}</p>
+
+            <h3 className="font-bold mt-4">Skills</h3>
+            <p>{skills.join(", ")}</p>
+
+            <h3 className="font-bold mt-4">Experience</h3>
+            <p className="whitespace-pre-line">{form.workExperience}</p>
+
+            <h3 className="font-bold mt-4">Projects</h3>
+            <p className="whitespace-pre-line">{form.projectDesc}</p>
+
+            <h3 className="font-bold mt-4">Education</h3>
+            <p className="whitespace-pre-line">{form.education}</p>
+
+            <h3 className="font-bold mt-4">Declaration</h3>
+            <p className="whitespace-pre-line">{form.declaration}</p>
+          </div>
+        );
+
+      /* 3 — Executive Dark (dark header, two-column) */
+      case "template3":
+        return (
+          <div className="bg-white p-8" ref={previewRef}>
+            <div className="bg-gray-900 text-white p-4 rounded-md">
+              <h1 className="text-2xl font-bold">{form.fullName || "YOUR NAME"}</h1>
+              <p className="text-sm">{form.roleTitle}</p>
+            </div>
+
+            <div className="grid grid-cols-3 gap-6 mt-4">
+              <div className="col-span-2">
+                <h4 className="font-bold">Profile</h4>
+                <p className="whitespace-pre-line">{form.summary}</p>
+
+                <h4 className="font-bold mt-4">Experience</h4>
+                <p className="whitespace-pre-line">{form.workExperience}</p>
+
+                <h4 className="font-bold mt-4">Projects</h4>
+                <p className="whitespace-pre-line">{form.projectDesc}</p>
+              </div>
+
+              <div className="col-span-1 border-l pl-4">
+                <h4 className="font-bold">Contact</h4>
+                <p>{form.email}</p>
+                <p>{form.phone}</p>
+                <p>{form.location}</p>
+
+                <h4 className="font-bold mt-4">Skills</h4>
+                <ul className="list-disc ml-5">{skills.map((s,i)=><li key={i}>{s}</li>)}</ul>
+
+                <h4 className="font-bold mt-4">Education</h4>
+                <p className="whitespace-pre-line">{form.education}</p>
+              </div>
+            </div>
+
+            <div className="mt-6">
+              <h4 className="font-bold">Declaration</h4>
+              <p className="whitespace-pre-line">{form.declaration}</p>
+            </div>
+          </div>
+        );
+
+      /* 4 — Two-column MNC (Left profile details, Right experience) */
+      case "template4":
+        return (
+          <div className="bg-white p-8" ref={previewRef}>
+            <div className="grid grid-cols-2 gap-6">
+              <div>
+                <h2 className="text-xl font-bold text-blue-700">{form.fullName || "YOUR NAME"}</h2>
+                <p className="text-sm">{form.roleTitle}</p>
+
+                <h4 className="font-bold mt-4">Contact</h4>
+                <p>{form.phone}</p>
+                <p>{form.email}</p>
+                <p>{form.location}</p>
+
+                <h4 className="font-bold mt-4">Skills</h4>
+                <ul className="list-disc ml-5">{skills.map((s,i)=><li key={i}>{s}</li>)}</ul>
+
+                <h4 className="font-bold mt-4">Languages</h4>
+                <p>{languages.join(", ")}</p>
+
+                <h4 className="font-bold mt-4">Education</h4>
+                <p>{form.education}</p>
+              </div>
+
+              <div>
+                <h4 className="font-bold">Profile Summary</h4>
+                <p className="whitespace-pre-line">{form.summary}</p>
+
+                <h4 className="font-bold mt-4">Work Experience</h4>
+                <p className="whitespace-pre-line">{form.workExperience}</p>
+
+                <h4 className="font-bold mt-4">Project Description</h4>
+                <p className="whitespace-pre-line">{form.projectDesc}</p>
+
+                <h4 className="font-bold mt-4">Roles & Responsibilities</h4>
+                <p className="whitespace-pre-line">{form.responsibilities}</p>
+
+                <h4 className="font-bold mt-4">Declaration</h4>
+                <p className="whitespace-pre-line">{form.declaration}</p>
+              </div>
+            </div>
+          </div>
+        );
+
+      /* 5 — Clean Corporate */
+      case "template5":
+        return (
+          <div className="bg-white p-8" ref={previewRef}>
+            <div className="text-center">
+              <h1 className="text-2xl font-bold">{form.fullName || "YOUR NAME"}</h1>
+              <p className="text-sm text-gray-700">{form.roleTitle}</p>
+            </div>
+
+            <div className="mt-4">
+              <h4 className="font-bold">Summary</h4>
+              <p className="whitespace-pre-line">{form.summary}</p>
+
+              <h4 className="font-bold mt-4">Skills</h4>
+              <p>{skills.join(", ")}</p>
+
+              <h4 className="font-bold mt-4">Experience</h4>
+              <p className="whitespace-pre-line">{form.workExperience}</p>
+
+              <h4 className="font-bold mt-4">Projects</h4>
+              <p className="whitespace-pre-line">{form.projectDesc}</p>
+
+              <h4 className="font-bold mt-4">Education</h4>
+              <p>{form.education}</p>
+
+              <h4 className="font-bold mt-4">Declaration</h4>
+              <p className="whitespace-pre-line">{form.declaration}</p>
+            </div>
+          </div>
+        );
+
+      /* 6 — Consulting / Deloitte style (two columns with highlights) */
+      case "template6":
+        return (
+          <div className="bg-white p-8" ref={previewRef}>
+            <div className="flex justify-between items-start">
+              <div>
+                <h1 className="text-2xl font-bold">{form.fullName || "YOUR NAME"}</h1>
+                <p className="text-sm">{form.roleTitle}</p>
+              </div>
+              <div className="text-sm text-right">
+                <p>{form.email}</p>
+                <p>{form.phone}</p>
+                <p>{form.location}</p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-3 gap-6 mt-4">
+              <div className="col-span-2">
+                <h4 className="font-bold">Profile</h4>
+                <p className="whitespace-pre-line">{form.summary}</p>
+
+                <h4 className="font-bold mt-4">Experience</h4>
+                <p className="whitespace-pre-line">{form.workExperience}</p>
+
+                <h4 className="font-bold mt-4">Projects</h4>
+                <p className="whitespace-pre-line">{form.projectDesc}</p>
+              </div>
+
+              <div className="col-span-1 border-l pl-4">
+                <h4 className="font-bold">Skills</h4>
+                <ul className="list-disc ml-5">{skills.map((s,i)=><li key={i}>{s}</li>)}</ul>
+
+                <h4 className="font-bold mt-4">Education</h4>
+                <p>{form.education}</p>
+              </div>
+            </div>
+
+            <div className="mt-6">
+              <h4 className="font-bold">Declaration</h4>
+              <p className="whitespace-pre-line">{form.declaration}</p>
+            </div>
+          </div>
+        );
+
+      /* 7 — Creative (left colored bar, more spacing) */
+      case "template7":
+        return (
+          <div className="bg-white p-8" ref={previewRef}>
+            <div className="flex">
+              <div className="w-1/4 pr-6 border-r">
+                <h2 className="text-lg font-bold">{form.fullName || "YOUR NAME"}</h2>
+                <p className="text-sm">{form.roleTitle}</p>
+
+                <h4 className="font-bold mt-4">Contact</h4>
+                <p className="text-sm">{form.email}</p>
+                <p className="text-sm">{form.phone}</p>
+
+                <h4 className="font-bold mt-4">Skills</h4>
+                <ul className="list-disc ml-5">{skills.map((s,i)=><li key={i}>{s}</li>)}</ul>
+              </div>
+
+              <div className="w-3/4 pl-6">
+                <h4 className="font-bold">Summary</h4>
+                <p className="whitespace-pre-line">{form.summary}</p>
+
+                <h4 className="font-bold mt-4">Experience</h4>
+                <p className="whitespace-pre-line">{form.workExperience}</p>
+
+                <h4 className="font-bold mt-4">Projects</h4>
+                <p className="whitespace-pre-line">{form.projectDesc}</p>
+
+                <h4 className="font-bold mt-4">Declaration</h4>
+                <p className="whitespace-pre-line">{form.declaration}</p>
+              </div>
+            </div>
+          </div>
+        );
+
+      /* 8 — Simple Serif (print-friendly) */
+      case "template8":
+        return (
+          <div className="bg-white p-8 font-serif" ref={previewRef}>
+            <h1 className="text-2xl font-bold">{form.fullName || "YOUR NAME"}</h1>
+            <p className="text-sm">{form.roleTitle}</p>
+
+            <h4 className="font-bold mt-4">Profile</h4>
+            <p className="whitespace-pre-line">{form.summary}</p>
+
+            <h4 className="font-bold mt-4">Skills</h4>
+            <p>{skills.join(", ")}</p>
+
+            <h4 className="font-bold mt-4">Experience</h4>
+            <p className="whitespace-pre-line">{form.workExperience}</p>
+
+            <h4 className="font-bold mt-4">Projects</h4>
+            <p className="whitespace-pre-line">{form.projectDesc}</p>
+
+            <h4 className="font-bold mt-4">Education</h4>
+            <p>{form.education}</p>
+
+            <h4 className="font-bold mt-4">Declaration</h4>
+            <p>{form.declaration}</p>
+          </div>
+        );
+
+      /* 9 — Technical (compact, code-style blocks) */
+      case "template9":
+        return (
+          <div className="bg-white p-6" ref={previewRef}>
+            <div className="flex justify-between items-start">
+              <div>
+                <h1 className="text-xl font-bold">{form.fullName || "YOUR NAME"}</h1>
+                <p className="text-sm">{form.roleTitle}</p>
+              </div>
+              <div className="text-sm text-right">
+                <p>{form.email}</p>
+                <p>{form.phone}</p>
+                <p>{form.location}</p>
+              </div>
+            </div>
+
+            <div className="mt-4 grid grid-cols-2 gap-6">
+              <div>
+                <h4 className="font-bold">Skills</h4>
+                <pre className="whitespace-pre-wrap bg-gray-50 p-3 rounded text-sm">{skills.join(", ")}</pre>
+
+                <h4 className="font-bold mt-4">Projects</h4>
+                <pre className="whitespace-pre-wrap bg-gray-50 p-3 rounded text-sm">{form.projectDesc}</pre>
+              </div>
+
+              <div>
+                <h4 className="font-bold">Summary</h4>
+                <p className="whitespace-pre-line">{form.summary}</p>
+
+                <h4 className="font-bold mt-4">Experience</h4>
+                <p className="whitespace-pre-line">{form.workExperience}</p>
+              </div>
+            </div>
+
+            <div className="mt-4">
+              <h4 className="font-bold">Declaration</h4>
+              <p className="whitespace-pre-line">{form.declaration}</p>
+            </div>
+          </div>
+        );
+
+      /* 10 — Premium Resume.io inspired */
+      case "template10":
+        return (
+          <div className="bg-white p-8" ref={previewRef}>
+            <div className="flex justify-between">
+              <div>
+                <h1 className="text-3xl font-extrabold text-blue-700">{form.fullName || "YOUR NAME"}</h1>
+                <p className="text-sm font-semibold">{form.roleTitle}</p>
+              </div>
+
+              <div className="text-sm">
+                <p>{form.email}</p>
+                <p>{form.phone}</p>
+                <p>{form.location}</p>
+              </div>
+            </div>
+
+            <div className="mt-6">
+              <h4 className="font-bold">Profile</h4>
+              <p className="whitespace-pre-line">{form.summary}</p>
+            </div>
+
+            <div className="mt-4 grid grid-cols-2 gap-6">
+              <div>
+                <h4 className="font-bold">Experience</h4>
+                <p className="whitespace-pre-line">{form.workExperience}</p>
+                <h4 className="font-bold mt-4">Projects</h4>
+                <p className="whitespace-pre-line">{form.projectDesc}</p>
+              </div>
+
+              <div>
+                <h4 className="font-bold">Skills</h4>
+                <ul className="list-disc ml-5">{skills.map((s,i)=><li key={i}>{s}</li>)}</ul>
+
+                <h4 className="font-bold mt-4">Education</h4>
+                <p>{form.education}</p>
+
+                <h4 className="font-bold mt-4">Declaration</h4>
+                <p>{form.declaration}</p>
+              </div>
+            </div>
+          </div>
+        );
+
+      default:
+        return <div ref={previewRef}>Select a template</div>;
+    }
+  };
+
+  /* ---------------- UI ---------------- */
   return (
     <section className="py-20 bg-gray-100">
-      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 px-6">
+      <div className="max-w-7xl mx-auto px-6">
 
-        {/* LEFT SIDE — EDITOR */}
-        <div className="bg-white shadow rounded-xl p-6 space-y-5">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h2 className="text-2xl font-bold text-gray-800">Resume Editor</h2>
+            <p className="text-sm text-gray-600">
+              Fill details on left (existing editor) — choose template → download.
+            </p>
+          </div>
 
-          <h2 className="text-2xl font-bold">Resume Editor</h2>
+          <div className="flex items-center gap-3">
+            <label className="text-sm font-medium">Template</label>
+            <select
+              className="border rounded px-3 py-2"
+              value={selectedTemplate}
+              onChange={(e) => setSelectedTemplate(e.target.value)}
+            >
+              <option value="template1">Modern Blue (Two-column)</option>
+              <option value="template2">ATS Minimal</option>
+              <option value="template3">Executive Dark</option>
+              <option value="template4">Two-column MNC</option>
+              <option value="template5">Clean Corporate</option>
+              <option value="template6">Consulting (Deloitte-style)</option>
+              <option value="template7">Creative Layout</option>
+              <option value="template8">Simple Serif (Print)</option>
+              <option value="template9">Technical Compact</option>
+              <option value="template10">Premium Resume.io</option>
+            </select>
 
-          {/* PERSONAL DETAILS */}
-          <details className="border rounded-lg px-4 py-3">
-            <summary className="cursor-pointer font-semibold">Personal Details</summary>
+            <button
+              onClick={downloadPDF}
+              className="bg-green-600 text-white rounded px-3 py-2 text-sm hover:bg-green-700"
+            >
+              📄 Download PDF
+            </button>
 
-            <div className="mt-3 space-y-3">
-              <input className="inputbox" placeholder="Full Name" 
-                onChange={(e)=>handleInput("fullName",e.target.value)} />
-
-              <input className="inputbox" placeholder="Job Title" 
-                onChange={(e)=>handleInput("roleTitle",e.target.value)} />
-
-              <input className="inputbox" placeholder="Phone" 
-                onChange={(e)=>handleInput("phone",e.target.value)} />
-
-              <input className="inputbox" placeholder="Email" 
-                onChange={(e)=>handleInput("email",e.target.value)} />
-
-              <input className="inputbox" placeholder="Location" 
-                onChange={(e)=>handleInput("location",e.target.value)} />
-
-              <input className="inputbox" placeholder="Total Experience" 
-                onChange={(e)=>handleInput("experience",e.target.value)} />
-            </div>
-          </details>
-
-          {/* PROFILE SUMMARY */}
-          <details className="border rounded-lg px-4 py-3">
-            <summary className="cursor-pointer font-semibold">Profile Summary</summary>
-            <textarea rows="4" className="inputbox mt-3"
-              onChange={(e)=>handleInput("summary",e.target.value)}
-              placeholder="Write your profile summary..." />
-          </details>
-
-          {/* KEY SKILLS */}
-          <details className="border rounded-lg px-4 py-3">
-            <summary className="cursor-pointer font-semibold">Key Skills</summary>
-            <textarea rows="3" className="inputbox mt-3"
-              placeholder="Comma separated skills"
-              onChange={(e)=>handleInput("skills",e.target.value.split(","))} />
-          </details>
-
-          {/* LANGUAGES */}
-          <details className="border rounded-lg px-4 py-3">
-            <summary className="cursor-pointer font-semibold">Languages</summary>
-            <textarea rows="3" className="inputbox mt-3"
-              placeholder="Comma separated languages"
-              onChange={(e)=>handleInput("languages",e.target.value.split(","))} />
-          </details>
-
-          {/* WORK EXPERIENCE */}
-          <details className="border rounded-lg px-4 py-3">
-            <summary className="cursor-pointer font-semibold">Work Experience</summary>
-            <textarea rows="4" className="inputbox mt-3"
-              onChange={(e)=>handleInput("workExperience",e.target.value)}
-              placeholder="Company, Duration, Responsibilities..." />
-          </details>
-
-          {/* EDUCATION */}
-          <details className="border rounded-lg px-4 py-3">
-            <summary className="cursor-pointer font-semibold">Education</summary>
-            <textarea rows="3" className="inputbox mt-3"
-              onChange={(e)=>handleInput("education",e.target.value)}
-              placeholder="Degree, College, Year of Passing" />
-          </details>
-
-          {/* PROJECT DESCRIPTION */}
-          <details className="border rounded-lg px-4 py-3">
-            <summary className="cursor-pointer font-semibold">Project Description</summary>
-            <textarea rows="4" className="inputbox mt-3"
-              onChange={(e)=>handleInput("projectDesc",e.target.value)}
-              placeholder="Explain your project with responsibilities, tools, achievements..." />
-          </details>
-
-          {/* ROLES & RESPONSIBILITIES */}
-          <details className="border rounded-lg px-4 py-3">
-            <summary className="cursor-pointer font-semibold">Roles & Responsibilities</summary>
-            <textarea rows="4" className="inputbox mt-3"
-              onChange={(e)=>handleInput("responsibilities",e.target.value)}
-              placeholder="Write responsibilities in bullet points" />
-          </details>
-
-          {/* DECLARATION */}
-          <details className="border rounded-lg px-4 py-3">
-            <summary className="cursor-pointer font-semibold">Declaration</summary>
-            <textarea rows="3" className="inputbox mt-3"
-              onChange={(e)=>handleInput("declaration",e.target.value)}
-              placeholder="Write your declaration..." />
-          </details>
-
+            <button
+              onClick={downloadDOC}
+              className="bg-indigo-600 text-white rounded px-3 py-2 text-sm hover:bg-indigo-700"
+            >
+              📁 Download DOC
+            </button>
+          </div>
         </div>
 
-        {/* RIGHT SIDE — PREVIEW */}
-        <div className="bg-white rounded-xl shadow p-10">
+        {/* Main layout: left editor (reuse your editor) + right preview */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {/* LEFT: Editor (reuse existing fields) */}
+          <div className="bg-white rounded-2xl shadow p-6 space-y-4">
+            {/* NOTE: This editor is intentionally duplicated here to be self-contained.
+                If you already render editor fields elsewhere, keep them in sync by
+                controlling the same `form` state. */}
+            <div>
+              <label className="block text-sm font-semibold">Full Name</label>
+              <input className="inputbox mt-1" onChange={(e)=>handleInput("fullName", e.target.value)} value={form.fullName}/>
+            </div>
 
-          {/* NAME + TITLE */}
-          <h1 className="text-3xl font-bold text-blue-700">
-            {form.fullName || "YOUR NAME"}
-          </h1>
-          <p className="uppercase font-semibold text-sm">{form.roleTitle}</p>
+            <div>
+              <label className="block text-sm font-semibold">Job Title</label>
+              <input className="inputbox mt-1" onChange={(e)=>handleInput("roleTitle", e.target.value)} value={form.roleTitle}/>
+            </div>
 
-          <div className="w-28 border-b-4 border-blue-600 my-4"></div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-sm font-semibold">Phone</label>
+                <input className="inputbox mt-1" onChange={(e)=>handleInput("phone", e.target.value)} value={form.phone}/>
+              </div>
+              <div>
+                <label className="block text-sm font-semibold">Email</label>
+                <input className="inputbox mt-1" onChange={(e)=>handleInput("email", e.target.value)} value={form.email}/>
+              </div>
+            </div>
 
-          {/* RIGHT SIDE CONTACT */}
-          <div className="grid grid-cols-2 mt-8 mb-4">
-            <div></div>
-            <div className="text-sm space-y-1 border-l pl-4">
-              <p><b>Phone:</b> {form.phone}</p>
-              <p><b>Email:</b> {form.email}</p>
-              <p><b>Location:</b> {form.location}</p>
-              <p><b>Experience:</b> {form.experience}</p>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-sm font-semibold">Location</label>
+                <input className="inputbox mt-1" onChange={(e)=>handleInput("location", e.target.value)} value={form.location}/>
+              </div>
+              <div>
+                <label className="block text-sm font-semibold">Experience</label>
+                <input className="inputbox mt-1" onChange={(e)=>handleInput("experience", e.target.value)} value={form.experience}/>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold">Profile Summary</label>
+              <textarea className="inputbox mt-1" rows={3} onChange={(e)=>handleInput("summary", e.target.value)} value={form.summary}/>
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold">Skills (comma separated)</label>
+              <textarea className="inputbox mt-1" rows={2} onChange={(e)=>handleInput("skills", e.target.value.split(","))} value={Array.isArray(form.skills)?form.skills.join(", "):form.skills}/>
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold">Languages (comma separated)</label>
+              <textarea className="inputbox mt-1" rows={2} onChange={(e)=>handleInput("languages", e.target.value.split(","))} value={Array.isArray(form.languages)?form.languages.join(", "):form.languages}/>
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold">Work Experience</label>
+              <textarea className="inputbox mt-1" rows={3} onChange={(e)=>handleInput("workExperience", e.target.value)} value={form.workExperience}/>
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold">Education</label>
+              <input className="inputbox mt-1" onChange={(e)=>handleInput("education", e.target.value)} value={form.education}/>
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold">Project Description</label>
+              <textarea className="inputbox mt-1" rows={3} onChange={(e)=>handleInput("projectDesc", e.target.value)} value={form.projectDesc}/>
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold">Roles & Responsibilities</label>
+              <textarea className="inputbox mt-1" rows={3} onChange={(e)=>handleInput("responsibilities", e.target.value)} value={form.responsibilities}/>
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold">Declaration</label>
+              <textarea className="inputbox mt-1" rows={2} onChange={(e)=>handleInput("declaration", e.target.value)} value={form.declaration}/>
             </div>
           </div>
 
-          {/* PROFILE SUMMARY */}
-          <h2 className="heading">Profile Summary</h2>
-          <p className="text-gray-700">{form.summary}</p>
-
-          {/* KEY SKILLS */}
-          <h2 className="heading mt-6">Key Skills</h2>
-          <ul className="list-disc ml-6 text-gray-700">
-            {form.skills.map((s,i)=><li key={i}>{s}</li>)}
-          </ul>
-
-          {/* LANGUAGES */}
-          <h2 className="heading mt-6">Languages</h2>
-          <ul className="list-disc ml-6 text-gray-700">
-            {form.languages.map((l,i)=><li key={i}>{l}</li>)}
-          </ul>
-
-          {/* WORK EXPERIENCE */}
-          <h2 className="heading mt-6">Work Experience</h2>
-          <p className="text-gray-700 whitespace-pre-line">{form.workExperience}</p>
-
-          {/* EDUCATION */}
-          <h2 className="heading mt-6">Education</h2>
-          <p className="text-gray-700 whitespace-pre-line">{form.education}</p>
-
-          {/* PROJECT DESCRIPTION */}
-          <h2 className="heading mt-6">Project Description</h2>
-          <p className="text-gray-700 whitespace-pre-line">{form.projectDesc}</p>
-
-          {/* ROLES & RESPONSIBILITIES */}
-          <h2 className="heading mt-6">Roles & Responsibilities</h2>
-          <p className="text-gray-700 whitespace-pre-line">{form.responsibilities}</p>
-
-          {/* DECLARATION */}
-          <h2 className="heading mt-6">Declaration</h2>
-          <p className="text-gray-700 whitespace-pre-line">{form.declaration}</p>
-
+          {/* RIGHT: Preview (renders selected template) */}
+          <div className="bg-white rounded-2xl shadow p-4 overflow-hidden">
+            <div className="border border-gray-100 rounded-lg overflow-hidden">
+              <TemplateRenderer which={selectedTemplate} />
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* STYLES */}
       <style>{`
-        .inputbox { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; }
-        .heading { font-size: 18px; font-weight: bold; margin-top: 20px; }
+        .inputbox { width: 100%; padding: 9px 12px; border: 1px solid #e5e7eb; border-radius: 8px; }
+        .inputbox:focus { outline: none; box-shadow: 0 0 0 3px rgba(59,130,246,0.08); border-color: #3b82f6; }
       `}</style>
     </section>
   );
