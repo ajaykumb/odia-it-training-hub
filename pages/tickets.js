@@ -439,7 +439,7 @@ function InterviewSection() {
 }
 
 
-/* ---------------- RESUME EDITOR with 10 Templates + PDF/DOC Download ---------------- */
+/* ---------------- RESUME EDITOR with 10 Templates (ALL FIELDS) + PDF/DOC ---------------- */
 function ResumeIOLayout() {
   const [form, setForm] = useState({
     fullName: "",
@@ -461,35 +461,43 @@ function ResumeIOLayout() {
   const [selectedTemplate, setSelectedTemplate] = useState("template1");
   const previewRef = useRef(null);
 
-  const handleInput = (key, val) =>
+  const handleInput = (key, val) => {
     setForm((p) => ({ ...p, [key]: val }));
+  };
 
-  // Helpers for rendering lists safely
-  const safeArray = (arr) =>
-    Array.isArray(arr) ? arr.filter(Boolean).map((s) => s.trim()) : [];
+  const safeArray = (v) => {
+    if (!v) return [];
+    if (Array.isArray(v)) return v.filter(Boolean).map((s) => String(s).trim());
+    return String(v)
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
+  };
 
   /* ---------------- PDF Download ---------------- */
   const downloadPDF = async () => {
     if (!previewRef.current) return alert("Preview not ready.");
 
     try {
-      // dynamic import so build won't break on server-side
       const html2canvasModule = await import("html2canvas");
       const jsPDFModule = await import("jspdf");
       const html2canvas = html2canvasModule.default;
       const { default: jsPDF } = jsPDFModule;
 
-      // increase scale for better quality
-      const canvas = await html2canvas(previewRef.current, {
+      const element = previewRef.current;
+
+      // temporarily expand width for A4-like capture if needed
+      const canvas = await html2canvas(element, {
         scale: 2,
         useCORS: true,
         allowTaint: true,
+        logging: false,
       });
 
       const imgData = canvas.toDataURL("image/png");
       const pdf = new jsPDF("p", "mm", "a4");
-      const pageWidth = 210; // mm
-      const pageHeight = 297; // mm
+      const pageWidth = 210;
+      const pageHeight = 297;
       const imgWidth = pageWidth;
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
@@ -507,27 +515,25 @@ function ResumeIOLayout() {
       const filename = `${(form.fullName || "Resume").replace(/\s+/g, "_")}.pdf`;
       pdf.save(filename);
     } catch (err) {
-      console.error(err);
-      alert("PDF generation failed. Please open the console for details.");
+      console.error("PDF error:", err);
+      alert("PDF generation failed — check console for details.");
     }
   };
 
-  /* ---------------- DOC Download (.doc via HTML) ----------------
-     This creates an HTML document and downloads with application/msword.
-     Word will open the HTML and preserve styles inline.
-  */
+  /* ---------------- DOC Download (.doc via HTML) ---------------- */
   const downloadDOC = () => {
     if (!previewRef.current) return alert("Preview not ready.");
 
     const header = `
-      <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+      <html xmlns:o='urn:schemas-microsoft-com:office:office'
+            xmlns:w='urn:schemas-microsoft-com:office:word'
+            xmlns='http://www.w3.org/TR/REC-html40'>
       <head><meta charset="utf-8"><title>Resume</title></head><body>
     `;
 
-    // Use outerHTML for the preview; inline minimal styling for Word compatibility
-    const previewHtml = previewRef.current.outerHTML;
+    // Remove any react data attributes to keep Word clean:
+    const previewHtml = previewRef.current.outerHTML.replace(/ data-reactroot="?"| data-reactid="[^"]*"/g, "");
     const footer = "</body></html>";
-
     const html = header + previewHtml + footer;
     const blob = new Blob(["\ufeff", html], { type: "application/msword" });
     const url = URL.createObjectURL(blob);
@@ -542,293 +548,252 @@ function ResumeIOLayout() {
 
   /* ---------------- Template renderer (10 templates) ---------------- */
   const TemplateRenderer = ({ which }) => {
-    // common values
+    // arrays
     const skills = safeArray(form.skills);
     const languages = safeArray(form.languages);
 
+    // standardized block used by all templates (Standard CV Order)
+    const StandardBlocks = () => (
+      <>
+        {/* Profile Summary */}
+        <section className="mt-4">
+          <h4 className="font-semibold">Profile Summary</h4>
+          <p className="whitespace-pre-line text-sm text-gray-700">{form.summary || "—"}</p>
+        </section>
+
+        {/* Skills */}
+        <section className="mt-4">
+          <h4 className="font-semibold">Skills</h4>
+          <p className="text-sm text-gray-700">{skills.length ? skills.join(", ") : "—"}</p>
+        </section>
+
+        {/* Languages */}
+        <section className="mt-4">
+          <h4 className="font-semibold">Languages</h4>
+          <p className="text-sm text-gray-700">{languages.length ? languages.join(", ") : "—"}</p>
+        </section>
+
+        {/* Work Experience */}
+        <section className="mt-4">
+          <h4 className="font-semibold">Work Experience</h4>
+          <p className="whitespace-pre-line text-sm text-gray-700">{form.workExperience || "—"}</p>
+        </section>
+
+        {/* Project Description */}
+        <section className="mt-4">
+          <h4 className="font-semibold">Project Description</h4>
+          <p className="whitespace-pre-line text-sm text-gray-700">{form.projectDesc || "—"}</p>
+        </section>
+
+        {/* Roles & Responsibilities */}
+        <section className="mt-4">
+          <h4 className="font-semibold">Roles & Responsibilities</h4>
+          <p className="whitespace-pre-line text-sm text-gray-700">{form.responsibilities || "—"}</p>
+        </section>
+
+        {/* Education */}
+        <section className="mt-4">
+          <h4 className="font-semibold">Education</h4>
+          <p className="whitespace-pre-line text-sm text-gray-700">{form.education || "—"}</p>
+        </section>
+
+        {/* Declaration */}
+        <section className="mt-4">
+          <h4 className="font-semibold">Declaration</h4>
+          <p className="whitespace-pre-line text-sm text-gray-700">{form.declaration || "—"}</p>
+        </section>
+      </>
+    );
+
+    /* Return per-template layout but include StandardBlocks in each */
     switch (which) {
       /* 1 — Modern Blue (two-column left skills) */
       case "template1":
         return (
           <div className="text-gray-900 bg-white p-8" ref={previewRef}>
             <div className="grid grid-cols-3 gap-6">
-              <div className="col-span-1 pr-4 border-r">
-                <h3 className="text-xl font-bold text-blue-700 mb-2">Key Skills</h3>
-                <ul className="list-disc ml-5 text-sm space-y-1">
-                  {skills.map((s,i)=> <li key={i}>{s}</li>)}
-                </ul>
+              <aside className="col-span-1 pr-4 border-r">
+                <h3 className="text-lg font-bold text-blue-700 mb-2">{form.fullName || "YOUR NAME"}</h3>
+                <p className="text-sm">{form.roleTitle || "YOUR TITLE"}</p>
 
-                <h3 className="text-xl font-bold text-blue-700 mt-6 mb-2">Languages</h3>
-                <ul className="list-disc ml-5 text-sm space-y-1">
-                  {languages.map((l,i)=> <li key={i}>{l}</li>)}
-                </ul>
-              </div>
-
-              <div className="col-span-2">
-                <h1 className="text-3xl font-extrabold text-blue-700">{form.fullName || "YOUR NAME"}</h1>
-                <p className="uppercase text-sm font-semibold text-gray-700">{form.roleTitle}</p>
-                <div className="my-4 border-b-4 w-24 border-blue-600"></div>
-
-                <div className="text-sm text-gray-700">
-                  <p><strong>Phone:</strong> {form.phone}</p>
-                  <p><strong>Email:</strong> {form.email}</p>
-                  <p><strong>Location:</strong> {form.location}</p>
+                <div className="mt-4 text-sm text-gray-700 space-y-1">
+                  <p><strong>Phone:</strong> {form.phone || "—"}</p>
+                  <p><strong>Email:</strong> {form.email || "—"}</p>
+                  <p><strong>Location:</strong> {form.location || "—"}</p>
+                  <p><strong>Experience:</strong> {form.experience || "—"}</p>
                 </div>
 
-                <section className="mt-6">
-                  <h4 className="font-bold">Profile Summary</h4>
-                  <p className="whitespace-pre-line">{form.summary}</p>
-                </section>
+                <div className="mt-6">
+                  <h4 className="font-semibold">Skills</h4>
+                  <ul className="list-disc ml-5 text-sm">
+                    {skills.length ? skills.map((s,i) => <li key={i}>{s}</li>) : <li>—</li>}
+                  </ul>
+                </div>
 
-                <section className="mt-4">
-                  <h4 className="font-bold">Work Experience</h4>
-                  <p className="whitespace-pre-line">{form.workExperience}</p>
-                </section>
+                <div className="mt-4">
+                  <h4 className="font-semibold">Languages</h4>
+                  <ul className="list-disc ml-5 text-sm">
+                    {languages.length ? languages.map((l,i) => <li key={i}>{l}</li>) : <li>—</li>}
+                  </ul>
+                </div>
+              </aside>
 
-                <section className="mt-4">
-                  <h4 className="font-bold">Education</h4>
-                  <p className="whitespace-pre-line">{form.education}</p>
-                </section>
+              <main className="col-span-2">
+                <div>
+                  <h1 className="text-2xl font-extrabold text-blue-700">{form.fullName || "YOUR NAME"}</h1>
+                  <p className="text-sm font-semibold text-gray-700 mt-1">{form.roleTitle || "YOUR TITLE"}</p>
+                  <div className="my-3 border-b-4 w-24 border-blue-600"></div>
+                </div>
 
-                <section className="mt-4">
-                  <h4 className="font-bold">Project Description</h4>
-                  <p className="whitespace-pre-line">{form.projectDesc}</p>
-                </section>
-
-                <section className="mt-4">
-                  <h4 className="font-bold">Roles & Responsibilities</h4>
-                  <p className="whitespace-pre-line">{form.responsibilities}</p>
-                </section>
-
-                <section className="mt-4">
-                  <h4 className="font-bold">Declaration</h4>
-                  <p className="whitespace-pre-line">{form.declaration}</p>
-                </section>
-              </div>
+                <StandardBlocks />
+              </main>
             </div>
           </div>
         );
 
-      /* 2 — ATS Minimal (single column, simple headings) */
+      /* 2 — ATS Minimal (single column) */
       case "template2":
         return (
           <div className="bg-white p-8 text-black" ref={previewRef}>
-            <h1 className="text-2xl font-bold">{form.fullName || "YOUR NAME"}</h1>
-            <p className="text-sm text-gray-700">{form.roleTitle}</p>
-            <p className="text-xs text-gray-600 mt-1">{form.email} | {form.phone} | {form.location}</p>
+            <header>
+              <h1 className="text-2xl font-bold">{form.fullName || "YOUR NAME"}</h1>
+              <p className="text-sm text-gray-700">{form.roleTitle || "YOUR TITLE"}</p>
+              <p className="text-xs text-gray-600 mt-1">{form.email || "—"} | {form.phone || "—"} | {form.location || "—"}</p>
+            </header>
 
-            <hr className="my-4" />
-            <h3 className="font-bold">Profile Summary</h3>
-            <p className="whitespace-pre-line">{form.summary}</p>
-
-            <h3 className="font-bold mt-4">Skills</h3>
-            <p>{skills.join(", ")}</p>
-
-            <h3 className="font-bold mt-4">Experience</h3>
-            <p className="whitespace-pre-line">{form.workExperience}</p>
-
-            <h3 className="font-bold mt-4">Projects</h3>
-            <p className="whitespace-pre-line">{form.projectDesc}</p>
-
-            <h3 className="font-bold mt-4">Education</h3>
-            <p className="whitespace-pre-line">{form.education}</p>
-
-            <h3 className="font-bold mt-4">Declaration</h3>
-            <p className="whitespace-pre-line">{form.declaration}</p>
+            <div className="mt-4">
+              <StandardBlocks />
+            </div>
           </div>
         );
 
-      /* 3 — Executive Dark (dark header, two-column) */
+      /* 3 — Executive Dark header */
       case "template3":
         return (
           <div className="bg-white p-8" ref={previewRef}>
-            <div className="bg-gray-900 text-white p-4 rounded-md">
+            <div className="bg-gray-900 text-white p-4 rounded">
               <h1 className="text-2xl font-bold">{form.fullName || "YOUR NAME"}</h1>
-              <p className="text-sm">{form.roleTitle}</p>
+              <p className="text-sm">{form.roleTitle || "YOUR TITLE"}</p>
             </div>
 
-            <div className="grid grid-cols-3 gap-6 mt-4">
+            <div className="mt-4 grid grid-cols-3 gap-6">
               <div className="col-span-2">
-                <h4 className="font-bold">Profile</h4>
-                <p className="whitespace-pre-line">{form.summary}</p>
-
-                <h4 className="font-bold mt-4">Experience</h4>
-                <p className="whitespace-pre-line">{form.workExperience}</p>
-
-                <h4 className="font-bold mt-4">Projects</h4>
-                <p className="whitespace-pre-line">{form.projectDesc}</p>
+                <StandardBlocks />
               </div>
 
-              <div className="col-span-1 border-l pl-4">
-                <h4 className="font-bold">Contact</h4>
-                <p>{form.email}</p>
-                <p>{form.phone}</p>
-                <p>{form.location}</p>
-
-                <h4 className="font-bold mt-4">Skills</h4>
-                <ul className="list-disc ml-5">{skills.map((s,i)=><li key={i}>{s}</li>)}</ul>
-
-                <h4 className="font-bold mt-4">Education</h4>
-                <p className="whitespace-pre-line">{form.education}</p>
-              </div>
-            </div>
-
-            <div className="mt-6">
-              <h4 className="font-bold">Declaration</h4>
-              <p className="whitespace-pre-line">{form.declaration}</p>
+              <aside className="col-span-1 border-l pl-4 text-sm text-gray-700">
+                <p><strong>Email:</strong> {form.email || "—"}</p>
+                <p><strong>Phone:</strong> {form.phone || "—"}</p>
+                <p><strong>Location:</strong> {form.location || "—"}</p>
+                <p className="mt-4"><strong>Education:</strong><br/>{form.education || "—"}</p>
+              </aside>
             </div>
           </div>
         );
 
-      /* 4 — Two-column MNC (Left profile details, Right experience) */
+      /* 4 — Two-column MNC */
       case "template4":
         return (
           <div className="bg-white p-8" ref={previewRef}>
             <div className="grid grid-cols-2 gap-6">
               <div>
                 <h2 className="text-xl font-bold text-blue-700">{form.fullName || "YOUR NAME"}</h2>
-                <p className="text-sm">{form.roleTitle}</p>
+                <p className="text-sm">{form.roleTitle || "YOUR TITLE"}</p>
 
-                <h4 className="font-bold mt-4">Contact</h4>
-                <p>{form.phone}</p>
-                <p>{form.email}</p>
-                <p>{form.location}</p>
+                <div className="mt-4 text-sm text-gray-700 space-y-1">
+                  <p><strong>Phone:</strong> {form.phone || "—"}</p>
+                  <p><strong>Email:</strong> {form.email || "—"}</p>
+                  <p><strong>Location:</strong> {form.location || "—"}</p>
+                  <p><strong>Experience:</strong> {form.experience || "—"}</p>
+                </div>
 
-                <h4 className="font-bold mt-4">Skills</h4>
-                <ul className="list-disc ml-5">{skills.map((s,i)=><li key={i}>{s}</li>)}</ul>
+                <div className="mt-6">
+                  <h4 className="font-semibold">Skills</h4>
+                  <p className="text-sm">{skills.join(", ") || "—"}</p>
 
-                <h4 className="font-bold mt-4">Languages</h4>
-                <p>{languages.join(", ")}</p>
+                  <h4 className="font-semibold mt-4">Languages</h4>
+                  <p className="text-sm">{languages.join(", ") || "—"}</p>
 
-                <h4 className="font-bold mt-4">Education</h4>
-                <p>{form.education}</p>
+                  <h4 className="font-semibold mt-4">Education</h4>
+                  <p className="text-sm whitespace-pre-line">{form.education || "—"}</p>
+                </div>
               </div>
 
               <div>
-                <h4 className="font-bold">Profile Summary</h4>
-                <p className="whitespace-pre-line">{form.summary}</p>
-
-                <h4 className="font-bold mt-4">Work Experience</h4>
-                <p className="whitespace-pre-line">{form.workExperience}</p>
-
-                <h4 className="font-bold mt-4">Project Description</h4>
-                <p className="whitespace-pre-line">{form.projectDesc}</p>
-
-                <h4 className="font-bold mt-4">Roles & Responsibilities</h4>
-                <p className="whitespace-pre-line">{form.responsibilities}</p>
-
-                <h4 className="font-bold mt-4">Declaration</h4>
-                <p className="whitespace-pre-line">{form.declaration}</p>
+                <StandardBlocks />
               </div>
             </div>
           </div>
         );
 
-      /* 5 — Clean Corporate */
+      /* 5 — Clean Corporate (single-column center) */
       case "template5":
         return (
-          <div className="bg-white p-8" ref={previewRef}>
-            <div className="text-center">
-              <h1 className="text-2xl font-bold">{form.fullName || "YOUR NAME"}</h1>
-              <p className="text-sm text-gray-700">{form.roleTitle}</p>
-            </div>
+          <div className="bg-white p-8 text-center" ref={previewRef}>
+            <h1 className="text-2xl font-bold">{form.fullName || "YOUR NAME"}</h1>
+            <p className="text-sm text-gray-700">{form.roleTitle || "YOUR TITLE"}</p>
+            <p className="text-xs text-gray-600 mt-2">{form.email || "—"} | {form.phone || "—"} | {form.location || "—"}</p>
 
-            <div className="mt-4">
-              <h4 className="font-bold">Summary</h4>
-              <p className="whitespace-pre-line">{form.summary}</p>
-
-              <h4 className="font-bold mt-4">Skills</h4>
-              <p>{skills.join(", ")}</p>
-
-              <h4 className="font-bold mt-4">Experience</h4>
-              <p className="whitespace-pre-line">{form.workExperience}</p>
-
-              <h4 className="font-bold mt-4">Projects</h4>
-              <p className="whitespace-pre-line">{form.projectDesc}</p>
-
-              <h4 className="font-bold mt-4">Education</h4>
-              <p>{form.education}</p>
-
-              <h4 className="font-bold mt-4">Declaration</h4>
-              <p className="whitespace-pre-line">{form.declaration}</p>
+            <div className="mt-4 text-left">
+              <StandardBlocks />
             </div>
           </div>
         );
 
-      /* 6 — Consulting / Deloitte style (two columns with highlights) */
+      /* 6 — Consulting style */
       case "template6":
         return (
           <div className="bg-white p-8" ref={previewRef}>
-            <div className="flex justify-between items-start">
+            <div className="flex justify-between">
               <div>
                 <h1 className="text-2xl font-bold">{form.fullName || "YOUR NAME"}</h1>
-                <p className="text-sm">{form.roleTitle}</p>
+                <p className="text-sm">{form.roleTitle || "YOUR TITLE"}</p>
               </div>
               <div className="text-sm text-right">
-                <p>{form.email}</p>
-                <p>{form.phone}</p>
-                <p>{form.location}</p>
+                <p>{form.email || "—"}</p>
+                <p>{form.phone || "—"}</p>
+                <p>{form.location || "—"}</p>
               </div>
             </div>
 
-            <div className="grid grid-cols-3 gap-6 mt-4">
+            <div className="mt-4 grid grid-cols-3 gap-6">
               <div className="col-span-2">
-                <h4 className="font-bold">Profile</h4>
-                <p className="whitespace-pre-line">{form.summary}</p>
-
-                <h4 className="font-bold mt-4">Experience</h4>
-                <p className="whitespace-pre-line">{form.workExperience}</p>
-
-                <h4 className="font-bold mt-4">Projects</h4>
-                <p className="whitespace-pre-line">{form.projectDesc}</p>
+                <StandardBlocks />
               </div>
+              <aside className="col-span-1 border-l pl-4">
+                <h4 className="font-semibold">Skills</h4>
+                <p className="text-sm">{skills.join(", ") || "—"}</p>
 
-              <div className="col-span-1 border-l pl-4">
-                <h4 className="font-bold">Skills</h4>
-                <ul className="list-disc ml-5">{skills.map((s,i)=><li key={i}>{s}</li>)}</ul>
-
-                <h4 className="font-bold mt-4">Education</h4>
-                <p>{form.education}</p>
-              </div>
-            </div>
-
-            <div className="mt-6">
-              <h4 className="font-bold">Declaration</h4>
-              <p className="whitespace-pre-line">{form.declaration}</p>
+                <h4 className="font-semibold mt-4">Education</h4>
+                <p className="text-sm whitespace-pre-line">{form.education || "—"}</p>
+              </aside>
             </div>
           </div>
         );
 
-      /* 7 — Creative (left colored bar, more spacing) */
+      /* 7 — Creative */
       case "template7":
         return (
           <div className="bg-white p-8" ref={previewRef}>
-            <div className="flex">
-              <div className="w-1/4 pr-6 border-r">
-                <h2 className="text-lg font-bold">{form.fullName || "YOUR NAME"}</h2>
-                <p className="text-sm">{form.roleTitle}</p>
+            <div className="flex gap-6">
+              <aside className="w-1/4 border-r pr-4">
+                <h2 className="font-bold">{form.fullName || "YOUR NAME"}</h2>
+                <p className="text-sm">{form.roleTitle || "YOUR TITLE"}</p>
 
-                <h4 className="font-bold mt-4">Contact</h4>
-                <p className="text-sm">{form.email}</p>
-                <p className="text-sm">{form.phone}</p>
+                <div className="mt-4 text-sm">
+                  <p><strong>Email:</strong> {form.email || "—"}</p>
+                  <p><strong>Phone:</strong> {form.phone || "—"}</p>
+                </div>
 
-                <h4 className="font-bold mt-4">Skills</h4>
-                <ul className="list-disc ml-5">{skills.map((s,i)=><li key={i}>{s}</li>)}</ul>
-              </div>
+                <div className="mt-4">
+                  <h4 className="font-semibold">Skills</h4>
+                  <ul className="list-disc ml-5 text-sm">{skills.length ? skills.map((s,i)=> <li key={i}>{s}</li>) : <li>—</li>}</ul>
+                </div>
+              </aside>
 
-              <div className="w-3/4 pl-6">
-                <h4 className="font-bold">Summary</h4>
-                <p className="whitespace-pre-line">{form.summary}</p>
-
-                <h4 className="font-bold mt-4">Experience</h4>
-                <p className="whitespace-pre-line">{form.workExperience}</p>
-
-                <h4 className="font-bold mt-4">Projects</h4>
-                <p className="whitespace-pre-line">{form.projectDesc}</p>
-
-                <h4 className="font-bold mt-4">Declaration</h4>
-                <p className="whitespace-pre-line">{form.declaration}</p>
-              </div>
+              <main className="flex-1 pl-4">
+                <StandardBlocks />
+              </main>
             </div>
           </div>
         );
@@ -838,65 +803,32 @@ function ResumeIOLayout() {
         return (
           <div className="bg-white p-8 font-serif" ref={previewRef}>
             <h1 className="text-2xl font-bold">{form.fullName || "YOUR NAME"}</h1>
-            <p className="text-sm">{form.roleTitle}</p>
+            <p className="text-sm">{form.roleTitle || "YOUR TITLE"}</p>
 
-            <h4 className="font-bold mt-4">Profile</h4>
-            <p className="whitespace-pre-line">{form.summary}</p>
-
-            <h4 className="font-bold mt-4">Skills</h4>
-            <p>{skills.join(", ")}</p>
-
-            <h4 className="font-bold mt-4">Experience</h4>
-            <p className="whitespace-pre-line">{form.workExperience}</p>
-
-            <h4 className="font-bold mt-4">Projects</h4>
-            <p className="whitespace-pre-line">{form.projectDesc}</p>
-
-            <h4 className="font-bold mt-4">Education</h4>
-            <p>{form.education}</p>
-
-            <h4 className="font-bold mt-4">Declaration</h4>
-            <p>{form.declaration}</p>
+            <div className="mt-4">
+              <StandardBlocks />
+            </div>
           </div>
         );
 
-      /* 9 — Technical (compact, code-style blocks) */
+      /* 9 — Technical compact */
       case "template9":
         return (
           <div className="bg-white p-6" ref={previewRef}>
             <div className="flex justify-between items-start">
               <div>
                 <h1 className="text-xl font-bold">{form.fullName || "YOUR NAME"}</h1>
-                <p className="text-sm">{form.roleTitle}</p>
+                <p className="text-sm">{form.roleTitle || "YOUR TITLE"}</p>
               </div>
               <div className="text-sm text-right">
-                <p>{form.email}</p>
-                <p>{form.phone}</p>
-                <p>{form.location}</p>
-              </div>
-            </div>
-
-            <div className="mt-4 grid grid-cols-2 gap-6">
-              <div>
-                <h4 className="font-bold">Skills</h4>
-                <pre className="whitespace-pre-wrap bg-gray-50 p-3 rounded text-sm">{skills.join(", ")}</pre>
-
-                <h4 className="font-bold mt-4">Projects</h4>
-                <pre className="whitespace-pre-wrap bg-gray-50 p-3 rounded text-sm">{form.projectDesc}</pre>
-              </div>
-
-              <div>
-                <h4 className="font-bold">Summary</h4>
-                <p className="whitespace-pre-line">{form.summary}</p>
-
-                <h4 className="font-bold mt-4">Experience</h4>
-                <p className="whitespace-pre-line">{form.workExperience}</p>
+                <p>{form.email || "—"}</p>
+                <p>{form.phone || "—"}</p>
+                <p>{form.location || "—"}</p>
               </div>
             </div>
 
             <div className="mt-4">
-              <h4 className="font-bold">Declaration</h4>
-              <p className="whitespace-pre-line">{form.declaration}</p>
+              <StandardBlocks />
             </div>
           </div>
         );
@@ -908,39 +840,29 @@ function ResumeIOLayout() {
             <div className="flex justify-between">
               <div>
                 <h1 className="text-3xl font-extrabold text-blue-700">{form.fullName || "YOUR NAME"}</h1>
-                <p className="text-sm font-semibold">{form.roleTitle}</p>
+                <p className="text-sm font-semibold">{form.roleTitle || "YOUR TITLE"}</p>
               </div>
 
               <div className="text-sm">
-                <p>{form.email}</p>
-                <p>{form.phone}</p>
-                <p>{form.location}</p>
+                <p>{form.email || "—"}</p>
+                <p>{form.phone || "—"}</p>
+                <p>{form.location || "—"}</p>
+                <p>{form.experience ? `Experience: ${form.experience}` : "—"}</p>
               </div>
-            </div>
-
-            <div className="mt-6">
-              <h4 className="font-bold">Profile</h4>
-              <p className="whitespace-pre-line">{form.summary}</p>
             </div>
 
             <div className="mt-4 grid grid-cols-2 gap-6">
               <div>
-                <h4 className="font-bold">Experience</h4>
-                <p className="whitespace-pre-line">{form.workExperience}</p>
-                <h4 className="font-bold mt-4">Projects</h4>
-                <p className="whitespace-pre-line">{form.projectDesc}</p>
+                <StandardBlocks />
               </div>
 
-              <div>
-                <h4 className="font-bold">Skills</h4>
-                <ul className="list-disc ml-5">{skills.map((s,i)=><li key={i}>{s}</li>)}</ul>
+              <aside>
+                <h4 className="font-semibold">Skills</h4>
+                <ul className="list-disc ml-5">{skills.length ? skills.map((s,i)=> <li key={i}>{s}</li>) : <li>—</li>}</ul>
 
-                <h4 className="font-bold mt-4">Education</h4>
-                <p>{form.education}</p>
-
-                <h4 className="font-bold mt-4">Declaration</h4>
-                <p>{form.declaration}</p>
-              </div>
+                <h4 className="font-semibold mt-4">Education</h4>
+                <p className="text-sm whitespace-pre-line">{form.education || "—"}</p>
+              </aside>
             </div>
           </div>
         );
@@ -959,7 +881,7 @@ function ResumeIOLayout() {
           <div>
             <h2 className="text-2xl font-bold text-gray-800">Resume Editor</h2>
             <p className="text-sm text-gray-600">
-              Fill details on left (existing editor) — choose template → download.
+              Fill details below — select a template → download.
             </p>
           </div>
 
@@ -975,9 +897,9 @@ function ResumeIOLayout() {
               <option value="template3">Executive Dark</option>
               <option value="template4">Two-column MNC</option>
               <option value="template5">Clean Corporate</option>
-              <option value="template6">Consulting (Deloitte-style)</option>
-              <option value="template7">Creative Layout</option>
-              <option value="template8">Simple Serif (Print)</option>
+              <option value="template6">Consulting</option>
+              <option value="template7">Creative</option>
+              <option value="template8">Simple Serif</option>
               <option value="template9">Technical Compact</option>
               <option value="template10">Premium Resume.io</option>
             </select>
@@ -998,13 +920,10 @@ function ResumeIOLayout() {
           </div>
         </div>
 
-        {/* Main layout: left editor (reuse your editor) + right preview */}
+        {/* Main layout: left editor + right preview */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* LEFT: Editor (reuse existing fields) */}
+          {/* LEFT: Editor */}
           <div className="bg-white rounded-2xl shadow p-6 space-y-4">
-            {/* NOTE: This editor is intentionally duplicated here to be self-contained.
-                If you already render editor fields elsewhere, keep them in sync by
-                controlling the same `form` state. */}
             <div>
               <label className="block text-sm font-semibold">Full Name</label>
               <input className="inputbox mt-1" onChange={(e)=>handleInput("fullName", e.target.value)} value={form.fullName}/>
