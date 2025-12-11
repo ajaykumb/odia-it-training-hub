@@ -1007,9 +1007,32 @@ function ResumeIOLayout() {
       </div>
 
       <style>{`
-        .inputbox { width: 100%; padding: 9px 12px; border: 1px solid #e5e7eb; border-radius: 8px; }
-        .inputbox:focus { outline: none; box-shadow: 0 0 0 3px rgba(59,130,246,0.08); border-color: #3b82f6; }
-      `}</style>
+  .inputbox { 
+    width: 100%; 
+    padding: 10px; 
+    border: 1px solid #ddd; 
+    border-radius: 8px; 
+  }
+
+  .heading {
+    font-size: 18px;
+    font-weight: bold;
+    margin-top: 20px;
+  }
+
+  /* PDF FIXES */
+  .preview-page {
+    width: 794px;        /* Exact A4 width in px for html2canvas */
+    margin: 0 auto;      /* Center page */
+    background: white;
+    padding: 20px;
+  }
+
+  .resume-section {
+    page-break-inside: avoid;   /* Avoid content cutting */
+    margin-bottom: 20px;        /* Add spacing for clean breaks */
+  }
+`}</style>
     </section>
   );
 }
