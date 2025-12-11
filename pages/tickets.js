@@ -452,26 +452,28 @@ function ResumeIOLayout() {
     skills: [],
     languages: [],
     workExperience: "",
+    education: "",
+    projectDesc: "",
+    responsibilities: "",
+    declaration: "",
   });
 
-  const handleInput = (key, value) => {
-    setForm({ ...form, [key]: value });
-  };
+  const handleInput = (key, val) => setForm({ ...form, [key]: val });
 
   return (
     <section className="py-20 bg-gray-100">
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 px-6">
-        
-        {/* LEFT EDITOR */}
-        <div className="bg-white rounded-xl shadow p-6 space-y-4">
 
-          <h2 className="text-2xl font-bold text-gray-800">Resume Editor</h2>
+        {/* LEFT SIDE — EDITOR */}
+        <div className="bg-white shadow rounded-xl p-6 space-y-5">
 
-          {/* Personal Details */}
+          <h2 className="text-2xl font-bold">Resume Editor</h2>
+
+          {/* PERSONAL DETAILS */}
           <details className="border rounded-lg px-4 py-3">
-            <summary className="font-semibold cursor-pointer">Personal details</summary>
+            <summary className="cursor-pointer font-semibold">Personal Details</summary>
 
-            <div className="space-y-3 mt-3">
+            <div className="mt-3 space-y-3">
               <input className="inputbox" placeholder="Full Name" 
                 onChange={(e)=>handleInput("fullName",e.target.value)} />
 
@@ -487,119 +489,142 @@ function ResumeIOLayout() {
               <input className="inputbox" placeholder="Location" 
                 onChange={(e)=>handleInput("location",e.target.value)} />
 
-              <input className="inputbox" placeholder="Experience (3 years 6 months)" 
+              <input className="inputbox" placeholder="Total Experience" 
                 onChange={(e)=>handleInput("experience",e.target.value)} />
             </div>
           </details>
 
-          {/* Summary */}
+          {/* PROFILE SUMMARY */}
           <details className="border rounded-lg px-4 py-3">
-            <summary className="font-semibold cursor-pointer">Profile summary</summary>
-
+            <summary className="cursor-pointer font-semibold">Profile Summary</summary>
             <textarea rows="4" className="inputbox mt-3"
               onChange={(e)=>handleInput("summary",e.target.value)}
-              placeholder="Write your professional summary..."
-            />
+              placeholder="Write your profile summary..." />
           </details>
 
-          {/* Skills */}
+          {/* KEY SKILLS */}
           <details className="border rounded-lg px-4 py-3">
-            <summary className="font-semibold cursor-pointer">Key skills</summary>
-
+            <summary className="cursor-pointer font-semibold">Key Skills</summary>
             <textarea rows="3" className="inputbox mt-3"
               placeholder="Comma separated skills"
-              onChange={(e)=>handleInput("skills", e.target.value.split(","))}
-            />
+              onChange={(e)=>handleInput("skills",e.target.value.split(","))} />
           </details>
 
-          {/* Languages */}
+          {/* LANGUAGES */}
           <details className="border rounded-lg px-4 py-3">
-            <summary className="font-semibold cursor-pointer">Languages</summary>
-
+            <summary className="cursor-pointer font-semibold">Languages</summary>
             <textarea rows="3" className="inputbox mt-3"
               placeholder="Comma separated languages"
-              onChange={(e)=>handleInput("languages", e.target.value.split(","))}
-            />
+              onChange={(e)=>handleInput("languages",e.target.value.split(","))} />
           </details>
 
-          {/* Work Experience */}
+          {/* WORK EXPERIENCE */}
           <details className="border rounded-lg px-4 py-3">
-            <summary className="font-semibold cursor-pointer">Work experience</summary>
-
-            <textarea rows="5" className="inputbox mt-3"
-              placeholder="Your job experience details..."
+            <summary className="cursor-pointer font-semibold">Work Experience</summary>
+            <textarea rows="4" className="inputbox mt-3"
               onChange={(e)=>handleInput("workExperience",e.target.value)}
-            />
+              placeholder="Company, Duration, Responsibilities..." />
+          </details>
+
+          {/* EDUCATION */}
+          <details className="border rounded-lg px-4 py-3">
+            <summary className="cursor-pointer font-semibold">Education</summary>
+            <textarea rows="3" className="inputbox mt-3"
+              onChange={(e)=>handleInput("education",e.target.value)}
+              placeholder="Degree, College, Year of Passing" />
+          </details>
+
+          {/* PROJECT DESCRIPTION */}
+          <details className="border rounded-lg px-4 py-3">
+            <summary className="cursor-pointer font-semibold">Project Description</summary>
+            <textarea rows="4" className="inputbox mt-3"
+              onChange={(e)=>handleInput("projectDesc",e.target.value)}
+              placeholder="Explain your project with responsibilities, tools, achievements..." />
+          </details>
+
+          {/* ROLES & RESPONSIBILITIES */}
+          <details className="border rounded-lg px-4 py-3">
+            <summary className="cursor-pointer font-semibold">Roles & Responsibilities</summary>
+            <textarea rows="4" className="inputbox mt-3"
+              onChange={(e)=>handleInput("responsibilities",e.target.value)}
+              placeholder="Write responsibilities in bullet points" />
+          </details>
+
+          {/* DECLARATION */}
+          <details className="border rounded-lg px-4 py-3">
+            <summary className="cursor-pointer font-semibold">Declaration</summary>
+            <textarea rows="3" className="inputbox mt-3"
+              onChange={(e)=>handleInput("declaration",e.target.value)}
+              placeholder="Write your declaration..." />
           </details>
 
         </div>
 
-        {/* RIGHT PREVIEW */}
+        {/* RIGHT SIDE — PREVIEW */}
         <div className="bg-white rounded-xl shadow p-10">
 
+          {/* NAME + TITLE */}
           <h1 className="text-3xl font-bold text-blue-700">
             {form.fullName || "YOUR NAME"}
           </h1>
+          <p className="uppercase font-semibold text-sm">{form.roleTitle}</p>
 
-          <p className="text-sm font-semibold uppercase">
-            {form.roleTitle || "YOUR TITLE"}
-          </p>
+          <div className="w-28 border-b-4 border-blue-600 my-4"></div>
 
-          <div className="w-24 border-b-4 border-blue-600 my-4"></div>
-
-          {/* Skills */}
-          <h2 className="heading">Key Skills</h2>
-          <ul className="ml-6 list-disc text-gray-700">
-            {form.skills.map((s,i)=> <li key={i}>{s.trim()}</li>)}
-          </ul>
-
-          {/* Languages */}
-          <h2 className="heading mt-6">Languages</h2>
-          <ul className="ml-6 list-disc text-gray-700">
-            {form.languages.map((l,i)=> <li key={i}>{l.trim()}</li>)}
-          </ul>
-
-          {/* Contact Block */}
+          {/* RIGHT SIDE CONTACT */}
           <div className="grid grid-cols-2 mt-8 mb-4">
             <div></div>
-            <div className="border-l pl-4 text-sm space-y-1">
-              <p><strong>Phone:</strong> {form.phone}</p>
-              <p><strong>Email:</strong> {form.email}</p>
-              <p><strong>Location:</strong> {form.location}</p>
-              <p><strong>Experience:</strong> {form.experience}</p>
+            <div className="text-sm space-y-1 border-l pl-4">
+              <p><b>Phone:</b> {form.phone}</p>
+              <p><b>Email:</b> {form.email}</p>
+              <p><b>Location:</b> {form.location}</p>
+              <p><b>Experience:</b> {form.experience}</p>
             </div>
           </div>
 
-          {/* Summary */}
+          {/* PROFILE SUMMARY */}
           <h2 className="heading">Profile Summary</h2>
-          <p className="text-gray-700 leading-relaxed">{form.summary}</p>
+          <p className="text-gray-700">{form.summary}</p>
 
-          {/* Work Experience */}
+          {/* KEY SKILLS */}
+          <h2 className="heading mt-6">Key Skills</h2>
+          <ul className="list-disc ml-6 text-gray-700">
+            {form.skills.map((s,i)=><li key={i}>{s}</li>)}
+          </ul>
+
+          {/* LANGUAGES */}
+          <h2 className="heading mt-6">Languages</h2>
+          <ul className="list-disc ml-6 text-gray-700">
+            {form.languages.map((l,i)=><li key={i}>{l}</li>)}
+          </ul>
+
+          {/* WORK EXPERIENCE */}
           <h2 className="heading mt-6">Work Experience</h2>
-          <p className="text-gray-700 whitespace-pre-line">
-            {form.workExperience}
-          </p>
+          <p className="text-gray-700 whitespace-pre-line">{form.workExperience}</p>
 
-          {/* Education Static */}
+          {/* EDUCATION */}
           <h2 className="heading mt-6">Education</h2>
-          <p className="text-gray-700">Add your education details here...</p>
+          <p className="text-gray-700 whitespace-pre-line">{form.education}</p>
+
+          {/* PROJECT DESCRIPTION */}
+          <h2 className="heading mt-6">Project Description</h2>
+          <p className="text-gray-700 whitespace-pre-line">{form.projectDesc}</p>
+
+          {/* ROLES & RESPONSIBILITIES */}
+          <h2 className="heading mt-6">Roles & Responsibilities</h2>
+          <p className="text-gray-700 whitespace-pre-line">{form.responsibilities}</p>
+
+          {/* DECLARATION */}
+          <h2 className="heading mt-6">Declaration</h2>
+          <p className="text-gray-700 whitespace-pre-line">{form.declaration}</p>
+
         </div>
       </div>
 
-      {/* Input styling */}
+      {/* STYLES */}
       <style>{`
-        .inputbox {
-          width: 100%;
-          border: 1px solid #ddd;
-          padding: 8px 12px;
-          border-radius: 8px;
-        }
-        .heading {
-          font-size: 18px;
-          font-weight: 700;
-          margin-top: 10px;
-          color: #111;
-        }
+        .inputbox { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; }
+        .heading { font-size: 18px; font-weight: bold; margin-top: 20px; }
       `}</style>
     </section>
   );
