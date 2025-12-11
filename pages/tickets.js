@@ -438,776 +438,169 @@ function InterviewSection() {
   );
 }
 
-/* ---------------- RESUME BUILDER SECTION ---------------- */
+/* ---------------- RESUME EDITOR — Resume.io EXACT FORMAT ---------------- */
 
-function ResumeBuilderSection() {
+function ResumeIOLayout() {
   const [form, setForm] = useState({
     fullName: "",
-    roleTitle: "Application / Production Support Engineer",
-    experience: "3.9",
-    location: "Bhubaneswar, Odisha",
-    phone: "+91-",
+    roleTitle: "",
+    phone: "",
     email: "",
-    linkedin: "",
-    summary:
-      "Technical professional with hands-on experience in application and production support (L1/L2), incident analysis, log analysis, job monitoring, and root cause analysis using SQL, Linux, Autosys, Splunk and ITIL processes.",
-    skills:
-      "SQL, PL/SQL, Linux, Shell Script, Autosys, Control-M, Splunk, Dynatrace, ITIL, Incident Management, RCA, Monitoring, Job Scheduling",
-    tools:
-      "Oracle, SQL Developer, Linux (RHEL), Autosys, Control-M, Splunk, Dynatrace, Git, ServiceNow / JIRA",
-    currentCompany: "TCS (Previous Organization)",
-    currentRole: "Application & Production Support Engineer (L1/L2)",
-    responsibilities:
-      "• Monitoring critical batch jobs, applications and alerts using Autosys, Control-M and Splunk.\n• Analyzing logs, identifying root cause and providing quick resolution for job failures and production incidents.\n• Working with SQL/PLSQL for data validation, debugging queries and performance analysis.\n• Coordinating with L3/Dev teams and stakeholders for incident resolution and status updates.\n• Preparing RCA documents and maintaining knowledge base for recurring issues.",
-    education: "B.Tech in Computer Science / IT (Year – College Name)",
-    noticePeriod: "Immediate Joiner",
+    location: "",
+    experience: "",
+    summary: "",
+    skills: [],
+    languages: [],
+    workExperience: "",
   });
 
-  const [template, setTemplate] = useState("template1");
-  const previewRef = useRef(null);
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleCopy = () => {
-    const text = `
-${(form.fullName || "").toUpperCase()}
-${form.roleTitle}
-
-Contact: ${form.phone} | ${form.email}
-Location: ${form.location}
-LinkedIn: ${form.linkedin}
-
-PROFILE SUMMARY
-${form.summary}
-
-SKILLS
-${form.skills}
-
-TOOLS & TECHNOLOGIES
-${form.tools}
-
-EXPERIENCE
-${form.currentCompany}
-${form.currentRole}
-${form.responsibilities}
-
-EDUCATION
-${form.education}
-
-OTHER DETAILS
-Total Experience: ${form.experience} Years
-Notice Period: ${form.noticePeriod}
-`;
-
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard
-        .writeText(text)
-        .then(() => {
-          alert(
-            "✅ Resume text copied! You can paste it into Word / Naukri / LinkedIn."
-          );
-        })
-        .catch(() => {
-          alert(
-            "Copy failed. Please select and copy manually from the preview."
-          );
-        });
-    } else {
-      alert(
-        "Your browser does not support direct copy. Please copy manually from preview."
-      );
-    }
-  };
-
-  const downloadPDF = async () => {
-    if (!previewRef.current) return;
-
-    const html2canvas = (await import("html2canvas")).default;
-    const jsPDF = (await import("jspdf")).default;
-
-    const element = previewRef.current;
-
-    const canvas = await html2canvas(element, {
-      scale: 2,
-      useCORS: true,
-    });
-
-    const imgData = canvas.toDataURL("image/png");
-    const pdf = new jsPDF("p", "mm", "a4");
-
-    const imgWidth = 210; // A4 width in mm
-    const pageHeight = 297;
-    const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-    let heightLeft = imgHeight;
-    let position = 0;
-
-    pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
-    heightLeft -= pageHeight;
-
-    while (heightLeft > 0) {
-      position = heightLeft - imgHeight;
-      pdf.addPage();
-      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
-    }
-
-    pdf.save(`${form.fullName || "Resume"}.pdf`);
+  const handleInput = (key, value) => {
+    setForm({ ...form, [key]: value });
   };
 
   return (
-    <section className="py-20 bg-gray-50">
-      <div className="max-w-6xl mx-auto px-6">
-        <h2 className="text-3xl md:text-4xl font-extrabold text-blue-700 mb-4 text-center">
-          📝 Automatic Resume Builder – Job Ready Profile
-        </h2>
+    <section className="py-20 bg-gray-100">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 px-6">
+        
+        {/* LEFT EDITOR */}
+        <div className="bg-white rounded-xl shadow p-6 space-y-4">
 
-        <p className="text-center text-gray-600 max-w-2xl mx-auto mb-6">
-          Fill your details below and get a professional{" "}
-          <strong>IT Support / Production Support resume</strong> ready for
-          Naukri, LinkedIn, and HR calls. Choose from 5 modern MNC-style
-          templates and download as PDF.
-        </p>
+          <h2 className="text-2xl font-bold text-gray-800">Resume Editor</h2>
 
-        {/* Template Selector */}
-        <div className="flex flex-wrap justify-center gap-3 mb-8">
-          <button
-            onClick={() => setTemplate("template1")}
-            className={`px-4 py-2 rounded-lg text-sm font-semibold ${
-              template === "template1"
-                ? "bg-blue-600 text-white"
-                : "bg-gray-200 text-gray-700"
-            }`}
-          >
-            Template 1
-          </button>
+          {/* Personal Details */}
+          <details className="border rounded-lg px-4 py-3">
+            <summary className="font-semibold cursor-pointer">Personal details</summary>
 
-          <button
-            onClick={() => setTemplate("template2")}
-            className={`px-4 py-2 rounded-lg text-sm font-semibold ${
-              template === "template2"
-                ? "bg-blue-600 text-white"
-                : "bg-gray-200 text-gray-700"
-            }`}
-          >
-            Template 2
-          </button>
+            <div className="space-y-3 mt-3">
+              <input className="inputbox" placeholder="Full Name" 
+                onChange={(e)=>handleInput("fullName",e.target.value)} />
 
-          <button
-            onClick={() => setTemplate("template3")}
-            className={`px-4 py-2 rounded-lg text-sm font-semibold ${
-              template === "template3"
-                ? "bg-blue-600 text-white"
-                : "bg-gray-200 text-gray-700"
-            }`}
-          >
-            Template 3
-          </button>
+              <input className="inputbox" placeholder="Job Title" 
+                onChange={(e)=>handleInput("roleTitle",e.target.value)} />
 
-          <button
-            onClick={() => setTemplate("template4")}
-            className={`px-4 py-2 rounded-lg text-sm font-semibold ${
-              template === "template4"
-                ? "bg-blue-600 text-white"
-                : "bg-gray-200 text-gray-700"
-            }`}
-          >
-            Template 4
-          </button>
+              <input className="inputbox" placeholder="Phone" 
+                onChange={(e)=>handleInput("phone",e.target.value)} />
 
-          <button
-            onClick={() => setTemplate("template5")}
-            className={`px-4 py-2 rounded-lg text-sm font-semibold ${
-              template === "template5"
-                ? "bg-blue-600 text-white"
-                : "bg-gray-200 text-gray-700"
-            }`}
-          >
-            Template 5
-          </button>
+              <input className="inputbox" placeholder="Email" 
+                onChange={(e)=>handleInput("email",e.target.value)} />
+
+              <input className="inputbox" placeholder="Location" 
+                onChange={(e)=>handleInput("location",e.target.value)} />
+
+              <input className="inputbox" placeholder="Experience (3 years 6 months)" 
+                onChange={(e)=>handleInput("experience",e.target.value)} />
+            </div>
+          </details>
+
+          {/* Summary */}
+          <details className="border rounded-lg px-4 py-3">
+            <summary className="font-semibold cursor-pointer">Profile summary</summary>
+
+            <textarea rows="4" className="inputbox mt-3"
+              onChange={(e)=>handleInput("summary",e.target.value)}
+              placeholder="Write your professional summary..."
+            />
+          </details>
+
+          {/* Skills */}
+          <details className="border rounded-lg px-4 py-3">
+            <summary className="font-semibold cursor-pointer">Key skills</summary>
+
+            <textarea rows="3" className="inputbox mt-3"
+              placeholder="Comma separated skills"
+              onChange={(e)=>handleInput("skills", e.target.value.split(","))}
+            />
+          </details>
+
+          {/* Languages */}
+          <details className="border rounded-lg px-4 py-3">
+            <summary className="font-semibold cursor-pointer">Languages</summary>
+
+            <textarea rows="3" className="inputbox mt-3"
+              placeholder="Comma separated languages"
+              onChange={(e)=>handleInput("languages", e.target.value.split(","))}
+            />
+          </details>
+
+          {/* Work Experience */}
+          <details className="border rounded-lg px-4 py-3">
+            <summary className="font-semibold cursor-pointer">Work experience</summary>
+
+            <textarea rows="5" className="inputbox mt-3"
+              placeholder="Your job experience details..."
+              onChange={(e)=>handleInput("workExperience",e.target.value)}
+            />
+          </details>
+
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
-          {/* Left: Form */}
-          <div className="bg-white rounded-2xl shadow-xl p-6 md:p-8 border border-gray-100">
-            <h3 className="text-xl font-bold text-gray-800 mb-4">
-              ✏️ Fill Your Details
-            </h3>
+        {/* RIGHT PREVIEW */}
+        <div className="bg-white rounded-xl shadow p-10">
 
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">
-                  Full Name
-                </label>
-                <input
-                  type="text"
-                  name="fullName"
-                  value={form.fullName}
-                  onChange={handleChange}
-                  className="w-full border rounded-lg px-3 py-2 text-sm"
-                  placeholder="Tarinee Prasad Chand"
-                />
-              </div>
+          <h1 className="text-3xl font-bold text-blue-700">
+            {form.fullName || "YOUR NAME"}
+          </h1>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">
-                    Role Title
-                  </label>
-                  <input
-                    type="text"
-                    name="roleTitle"
-                    value={form.roleTitle}
-                    onChange={handleChange}
-                    className="w-full border rounded-lg px-3 py-2 text-sm"
-                  />
-                </div>
+          <p className="text-sm font-semibold uppercase">
+            {form.roleTitle || "YOUR TITLE"}
+          </p>
 
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">
-                    Total Experience (Years)
-                  </label>
-                  <input
-                    type="text"
-                    name="experience"
-                    value={form.experience}
-                    onChange={handleChange}
-                    className="w-full border rounded-lg px-3 py-2 text-sm"
-                  />
-                </div>
-              </div>
+          <div className="w-24 border-b-4 border-blue-600 my-4"></div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">
-                    Location
-                  </label>
-                  <input
-                    type="text"
-                    name="location"
-                    value={form.location}
-                    onChange={handleChange}
-                    className="w-full border rounded-lg px-3 py-2 text-sm"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">
-                    Phone
-                  </label>
-                  <input
-                    type="text"
-                    name="phone"
-                    value={form.phone}
-                    onChange={handleChange}
-                    className="w-full border rounded-lg px-3 py-2 text-sm"
-                    placeholder="+91-7894..."
-                  />
-                </div>
-              </div>
+          {/* Skills */}
+          <h2 className="heading">Key Skills</h2>
+          <ul className="ml-6 list-disc text-gray-700">
+            {form.skills.map((s,i)=> <li key={i}>{s.trim()}</li>)}
+          </ul>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">
-                    Email
-                  </label>
-                  <input
-                    type="email"
-                    name="email"
-                    value={form.email}
-                    onChange={handleChange}
-                    className="w-full border rounded-lg px-3 py-2 text-sm"
-                    placeholder="you@example.com"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">
-                    LinkedIn URL
-                  </label>
-                  <input
-                    type="text"
-                    name="linkedin"
-                    value={form.linkedin}
-                    onChange={handleChange}
-                    className="w-full border rounded-lg px-3 py-2 text-sm"
-                    placeholder="https://linkedin.com/in/..."
-                  />
-                </div>
-              </div>
+          {/* Languages */}
+          <h2 className="heading mt-6">Languages</h2>
+          <ul className="ml-6 list-disc text-gray-700">
+            {form.languages.map((l,i)=> <li key={i}>{l.trim()}</li>)}
+          </ul>
 
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">
-                  Profile Summary
-                </label>
-                <textarea
-                  name="summary"
-                  value={form.summary}
-                  onChange={handleChange}
-                  rows={3}
-                  className="w-full border rounded-lg px-3 py-2 text-sm"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">
-                  Skills (comma separated)
-                </label>
-                <textarea
-                  name="skills"
-                  value={form.skills}
-                  onChange={handleChange}
-                  rows={2}
-                  className="w-full border rounded-lg px-3 py-2 text-sm"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">
-                  Tools & Technologies (comma separated)
-                </label>
-                <textarea
-                  name="tools"
-                  value={form.tools}
-                  onChange={handleChange}
-                  rows={2}
-                  className="w-full border rounded-lg px-3 py-2 text-sm"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">
-                  Current / Last Company
-                </label>
-                <input
-                  type="text"
-                  name="currentCompany"
-                  value={form.currentCompany}
-                  onChange={handleChange}
-                  className="w-full border rounded-lg px-3 py-2 text-sm"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">
-                  Role & Designation
-                </label>
-                <input
-                  type="text"
-                  name="currentRole"
-                  value={form.currentRole}
-                  onChange={handleChange}
-                  className="w-full border rounded-lg px-3 py-2 text-sm"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">
-                  Roles & Responsibilities (each point in new line)
-                </label>
-                <textarea
-                  name="responsibilities"
-                  value={form.responsibilities}
-                  onChange={handleChange}
-                  rows={4}
-                  className="w-full border rounded-lg px-3 py-2 text-sm"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">
-                  Education
-                </label>
-                <input
-                  type="text"
-                  name="education"
-                  value={form.education}
-                  onChange={handleChange}
-                  className="w-full border rounded-lg px-3 py-2 text-sm"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">
-                  Notice Period / Availability
-                </label>
-                <input
-                  type="text"
-                  name="noticePeriod"
-                  value={form.noticePeriod}
-                  onChange={handleChange}
-                  className="w-full border rounded-lg px-3 py-2 text-sm"
-                />
-              </div>
-
-              <button
-                type="button"
-                onClick={handleCopy}
-                className="w-full mt-4 bg-blue-600 text-white font-semibold py-2 rounded-lg hover:bg-blue-700 transition"
-              >
-                📋 Copy Resume Text
-              </button>
+          {/* Contact Block */}
+          <div className="grid grid-cols-2 mt-8 mb-4">
+            <div></div>
+            <div className="border-l pl-4 text-sm space-y-1">
+              <p><strong>Phone:</strong> {form.phone}</p>
+              <p><strong>Email:</strong> {form.email}</p>
+              <p><strong>Location:</strong> {form.location}</p>
+              <p><strong>Experience:</strong> {form.experience}</p>
             </div>
           </div>
 
-          {/* Right: Preview + Download */}
-          <div>
-            <div
-              ref={previewRef}
-              className="bg-white rounded-2xl shadow-xl p-6 md:p-8 border border-gray-100"
-            >
-              <h3 className="text-xl font-bold text-gray-800 mb-4">
-                👀 Live Resume Preview ({template.toUpperCase()})
-              </h3>
+          {/* Summary */}
+          <h2 className="heading">Profile Summary</h2>
+          <p className="text-gray-700 leading-relaxed">{form.summary}</p>
 
-              {template === "template1" && <Template1 form={form} />}
-              {template === "template2" && <Template2 form={form} />}
-              {template === "template3" && <Template3 form={form} />}
-              {template === "template4" && <Template4 form={form} />}
-              {template === "template5" && <Template5 form={form} />}
-            </div>
+          {/* Work Experience */}
+          <h2 className="heading mt-6">Work Experience</h2>
+          <p className="text-gray-700 whitespace-pre-line">
+            {form.workExperience}
+          </p>
 
-            <button
-              type="button"
-              onClick={downloadPDF}
-              className="w-full mt-4 bg-green-600 text-white font-semibold py-2 rounded-lg hover:bg-green-700 transition"
-            >
-              📄 Download as PDF
-            </button>
-          </div>
+          {/* Education Static */}
+          <h2 className="heading mt-6">Education</h2>
+          <p className="text-gray-700">Add your education details here...</p>
         </div>
       </div>
+
+      {/* Input styling */}
+      <style>{`
+        .inputbox {
+          width: 100%;
+          border: 1px solid #ddd;
+          padding: 8px 12px;
+          border-radius: 8px;
+        }
+        .heading {
+          font-size: 18px;
+          font-weight: 700;
+          margin-top: 10px;
+          color: #111;
+        }
+      `}</style>
     </section>
-  );
-}
-
-/* ---------------- RESUME TEMPLATES & HELPERS ---------------- */
-/* All 5 templates are Modern Blue / MNC-ready */
-
-function Template1({ form }) {
-  return (
-    <div className="text-gray-900 space-y-4">
-      <div className="border-b pb-3">
-        <h2 className="text-3xl font-extrabold text-blue-700">
-          {form.fullName || "Your Name"}
-        </h2>
-        <p className="text-lg font-semibold text-gray-800">
-          {form.roleTitle}
-        </p>
-        <p className="text-gray-700 text-sm">
-          {form.location} | {form.phone} | {form.email}
-        </p>
-        {form.linkedin && (
-          <p className="text-gray-700 text-sm">LinkedIn: {form.linkedin}</p>
-        )}
-      </div>
-
-      <SectionBlock title="Profile Summary" text={form.summary} />
-      <SectionBlock title="Skills" chips={form.skills} />
-      <SectionBlock title="Tools & Technologies" chips={form.tools} />
-      <ExperienceBlock form={form} />
-      <SectionBlock title="Education" text={form.education} />
-      <SectionBlock
-        title="Other Details"
-        text={`Total Experience: ${form.experience} Years\nNotice Period: ${form.noticePeriod}`}
-      />
-    </div>
-  );
-}
-
-/* Template 2 – Blue Header Bar (MNC CV style) */
-function Template2({ form }) {
-  return (
-    <div className="text-gray-900 text-sm space-y-4 border border-blue-100 rounded-lg">
-      <div className="bg-blue-700 text-white px-4 py-3 rounded-t-lg">
-        <h2 className="text-2xl font-bold">{form.fullName || "Your Name"}</h2>
-        <p className="text-sm">{form.roleTitle}</p>
-        <p className="text-xs mt-1">
-          {form.email} | {form.phone} | {form.location}
-        </p>
-        {form.linkedin && (
-          <p className="text-xs mt-1">LinkedIn: {form.linkedin}</p>
-        )}
-      </div>
-
-      <div className="px-4 pb-4 space-y-3">
-        <SectionBlock title="Profile Summary" text={form.summary} />
-        <SectionBlock title="Skills" chips={form.skills} />
-        <SectionBlock title="Tools & Technologies" chips={form.tools} />
-        <ExperienceBlock form={form} />
-        <SectionBlock title="Education" text={form.education} />
-      </div>
-    </div>
-  );
-}
-
-/* Template 3 – Two Column Modern Layout */
-function Template3({ form }) {
-  const skillsArray = (form.skills || "").split(",");
-  const toolsArray = (form.tools || "").split(",");
-
-  return (
-    <div className="text-gray-900 text-sm border border-blue-100 rounded-lg overflow-hidden">
-      <div className="bg-blue-50 px-4 py-3 border-b border-blue-100">
-        <h2 className="text-2xl font-bold text-blue-800">
-          {form.fullName || "Your Name"}
-        </h2>
-        <p className="font-semibold text-gray-800">{form.roleTitle}</p>
-        <p className="text-xs mt-1">
-          {form.location} | {form.phone} | {form.email}
-        </p>
-      </div>
-
-      <div className="grid grid-cols-3 gap-4 p-4">
-        {/* Left Column */}
-        <div className="col-span-1 space-y-3 border-r border-gray-200 pr-3">
-          <div>
-            <h4 className="font-bold text-gray-900 text-xs uppercase mb-1">
-              Skills
-            </h4>
-            <div className="flex flex-wrap">
-              {skillsArray.map(
-                (s, i) =>
-                  s.trim() && (
-                    <span
-                      key={i}
-                      className="bg-blue-100 text-blue-800 px-2 py-1 text-[10px] rounded-full mr-1 mb-1"
-                    >
-                      {s.trim()}
-                    </span>
-                  )
-              )}
-            </div>
-          </div>
-
-          <div>
-            <h4 className="font-bold text-gray-900 text-xs uppercase mb-1">
-              Tools
-            </h4>
-            <div className="flex flex-wrap">
-              {toolsArray.map(
-                (t, i) =>
-                  t.trim() && (
-                    <span
-                      key={i}
-                      className="bg-indigo-100 text-indigo-800 px-2 py-1 text-[10px] rounded-full mr-1 mb-1"
-                    >
-                      {t.trim()}
-                    </span>
-                  )
-              )}
-            </div>
-          </div>
-
-          <div>
-            <h4 className="font-bold text-gray-900 text-xs uppercase mb-1">
-              Education
-            </h4>
-            <p className="text-xs leading-relaxed">{form.education}</p>
-          </div>
-
-          <div>
-            <h4 className="font-bold text-gray-900 text-xs uppercase mb-1">
-              Other
-            </h4>
-            <p className="text-xs">
-              Experience: {form.experience} Years
-              <br />
-              Notice Period: {form.noticePeriod}
-            </p>
-          </div>
-        </div>
-
-        {/* Right Column */}
-        <div className="col-span-2 space-y-3">
-          <SectionBlock title="Profile Summary" text={form.summary} />
-          <ExperienceBlock form={form} />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/* Template 4 – Card Sections with Blue Accents */
-function Template4({ form }) {
-  return (
-    <div className="text-gray-900 text-sm space-y-4">
-      <div className="flex justify-between items-center border-b pb-3">
-        <div>
-          <h2 className="text-2xl font-bold text-blue-700">
-            {form.fullName || "Your Name"}
-          </h2>
-          <p className="font-semibold text-gray-800">{form.roleTitle}</p>
-        </div>
-        <div className="text-right text-xs text-gray-600">
-          <p>{form.phone}</p>
-          <p>{form.email}</p>
-          <p>{form.location}</p>
-          {form.linkedin && <p>{form.linkedin}</p>}
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 gap-3">
-        <div className="border border-blue-100 rounded-lg p-3">
-          <h4 className="font-bold text-blue-700 mb-1 text-sm">
-            Profile Summary
-          </h4>
-          <p className="leading-relaxed whitespace-pre-wrap">{form.summary}</p>
-        </div>
-
-        <div className="border border-blue-100 rounded-lg p-3">
-          <h4 className="font-bold text-blue-700 mb-1 text-sm">Skills</h4>
-          <SectionBlock chips={form.skills} />
-        </div>
-
-        <div className="border border-blue-100 rounded-lg p-3">
-          <h4 className="font-bold text-blue-700 mb-1 text-sm">
-            Tools & Technologies
-          </h4>
-          <SectionBlock chips={form.tools} />
-        </div>
-
-        <div className="border border-blue-100 rounded-lg p-3">
-          <h4 className="font-bold text-blue-700 mb-1 text-sm">
-            Experience
-          </h4>
-          <ExperienceBlock form={form} />
-        </div>
-
-        <div className="grid grid-cols-2 gap-3">
-          <div className="border border-blue-100 rounded-lg p-3">
-            <h4 className="font-bold text-blue-700 mb-1 text-sm">
-              Education
-            </h4>
-            <p className="text-xs">{form.education}</p>
-          </div>
-          <div className="border border-blue-100 rounded-lg p-3">
-            <h4 className="font-bold text-blue-700 mb-1 text-sm">
-              Other Details
-            </h4>
-            <p className="text-xs">
-              Experience: {form.experience} Years
-              <br />
-              Notice Period: {form.noticePeriod}
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/* Template 5 – Simple ATS-Friendly Blue Underlines */
-function Template5({ form }) {
-  return (
-    <div className="text-gray-900 text-sm space-y-3">
-      <div className="text-center border-b pb-3">
-        <h2 className="text-2xl font-bold text-blue-700">
-          {form.fullName || "Your Name"}
-        </h2>
-        <p className="font-semibold">{form.roleTitle}</p>
-        <p className="text-xs mt-1">
-          {form.email} | {form.phone} | {form.location}
-        </p>
-        {form.linkedin && (
-          <p className="text-xs mt-1">LinkedIn: {form.linkedin}</p>
-        )}
-      </div>
-
-      <div>
-        <h4 className="font-bold text-blue-700 border-b border-blue-200 mb-1">
-          Profile Summary
-        </h4>
-        <p className="leading-relaxed whitespace-pre-wrap">{form.summary}</p>
-      </div>
-
-      <div>
-        <h4 className="font-bold text-blue-700 border-b border-blue-200 mb-1">
-          Skills
-        </h4>
-        <p className="leading-relaxed whitespace-pre-wrap">{form.skills}</p>
-      </div>
-
-      <div>
-        <h4 className="font-bold text-blue-700 border-b border-blue-200 mb-1">
-          Tools & Technologies
-        </h4>
-        <p className="leading-relaxed whitespace-pre-wrap">{form.tools}</p>
-      </div>
-
-      <div>
-        <h4 className="font-bold text-blue-700 border-b border-blue-200 mb-1">
-          Experience
-        </h4>
-        <p className="font-semibold text-sm">{form.currentCompany}</p>
-        <p className="italic text-xs mb-1">{form.currentRole}</p>
-        <pre className="whitespace-pre-wrap text-xs">
-          {form.responsibilities}
-        </pre>
-      </div>
-
-      <div>
-        <h4 className="font-bold text-blue-700 border-b border-blue-200 mb-1">
-          Education
-        </h4>
-        <p className="text-xs">{form.education}</p>
-      </div>
-
-      <div>
-        <h4 className="font-bold text-blue-700 border-b border-blue-200 mb-1">
-          Other Details
-        </h4>
-        <p className="text-xs">
-          Experience: {form.experience} Years
-          <br />
-          Notice Period: {form.noticePeriod}
-        </p>
-      </div>
-    </div>
-  );
-}
-
-/* Shared helpers */
-
-function SectionBlock({ title, text, chips }) {
-  return (
-    <div>
-      {title && (
-        <h4 className="font-bold text-gray-900 mb-1 text-sm">{title}</h4>
-      )}
-
-      {text && (
-        <p className="leading-relaxed whitespace-pre-wrap text-sm">{text}</p>
-      )}
-
-      {chips && (
-        <div className="flex flex-wrap">
-          {chips.split(",").map(
-            (item, i) =>
-              item.trim() && (
-                <span
-                  key={i}
-                  className="bg-blue-100 text-blue-800 px-2 py-1 text-[11px] rounded-full mr-2 mb-2"
-                >
-                  {item.trim()}
-                </span>
-              )
-          )}
-        </div>
-      )}
-    </div>
-  );
-}
-
-function ExperienceBlock({ form }) {
-  return (
-    <div>
-      <p className="font-semibold text-sm">{form.currentCompany}</p>
-      <p className="italic text-xs mb-1">{form.currentRole}</p>
-      <pre className="whitespace-pre-wrap text-xs">
-        {form.responsibilities}
-      </pre>
-    </div>
   );
 }
