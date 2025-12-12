@@ -31,6 +31,15 @@ export default function AllAnswers() {
 
   const router = useRouter();
 
+    // HARD-CODED ADMIN LOGIN PROTECTION
+  useEffect(() => {
+    const ok = localStorage.getItem("adminLogin");
+    if (!ok) {
+      router.push("/admin/login");
+    }
+  }, []);
+
+
   // ---------------------------
   // NEW FEATURE STATES
   // ---------------------------
