@@ -72,6 +72,13 @@ export default function Home() {
   >
     Students Login
   </a>
+  {/* ⭐ Admin Login */}
+      <a
+        href="/admin/all-answers"
+        className="ml-2 bg-white text-red-600 px-5 py-2 rounded-full font-bold hover:bg-gray-200 transition-all shadow-md"
+      >
+        Admin Login
+      </a>
 </nav>
 
     {/* Mobile Login Button */}
