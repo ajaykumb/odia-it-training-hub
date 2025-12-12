@@ -3,23 +3,33 @@ import { useRouter } from "next/router";
 import { collection, query, where, onSnapshot, updateDoc, doc } from "firebase/firestore";
 import { db } from "../utils/firebaseConfig"; 
 
-// ✅ REAL EMAIL FUNCTION (calls API route)
+// ------------------------------
+// SEND APPROVAL EMAIL API CALL
+// ------------------------------
 const sendApprovalEmail = async (toEmail, name) => {
     try {
-        const res = await fetch("/api/sendApprovalEmail", {
+        await fetch("/api/sendApprovalEmail", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ toEmail, name })
         });
-
-        const data = await res.json();
-        console.log("Email API Response:", data);
-
-        if (!res.ok) {
-            console.error("Email API Error:", data.error);
-        }
     } catch (error) {
-        console.error("Email Send Failed:", error);
+        console.error("Approval Email Failed:", error);
+    }
+};
+
+// ------------------------------
+// SEND REJECT EMAIL API CALL
+// ------------------------------
+const sendRejectEmail = async (toEmail, name, reason) => {
+    try {
+        await fetch("/api/sendRejectEmail", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ toEmail, name, reason })
+        });
+    } catch (error) {
+        console.error("Reject Email Failed:", error);
     }
 };
 
@@ -27,10 +37,13 @@ export default function AdminDashboard() {
     const router = useRouter();
     const [pendingStudents, setPendingStudents] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [approvingId, setApprovingId] = useState(null); 
+    const [approvingId, setApprovingId] = useState(null);
+    const [rejectingId, setRejectingId] = useState(null);
     const [error, setError] = useState(null);
 
-    // Load pending students
+    // ------------------------------
+    // LOAD PENDING STUDENTS
+    // ------------------------------
     useEffect(() => {
         if (localStorage.getItem("adminToken") !== "VALID_ADMIN") {
             router.push("/admin-login");
@@ -38,7 +51,7 @@ export default function AdminDashboard() {
         }
 
         const studentsRef = collection(db, "students");
-        const q = query(studentsRef, where("isApproved", "==", false));
+        const q = query(studentsRef, where("isApproved", "==", false), where("isRejected", "==", false));
 
         const unsubscribe = onSnapshot(
             q,
@@ -53,8 +66,8 @@ export default function AdminDashboard() {
                 setError(null);
             },
             (error) => {
-                console.error("Error loading students:", error);
-                setError("Failed to load students. Check Firestore Rules.");
+                console.error("Error:", error);
+                setError("Failed to load students.");
                 setLoading(false);
             }
         );
@@ -62,24 +75,45 @@ export default function AdminDashboard() {
         return () => unsubscribe();
     }, [router]);
 
+    // ------------------------------
+    // APPROVE STUDENT
+    // ------------------------------
     const handleApprove = async (studentId, name, email) => {
-        setError(null);
         setApprovingId(studentId);
 
         try {
-            const ref = doc(db, "students", studentId);
-
-            await updateDoc(ref, { isApproved: true });
-
-            // 👉 SEND EMAIL after approval
+            await updateDoc(doc(db, "students", studentId), { isApproved: true });
             await sendApprovalEmail(email, name);
 
-            console.log(`Approved: ${name}`);
         } catch (error) {
-            console.error("Approval Error:", error);
-            setError(`Approval failed for ${name}. Check Firestore permissions.`);
+            console.error("Approve Error:", error);
+            setError("Approval failed.");
         } finally {
             setApprovingId(null);
+        }
+    };
+
+    // ------------------------------
+    // REJECT STUDENT
+    // ------------------------------
+    const handleReject = async (studentId, name, email) => {
+        const reason = prompt("Enter rejection reason (optional):");
+
+        setRejectingId(studentId);
+
+        try {
+            await updateDoc(doc(db, "students", studentId), {
+                isRejected: true,
+                rejectionReason: reason || "Not specified"
+            });
+
+            await sendRejectEmail(email, name, reason);
+
+        } catch (error) {
+            console.error("Reject Error:", error);
+            setError("Reject failed.");
+        } finally {
+            setRejectingId(null);
         }
     };
 
@@ -93,6 +127,7 @@ export default function AdminDashboard() {
 
     return (
         <div className="min-h-screen bg-gray-50 p-8">
+            {/* Header */}
             <header className="flex justify-between items-center pb-6 border-b border-red-200 mb-8">
                 <h1 className="text-4xl font-extrabold text-red-700">
                     Admin Verification Dashboard
@@ -126,23 +161,38 @@ export default function AdminDashboard() {
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {pendingStudents.map((s) => (
-                        <div key={s.id} className="bg-white p-6 rounded-xl shadow-lg border hover:shadow-xl">
+                        <div key={s.id} className="bg-white p-6 rounded-xl shadow-lg border">
                             <p className="text-lg font-bold text-red-600 mb-1">{s.name}</p>
                             <p className="text-gray-600 mb-4 text-sm">
                                 <strong>Email:</strong> {s.email}
                             </p>
 
-                            <button
-                                onClick={() => handleApprove(s.id, s.name, s.email)}
-                                disabled={approvingId === s.id}
-                                className={`w-full py-2 rounded-lg font-semibold ${
-                                    approvingId === s.id
-                                        ? "bg-gray-400 cursor-not-allowed"
-                                        : "bg-green-500 text-white hover:bg-green-600"
-                                }`}
-                            >
-                                {approvingId === s.id ? "Approving..." : "Approve Student"}
-                            </button>
+                            {/* Buttons */}
+                            <div className="flex gap-3">
+                                <button
+                                    onClick={() => handleApprove(s.id, s.name, s.email)}
+                                    disabled={approvingId === s.id}
+                                    className={`flex-1 py-2 rounded-lg font-semibold ${
+                                        approvingId === s.id
+                                            ? "bg-gray-400 cursor-not-allowed"
+                                            : "bg-green-500 text-white hover:bg-green-600"
+                                    }`}
+                                >
+                                    {approvingId === s.id ? "Approving..." : "Approve"}
+                                </button>
+
+                                <button
+                                    onClick={() => handleReject(s.id, s.name, s.email)}
+                                    disabled={rejectingId === s.id}
+                                    className={`flex-1 py-2 rounded-lg font-semibold ${
+                                        rejectingId === s.id
+                                            ? "bg-gray-400 cursor-not-allowed"
+                                            : "bg-red-500 text-white hover:bg-red-600"
+                                    }`}
+                                >
+                                    {rejectingId === s.id ? "Rejecting..." : "Reject"}
+                                </button>
+                            </div>
                         </div>
                     ))}
                 </div>
