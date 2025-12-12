@@ -79,7 +79,7 @@ export default function Home() {
       href="/login"
       className="md:hidden bg-white text-blue-700 px-4 py-2 rounded-lg font-bold text-sm shadow-md hover:bg-gray-200 transition"
     >
-      Login
+      Students Login
     </a>
         </div>
       </header>
