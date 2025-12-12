@@ -30,22 +30,17 @@ export default function StudentDashboard() {
   const [progress] = useState(70);
   const [attendance] = useState(85);
 
-  // NEW: Announcements + Upcoming Class Info
   const [announcements, setAnnouncements] = useState([]);
   const [upcomingClass, setUpcomingClass] = useState(null);
   const [countdown, setCountdown] = useState("");
 
-  // ================================
   // LOGIN CHECK
-  // ================================
   useEffect(() => {
     const token = localStorage.getItem("studentToken");
     if (!token) router.push("/login");
   }, []);
 
-  // ================================
-  // LIVE CLASS (EXISTING FEATURE)
-  // ================================
+  // LIVE CLASS LISTENER
   useEffect(() => {
     const liveRef = doc(db, "liveClass", "current");
     const unsub = onSnapshot(liveRef, (snap) => {
@@ -59,36 +54,31 @@ export default function StudentDashboard() {
     return () => unsub();
   }, []);
 
-  // ================================
-  // NEW: Announcements Listener
-  // ================================
+  // ANNOUNCEMENTS
   useEffect(() => {
-    const q = query(collection(db, "announcements"), orderBy("timestamp", "desc"));
-
+    const q = query(
+      collection(db, "announcements"),
+      orderBy("timestamp", "desc")
+    );
     const unsub = onSnapshot(q, (snap) => {
       const list = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-      setAnnouncements(list.slice(0, 3)); // show latest 3
+      setAnnouncements(list.slice(0, 3));
     });
-
     return () => unsub();
   }, []);
 
-  // ================================
-  // NEW: Upcoming Class Listener
-  // ================================
+  // UPCOMING CLASS
   useEffect(() => {
-    const unsub = onSnapshot(doc(db, "liveClassStatus", "active"), (snap) => {
-      if (snap.exists()) {
-        setUpcomingClass(snap.data());
+    const unsub = onSnapshot(
+      doc(db, "liveClassStatus", "active"),
+      (snap) => {
+        if (snap.exists()) setUpcomingClass(snap.data());
       }
-    });
-
+    );
     return () => unsub();
   }, []);
 
-  // ================================
-  // NEW: Countdown Timer for Next Class
-  // ================================
+  // COUNTDOWN TIMER
   useEffect(() => {
     if (!upcomingClass?.nextClassTime) return;
 
@@ -109,23 +99,21 @@ export default function StudentDashboard() {
     return () => clearInterval(interval);
   }, [upcomingClass]);
 
-  // ================================
-  // LOGOUT
-  // ================================
   const logout = () => {
     localStorage.removeItem("studentToken");
     router.push("/login");
   };
 
   const joinLiveClass = () => {
-    const url = meetingUrl || "https://meet.jit.si/OdiaITTrainingHubLiveClass";
+    const url =
+      meetingUrl || "https://meet.jit.si/OdiaITTrainingHubLiveClass";
     window.open(url, "_blank");
   };
 
   return (
     <main className="relative min-h-screen bg-gradient-to-br from-blue-300 to-blue-100">
 
-      {/* FIXED HEADER */}
+      {/* HEADER */}
       <header className="fixed top-0 left-0 w-full bg-white/70 backdrop-blur-md shadow-md z-50">
         <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-3">
           <div className="flex items-center gap-3">
@@ -134,6 +122,7 @@ export default function StudentDashboard() {
               Odia IT Training Hub — LMS
             </h1>
           </div>
+
           <a href="/notifications" className="text-gray-700 hover:text-blue-700">
             <BellIcon className="w-7 h-7" />
           </a>
@@ -148,7 +137,6 @@ export default function StudentDashboard() {
           <h2 className="text-2xl font-bold text-blue-700 mb-5">Student Panel</h2>
 
           <nav className="space-y-4 text-gray-700">
-
             <a className="flex items-center gap-3 hover:text-blue-600" href="#">
               <HomeIcon className="w-5 h-5" /> Dashboard
             </a>
@@ -193,124 +181,160 @@ export default function StudentDashboard() {
             Welcome to Your Dashboard
           </h1>
 
-          {/* SUMMARY CARDS */}
+          {/* UPDATED SUMMARY CARDS */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
 
-            {/* Progress */}
-            <div className="bg-white shadow-md rounded-2xl p-6">
-              <h3 className="text-xl font-bold mb-2">Course Progress</h3>
-              <p className="text-blue-700 font-bold text-3xl">{progress}%</p>
-              <div className="bg-gray-200 h-2 mt-3 rounded-full">
-                <div className="bg-blue-600 h-2 rounded-full" style={{ width: `${progress}%` }}></div>
+            {/* PROGRESS CARD */}
+            <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 hover:shadow-md transition-all duration-200">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold text-gray-800">Course Progress</h3>
+                <div className="bg-blue-100 text-blue-600 p-2 rounded-lg text-sm font-bold">📘</div>
               </div>
+
+              <p className="text-blue-700 font-extrabold text-4xl mt-4">{progress}%</p>
+              <div className="w-full h-2 bg-gray-200 rounded-full mt-3 overflow-hidden">
+                <div
+                  className="h-2 bg-blue-500 rounded-full transition-all"
+                  style={{ width: `${progress}%` }}
+                ></div>
+              </div>
+
+              <p className="text-xs text-gray-500 mt-2">You're doing great — keep going!</p>
             </div>
 
-            {/* Attendance */}
-            <div className="bg-white shadow-md rounded-2xl p-6">
-              <h3 className="text-xl font-bold mb-2">Attendance</h3>
-              <p className="text-green-700 font-bold text-3xl">{attendance}%</p>
+            {/* ATTENDANCE CARD */}
+            <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 hover:shadow-md transition-all duration-200">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold text-gray-800">Attendance</h3>
+                <div className="bg-green-100 text-green-600 p-2 rounded-lg text-sm font-bold">📅</div>
+              </div>
+
+              <p className="text-green-700 font-extrabold text-4xl mt-4">{attendance}%</p>
+              <p className="text-xs text-gray-500 mt-2">Minimum 75% required for certificate</p>
             </div>
 
             {/* ANNOUNCEMENTS CARD */}
-            <div className="bg-white shadow-md rounded-2xl p-6">
-              <h3 className="text-xl font-bold mb-3">Announcements</h3>
+            <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 hover:shadow-md transition-all duration-200">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold text-gray-800">Announcements</h3>
+                <div className="bg-yellow-100 text-yellow-600 p-2 rounded-lg text-sm font-bold">📢</div>
+              </div>
 
-              {announcements.length === 0 && (
-                <p className="text-gray-500">No announcements</p>
-              )}
+              <div className="mt-4 space-y-3">
+                {announcements.length === 0 && (
+                  <p className="text-gray-500 text-sm">No announcements</p>
+                )}
 
-              {announcements.map((item) => (
-                <div key={item.id} className="border-b border-gray-200 pb-2 mb-2">
-                  <p className="font-semibold">{item.title}</p>
-                  <p className="text-gray-600 text-sm">{item.message}</p>
-                </div>
-              ))}
+                {announcements.map((item) => (
+                  <div
+                    key={item.id}
+                    className="border-l-4 border-blue-500 bg-blue-50 p-3 rounded-md shadow-sm"
+                  >
+                    <p className="font-semibold text-gray-800">{item.title}</p>
+                    <p className="text-gray-600 text-sm">{item.message}</p>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
 
-          {/* DASHBOARD CARDS */}
+          {/* UPDATED MAIN CARDS */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
 
             {/* NOTES */}
-            <div className="bg-white shadow-lg rounded-2xl p-6 hover:shadow-xl transition">
-              <h3 className="text-xl font-semibold mb-2">Videos and classes Notes</h3>
-              <p className="text-gray-500 mb-4">Handwritten + PDFs</p>
-              <a href="/class-notes" className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700">
+            <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 hover:shadow-lg transition-all duration-200">
+              <h3 className="text-xl font-semibold text-gray-900 mb-1 flex items-center gap-2">
+                📚 Class Notes
+              </h3>
+              <p className="text-gray-500 text-sm mb-4">Handwritten notes, PDFs & videos</p>
+              <a
+                href="/class-notes"
+                className="inline-block bg-blue-600 text-white px-4 py-2 rounded-md font-medium hover:bg-blue-700 shadow"
+              >
                 View Notes
               </a>
             </div>
 
             {/* ASSIGNMENTS */}
-            <div className="bg-white shadow-lg rounded-2xl p-6 hover:shadow-xl transition">
-              <h3 className="text-xl font-semibold mb-2">Assignments</h3>
-              <p className="text-gray-500 mb-4">View and submit assignments</p>
-              <a href="/assignment" className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700">
+            <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 hover:shadow-lg transition-all duration-200">
+              <h3 className="text-xl font-semibold text-gray-900 mb-1 flex items-center gap-2">
+                📝 Assignments
+              </h3>
+              <p className="text-gray-500 text-sm mb-4">View & submit assignments</p>
+              <a
+                href="/assignment"
+                className="inline-block bg-blue-600 text-white px-4 py-2 rounded-md font-medium hover:bg-blue-700 shadow"
+              >
                 View Assignments
               </a>
             </div>
 
-            {/* UPCOMING CLASS (NEW) */}
-            <div className="bg-white shadow-lg rounded-2xl p-6 hover:shadow-xl transition">
-              <h3 className="text-xl font-bold mb-2">Upcoming Class</h3>
+            {/* UPCOMING CLASS */}
+            <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 hover:shadow-lg transition-all duration-200">
+              <h3 className="text-xl font-semibold text-gray-900 mb-1 flex items-center gap-2">
+                📘 Upcoming Class
+              </h3>
 
               {upcomingClass ? (
                 <>
                   <p><strong>Topic:</strong> {upcomingClass.topic}</p>
                   <p><strong>Teacher:</strong> {upcomingClass.teacher}</p>
-                  <p className="mt-2"><strong>Starts at:</strong> {upcomingClass.nextClassTime}</p>
+                  <p className="mt-1"><strong>Starts at:</strong> {upcomingClass.nextClassTime}</p>
 
-                  <div className="bg-blue-100 text-blue-700 px-3 py-2 rounded-lg mt-3 text-center font-semibold">
+                  <div className="bg-blue-100 text-blue-700 px-4 py-2 rounded-md mt-3 text-center font-semibold shadow-sm">
                     {countdown}
                   </div>
                 </>
               ) : (
-                <p className="text-gray-500">No upcoming class</p>
+                <p className="text-gray-500 text-sm">No upcoming class</p>
               )}
             </div>
 
             {/* LIVE CLASS */}
-            <div className="bg-white shadow-lg rounded-2xl p-6 hover:shadow-xl transition col-span-1 md:col-span-3">
-              <h3 className="text-xl font-semibold mb-2">Live Class</h3>
+            <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 hover:shadow-lg transition-all duration-200 col-span-1 md:col-span-3">
+              <h3 className="text-xl font-semibold mb-2 flex items-center gap-2">
+                🎥 Live Class
+              </h3>
 
               {isLive ? (
-                <>
-                  <p className="text-green-700 mb-4 font-semibold">LIVE: {className}</p>
+                <div>
+                  <p className="text-green-600 font-semibold mb-3">🔴 LIVE NOW: {className}</p>
                   <button
                     onClick={joinLiveClass}
-                    className="bg-green-600 text-white px-4 py-2 rounded-lg shadow hover:bg-green-700"
+                    className="bg-green-600 text-white px-6 py-2 rounded-md shadow hover:bg-green-700"
                   >
-                    Join Now
+                    Join Live Class
                   </button>
-                </>
+                </div>
               ) : (
-                <>
-                  <p className="text-red-500 mb-4">No live class now</p>
-                  <button className="bg-gray-400 text-white px-4 py-2 rounded-lg cursor-not-allowed">
+                <div>
+                  <p className="text-red-500 font-semibold mb-3">No live class at the moment</p>
+                  <button className="bg-gray-400 text-white px-6 py-2 rounded-md cursor-not-allowed">
                     Waiting for Teacher
                   </button>
-                </>
+                </div>
               )}
             </div>
 
             {/* CERTIFICATE */}
-            <div className="bg-white shadow-lg rounded-2xl p-6 hover:shadow-xl transition">
-              <h3 className="text-xl font-semibold mb-2">Your Certificate</h3>
-              <p className="text-gray-500 mb-4">Download your course completion certificate</p>
+            <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 hover:shadow-lg transition-all duration-200">
+              <h3 className="text-xl font-semibold flex items-center gap-2">🎓 Certificate</h3>
+              <p className="text-gray-500 text-sm mb-4">Download your course completion certificate</p>
               <a
                 href="/certificate"
-                className="bg-purple-600 text-white px-4 py-2 rounded-lg shadow hover:bg-purple-700"
+                className="inline-block bg-purple-600 text-white px-4 py-2 rounded-md font-medium hover:bg-purple-700 shadow"
               >
                 View Certificate
               </a>
             </div>
 
-            {/* CHAT */}
-            <div className="bg-white shadow-lg rounded-2xl p-6 hover:shadow-xl transition">
-              <h3 className="text-xl font-semibold mb-2">Chat Support</h3>
-              <p className="text-gray-500 mb-4">Talk to your instructor in real time</p>
+            {/* CHAT SUPPORT */}
+            <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 hover:shadow-lg transition-all duration-200">
+              <h3 className="text-xl font-semibold flex items-center gap-2">💬 Chat Support</h3>
+              <p className="text-gray-500 text-sm mb-4">Talk to your instructor in real time</p>
               <a
                 href="/chat-support"
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700"
+                className="inline-block bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 shadow"
               >
                 Open Chat
               </a>
