@@ -81,34 +81,37 @@ export default function Login() {
       className="min-h-screen flex items-center justify-center bg-cover bg-center"
       style={{ backgroundImage: "url('/images/background.jpg')" }}
     >
-      <div className="bg-white bg-opacity-90 backdrop-blur-xl shadow-xl rounded-2xl p-10 w-full max-w-md">
+      <div className="bg-white bg-opacity-90 backdrop-blur-xl shadow-2xl rounded-2xl p-10 w-full max-w-md 
+                      transition-all hover:shadow-blue-300 hover:scale-[1.01]">
 
-        {/* 🔵 BACK BUTTON */}
-        <a href="/" className="text-blue-700 text-sm mb-4 inline-block">
+        {/* BACK BUTTON */}
+        <a href="/" className="text-blue-700 text-sm mb-4 inline-block hover:underline">
           ← Back to Main Site
         </a>
 
-        {/* 🔵 LOGO */}
-        <div className="flex justify-center mb-4">
+        {/* LOGO */}
+        <div className="relative flex justify-center mb-4">
+          <div className="absolute w-28 h-28 bg-blue-200 blur-3xl opacity-40 rounded-full"></div>
           <img 
             src="/images/logo.png"
             alt="Odia IT Training Hub Logo"
-            className="h-20 w-20 rounded-full shadow-lg border border-gray-300"
+            className="relative h-20 w-20 rounded-full shadow-lg border border-gray-300"
           />
         </div>
 
-        {/* 🔵 WELCOME BANNER */}
-        <div className="text-center mb-6">
+        {/* WELCOME BANNER */}
+        <div className="text-center mb-4">
           <h2 className="text-3xl font-bold text-blue-700">Odia IT Training Hub</h2>
           <p className="text-gray-700 text-sm mt-1">
             Personal Training • Real-Time Projects • Career Growth
           </p>
         </div>
 
-        {/* TITLE */}
-        <h3 className="text-xl font-semibold text-center mb-6 text-gray-700">
-          Student Login
-        </h3>
+        {/* TITLE WITH LINE */}
+        <div className="text-center mb-6">
+          <h3 className="text-xl font-semibold text-gray-700">Student Login</h3>
+          <div className="w-16 h-1 bg-blue-600 mx-auto mt-2 rounded-full"></div>
+        </div>
 
         <p className="text-center text-gray-600 mb-8 text-sm">
           Access your class notes & study materials
@@ -128,7 +131,7 @@ export default function Login() {
 
           <label className="text-gray-700 font-medium text-sm">Password</label>
 
-          {/* PASSWORD FIELD + EYE ICON */}
+          {/* PASSWORD FIELD */}
           <div className="relative mb-4">
             <input
               type={showPassword ? "text" : "password"}
@@ -147,10 +150,7 @@ export default function Login() {
             </span>
           </div>
 
-          {/* ERROR */}
           {error && <p className="text-red-600 mb-3">{error}</p>}
-
-          {/* RESET MESSAGE */}
           {resetMessage && <p className="text-green-600 text-sm mb-3">{resetMessage}</p>}
 
           {/* LOGIN BUTTON */}
@@ -164,7 +164,7 @@ export default function Login() {
           </button>
         </form>
 
-        {/* PASSWORD RESET LINK */}
+        {/* RESET PASSWORD */}
         <p
           className="text-center text-blue-700 mt-3 text-sm cursor-pointer hover:underline"
           onClick={handlePasswordReset}
@@ -172,7 +172,7 @@ export default function Login() {
           Forgot Password?
         </p>
 
-        {/* SIGNUP LINK */}
+        {/* SIGNUP */}
         <p className="text-center text-gray-600 mt-4 text-sm">
           Don't have an account?
           <a href="/signup" className="text-blue-700 font-semibold ml-1 hover:underline">
@@ -182,8 +182,8 @@ export default function Login() {
 
         {/* FOOTER */}
         <p className="text-center text-gray-500 text-xs mt-6">
-          © 2022–2025 Odia IT Training Hub • All Rights Reserved
-          Contact with us: +91 9437401378
+          © 2022–2025 Odia IT Training Hub • All Rights Reserved<br />
+          📞 +91 9437401378
         </p>
       </div>
     </div>
