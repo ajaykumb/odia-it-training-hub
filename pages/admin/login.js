@@ -1,23 +1,27 @@
 import { useState } from "react";
-import { auth } from "../../utils/firebaseConfig";
-import { signInWithEmailAndPassword } from "firebase/auth";
 import { useRouter } from "next/router";
 import { ShieldCheckIcon, EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 
 export default function AdminLogin() {
   const router = useRouter();
+
+  // 🔐 Hardcoded admin credentials
+  const ADMIN_EMAIL = "oracle.ajaykr@gmail.com"; 
+  const ADMIN_PASSWORD = "ajaykumb"; 
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [err, setErr] = useState("");
   const [showPass, setShowPass] = useState(false);
 
-  const login = async () => {
+  const login = () => {
     setErr("");
-    try {
-      await signInWithEmailAndPassword(auth, email, password);
+
+    if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
+      localStorage.setItem("adminLogin", "true");
       router.push("/admin/all-answers");
-    } catch (e) {
-      setErr("Invalid login details");
+    } else {
+      setErr("Invalid email or password");
     }
   };
 
@@ -50,7 +54,7 @@ export default function AdminLogin() {
           />
         </div>
 
-        {/* Password with toggle */}
+        {/* Password */}
         <div className="mb-5 relative">
           <label className="text-white font-medium">Password</label>
           <input
@@ -60,7 +64,7 @@ export default function AdminLogin() {
             focus:ring-2 focus:ring-yellow-300 outline-none"
             onChange={(e) => setPassword(e.target.value)}
           />
-          
+
           <button
             onClick={() => setShowPass(!showPass)}
             className="absolute right-3 top-11 text-white/80 hover:text-white transition"
