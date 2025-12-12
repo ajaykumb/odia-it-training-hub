@@ -101,7 +101,7 @@ export default function Login() {
         <div className="text-center mb-6">
           <h2 className="text-3xl font-bold text-blue-700">Odia IT Training Hub</h2>
           <p className="text-gray-700 text-sm mt-1">
-            Quality Training • Real-Time Projects • Career Growth
+            Personal Training • Real-Time Projects • Career Growth
           </p>
         </div>
 
@@ -183,6 +183,7 @@ export default function Login() {
         {/* FOOTER */}
         <p className="text-center text-gray-500 text-xs mt-6">
           © 2022–2025 Odia IT Training Hub • All Rights Reserved
+          Contact with us: +91 9437401378
         </p>
       </div>
     </div>
