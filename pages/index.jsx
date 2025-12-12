@@ -70,7 +70,7 @@ export default function Home() {
     href="/login"
     className="ml-6 bg-white text-blue-700 px-5 py-2 rounded-full font-bold hover:bg-gray-200 transition-all shadow-md"
   >
-    Login
+    Students Login
   </a>
 </nav>
 
