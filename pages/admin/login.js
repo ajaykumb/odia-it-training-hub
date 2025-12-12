@@ -5,7 +5,7 @@ import { ShieldCheckIcon, EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outl
 export default function AdminLogin() {
   const router = useRouter();
 
-  const ADMIN_EMAIL = "oracle.ajaykr@gmail.com";
+  const ADMIN_EMAIL = "trainingaj.group@gmail.com";
   const ADMIN_PASSWORD = "ajaykumb";
 
   const [email, setEmail] = useState("");
