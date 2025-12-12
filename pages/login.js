@@ -8,18 +8,17 @@ export default function Login() {
   const router = useRouter();
   const [email, setEmail] = useState(""); 
   const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false); // 👁 NEW
-  const [resetMessage, setResetMessage] = useState(""); // ⭐ NEW: Reset success message
+  const [showPassword, setShowPassword] = useState(false);
+  const [resetMessage, setResetMessage] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // ⭐ NEW: Password Reset Handler
+  // PASSWORD RESET
   const handlePasswordReset = async () => {
     if (!email) {
       setResetMessage("Please enter your email first.");
       return;
     }
-
     try {
       await sendPasswordResetEmail(auth, email);
       setResetMessage("Password reset link has been sent to your email.");
@@ -28,6 +27,7 @@ export default function Login() {
     }
   };
 
+  // LOGIN HANDLER
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
@@ -37,7 +37,7 @@ export default function Login() {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
-      // 🔍 Check Firestore Student Record
+      // FIRESTORE CHECK
       const q = query(collection(db, "students"), where("email", "==", email));
       const snap = await getDocs(q);
 
@@ -83,13 +83,29 @@ export default function Login() {
     >
       <div className="bg-white bg-opacity-90 backdrop-blur-xl shadow-xl rounded-2xl p-10 w-full max-w-md">
 
+        {/* 🔵 BACK BUTTON */}
         <a href="/" className="text-blue-700 text-sm mb-4 inline-block">
           ← Back to Main Site
         </a>
 
-        <h2 className="text-3xl font-bold text-center mb-2 text-blue-700">
-          Odia IT Training Hub
-        </h2>
+        {/* 🔵 LOGO */}
+        <div className="flex justify-center mb-4">
+          <img 
+            src="/images/logo.png"
+            alt="Odia IT Training Hub Logo"
+            className="h-20 w-20 rounded-full shadow-lg border border-gray-300"
+          />
+        </div>
+
+        {/* 🔵 WELCOME BANNER */}
+        <div className="text-center mb-6">
+          <h2 className="text-3xl font-bold text-blue-700">Odia IT Training Hub</h2>
+          <p className="text-gray-700 text-sm mt-1">
+            Quality Training • Real-Time Projects • Career Growth
+          </p>
+        </div>
+
+        {/* TITLE */}
         <h3 className="text-xl font-semibold text-center mb-6 text-gray-700">
           Student Login
         </h3>
@@ -98,6 +114,7 @@ export default function Login() {
           Access your class notes & study materials
         </p>
 
+        {/* FORM */}
         <form onSubmit={handleLogin}>
           <label className="text-gray-700 font-medium text-sm">Student ID (Email)</label>
           <input
@@ -110,11 +127,11 @@ export default function Login() {
           />
 
           <label className="text-gray-700 font-medium text-sm">Password</label>
-          
-          {/* ⭐ PASSWORD + EYE ICON */}
+
+          {/* PASSWORD FIELD + EYE ICON */}
           <div className="relative mb-4">
             <input
-              type={showPassword ? "text" : "password"} 
+              type={showPassword ? "text" : "password"}
               placeholder="Enter your Password"
               className="w-full p-3 border rounded"
               value={password}
@@ -122,7 +139,6 @@ export default function Login() {
               required
             />
 
-            {/* 👁 TOGGLE */}
             <span
               className="absolute right-3 top-3 cursor-pointer text-gray-600"
               onClick={() => setShowPassword(!showPassword)}
@@ -131,12 +147,13 @@ export default function Login() {
             </span>
           </div>
 
-          {/* Error Message */}
+          {/* ERROR */}
           {error && <p className="text-red-600 mb-3">{error}</p>}
 
-          {/* ⭐ RESET PASSWORD MESSAGE */}
+          {/* RESET MESSAGE */}
           {resetMessage && <p className="text-green-600 text-sm mb-3">{resetMessage}</p>}
 
+          {/* LOGIN BUTTON */}
           <button
             className={`w-full text-white py-3 rounded transition text-lg font-semibold ${
               loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
@@ -147,7 +164,7 @@ export default function Login() {
           </button>
         </form>
 
-        {/* ⭐ FORGOT PASSWORD LINK */}
+        {/* PASSWORD RESET LINK */}
         <p
           className="text-center text-blue-700 mt-3 text-sm cursor-pointer hover:underline"
           onClick={handlePasswordReset}
@@ -155,6 +172,7 @@ export default function Login() {
           Forgot Password?
         </p>
 
+        {/* SIGNUP LINK */}
         <p className="text-center text-gray-600 mt-4 text-sm">
           Don't have an account?
           <a href="/signup" className="text-blue-700 font-semibold ml-1 hover:underline">
@@ -162,8 +180,9 @@ export default function Login() {
           </a>
         </p>
 
+        {/* FOOTER */}
         <p className="text-center text-gray-500 text-xs mt-6">
-          © 2022 Odia IT Training Hub • All Rights Reserved
+          © 2022–2025 Odia IT Training Hub • All Rights Reserved
         </p>
       </div>
     </div>
