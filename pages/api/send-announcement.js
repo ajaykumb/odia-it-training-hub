@@ -7,11 +7,11 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { title, message } = req.body;
+  const { title, message, batch } = req.body;
 
-  if (!title || !message) {
-    return res.status(400).json({ error: "Title and message required" });
-  }
+if (!title || !message || !batch) {
+  return res.status(400).json({ error: "Title, message and batch required" });
+}
 
   try {
     console.log("📢 Preparing announcement email broadcast...");
@@ -19,7 +19,8 @@ export default async function handler(req, res) {
     // 1️⃣ Fetch all APPROVED students
     const q = query(
       collection(db, "students"),
-      where("isApproved", "==", true)
+      where("isApproved", "==", true),
+      where("batch", "==", batch)
     );
 
     const snap = await getDocs(q);
