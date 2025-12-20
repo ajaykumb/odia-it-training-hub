@@ -78,6 +78,7 @@ export default function AllAnswers() {
     await addDoc(collection(db, "announcements"), {
       title: annTitle,
       message: annMessage,
+      batch: selectedBatch,
       timestamp: Date.now(),
     });
 
@@ -89,6 +90,7 @@ export default function AllAnswers() {
         body: JSON.stringify({
           title: annTitle,
           message: annMessage,
+           batch: selectedBatch,
         }),
       });
 
@@ -309,6 +311,13 @@ export default function AllAnswers() {
             value={annMessage}
             onChange={(e) => setAnnMessage(e.target.value)}
           ></textarea>
+
+              <input
+          className="w-full p-3 border rounded-lg mb-3"
+          placeholder="Batch name (e.g. GREEN_BATCH_1)"
+          value={selectedBatch}
+          onChange={(e) => setSelectedBatch(e.target.value)}
+        />
 
           <button
             onClick={saveAnnouncement}
