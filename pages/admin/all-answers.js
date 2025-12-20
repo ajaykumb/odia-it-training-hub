@@ -31,7 +31,9 @@ export default function AllAnswers() {
 
   const router = useRouter();
 
-    // HARD-CODED ADMIN LOGIN PROTECTION
+  // ---------------------------
+  // ADMIN LOGIN PROTECTION
+  // ---------------------------
   useEffect(() => {
     const ok = localStorage.getItem("adminLogin");
     if (!ok) {
@@ -39,19 +41,22 @@ export default function AllAnswers() {
     }
   }, []);
 
-
   // ---------------------------
-  // NEW FEATURE STATES
+  // ANNOUNCEMENT STATES
   // ---------------------------
   const [annTitle, setAnnTitle] = useState("");
   const [annMessage, setAnnMessage] = useState("");
+  const [selectedBatch, setSelectedBatch] = useState(""); // ✅ NEW
 
+  // ---------------------------
+  // UPCOMING CLASS STATES
+  // ---------------------------
   const [topic, setTopic] = useState("");
   const [teacher, setTeacher] = useState("");
   const [nextClassTime, setNextClassTime] = useState("");
   const [isUpcomingLive, setIsUpcomingLive] = useState(false);
 
-  // Load upcoming class for admin edit
+  // Load upcoming class
   useEffect(() => {
     const unsub = onSnapshot(doc(db, "liveClassStatus", "active"), (snap) => {
       if (snap.exists()) {
@@ -66,22 +71,26 @@ export default function AllAnswers() {
   }, []);
 
   // ---------------------------------------------------
-  // ADD ANNOUNCEMENT + SEND EMAIL TO ALL APPROVED USERS
+  // SAVE ANNOUNCEMENT + SEND EMAIL (BATCH WISE)
   // ---------------------------------------------------
   const saveAnnouncement = async () => {
-    if (!annTitle.trim() || !annMessage.trim()) {
-      alert("Please fill all fields");
+    if (
+      !annTitle.trim() ||
+      !annMessage.trim() ||
+      !selectedBatch.trim()
+    ) {
+      alert("Please fill all fields including batch");
       return;
     }
 
-    // 1️⃣ Save Announcement to Firestore (existing logic)
+    // Save announcement
     await addDoc(collection(db, "announcements"), {
       title: annTitle,
       message: annMessage,
+      batch: selectedBatch, // ✅ saved
       timestamp: Date.now(),
     });
 
-    // 2️⃣ Send Email to all approved students (NEW)
     try {
       const res = await fetch("/api/send-announcement", {
         method: "POST",
@@ -89,13 +98,14 @@ export default function AllAnswers() {
         body: JSON.stringify({
           title: annTitle,
           message: annMessage,
+          batch: selectedBatch, // ✅ sent to API
         }),
       });
 
       const result = await res.json();
 
       if (result.success) {
-        alert(`📨 Announcement added + Email sent to ${result.sent} students!`);
+        alert(`📨 Email sent to ${result.sent} students`);
       } else {
         alert("Announcement saved but email sending failed.");
       }
@@ -106,6 +116,7 @@ export default function AllAnswers() {
 
     setAnnTitle("");
     setAnnMessage("");
+    setSelectedBatch("");
   };
 
   // UPDATE UPCOMING CLASS
@@ -116,12 +127,11 @@ export default function AllAnswers() {
       nextClassTime,
       isLive: isUpcomingLive,
     });
-
     alert("Upcoming class updated!");
   };
 
   // ---------------------------
-  // EXISTING AUTH + SUBMISSIONS
+  // AUTH + ASSIGNMENTS
   // ---------------------------
   useEffect(() => {
     const unsubAuth = onAuthStateChanged(auth, (user) => {
@@ -150,7 +160,7 @@ export default function AllAnswers() {
   }, [router]);
 
   // ---------------------------
-  // EXISTING LIVE STUDENTS
+  // LIVE STUDENTS
   // ---------------------------
   useEffect(() => {
     const liveRef = ref(rtdb, "liveStudents");
@@ -166,7 +176,6 @@ export default function AllAnswers() {
     return answers;
   }, [answers, filter]);
 
-  // DATE FORMATTER (existing)
   const formatDate = (d) => {
     if (!d) return "N/A";
     try {
@@ -178,145 +187,61 @@ export default function AllAnswers() {
     }
   };
 
-  // DELETE SUBMISSION
-  const handleDelete = async (id) => {
-    const ok = window.confirm("Delete this submission?");
-    if (!ok) return;
-
-    await deleteDoc(doc(db, "assignments", id));
-    setAnswers((prev) => prev.filter((i) => i.id !== id));
-  };
-
   // ---------------------------
-  // EXISTING LIVE CLASS CONTROLS
+  // UI
   // ---------------------------
-  const startLiveClass = async () => {
-    if (!className.trim()) return alert("Please enter class name");
-
-    await setDoc(doc(db, "liveClass", "current"), {
-      isLive: true,
-      className,
-      meetingUrl:
-        meetingUrl.trim() ||
-        "https://meet.jit.si/OdiaITTrainingHubLiveClass",
-      startedAt: Date.now(),
-    });
-
-    alert("Live class started!");
-  };
-
-  const stopLiveClass = async () => {
-    await setDoc(doc(db, "liveClass", "current"), {
-      isLive: false,
-      className: "",
-      meetingUrl: "",
-      endedAt: Date.now(),
-    });
-
-    alert("Live class stopped.");
-  };
-
-  const joinAsTeacher = () => {
-    const url =
-      meetingUrl.trim() ||
-      "https://meet.jit.si/OdiaITTrainingHubLiveClass";
-    window.open(url, "_blank");
-  };
-
-  // ---------------------------
-  // EXISTING CHAT USERS
-  // ---------------------------
-  useEffect(() => {
-    const q = query(collection(db, "chats"), orderBy("updatedAt", "desc"));
-    const unsub = onSnapshot(q, (snap) => {
-      const arr = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-      setChatUsers(arr);
-    });
-    return () => unsub();
-  }, []);
-
-  // LOAD CHAT MESSAGES
-  useEffect(() => {
-    if (!selectedStudent) return;
-    const msgRef = collection(db, "chats", selectedStudent, "messages");
-    const q = query(msgRef, orderBy("timestamp", "asc"));
-    const unsub = onSnapshot(q, (snap) => {
-      const arr = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-      setMessages(arr);
-    });
-    return () => unsub();
-  }, [selectedStudent]);
-
-  // SEND TEACHER MESSAGE
-  const sendTeacherReply = async () => {
-    if (!reply.trim()) return;
-
-    await addDoc(collection(db, "chats", selectedStudent, "messages"), {
-      sender: "teacher",
-      text: reply.trim(),
-      timestamp: serverTimestamp(),
-      seenByTeacher: true,
-    });
-
-    await updateDoc(doc(db, "chats", selectedStudent), {
-      updatedAt: serverTimestamp(),
-    });
-
-    setReply("");
-  };
-
-  // ---------------------------
-  // UI STARTS HERE
-  // ---------------------------
-
   return (
     <main className="min-h-screen bg-gradient-to-br from-gray-100 via-blue-50 to-gray-100 p-6">
 
       {/* HEADER */}
       <div className="flex justify-between items-center mb-10">
-        <h1 className="text-4xl font-extrabold text-gray-800 tracking-tight">
+        <h1 className="text-4xl font-extrabold text-gray-800">
           Admin Dashboard
         </h1>
         <button
           onClick={() => signOut(auth)}
-          className="bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-lg shadow"
+          className="bg-red-600 text-white px-5 py-2 rounded-lg"
         >
           Logout
         </button>
       </div>
 
-      {/* NEW SECTION: ANNOUNCEMENT + UPCOMING CLASS */}
+      {/* ANNOUNCEMENT SECTION */}
       <section className="bg-white shadow-xl rounded-2xl p-6 mb-10 border border-yellow-300">
         <h2 className="text-2xl font-bold text-yellow-700 mb-5">
-          📢 Announcements & Upcoming Class Control
+          📢 Announcements
         </h2>
 
-        {/* ANNOUNCEMENT FORM */}
-        <div className="mb-8">
-          <h3 className="font-bold text-lg mb-2">Create Announcement</h3>
+        <input
+          className="w-full p-3 border rounded-lg mb-3"
+          placeholder="Announcement Title"
+          value={annTitle}
+          onChange={(e) => setAnnTitle(e.target.value)}
+        />
 
-          <input
-            className="w-full p-3 border rounded-lg mb-3"
-            placeholder="Announcement Title"
-            value={annTitle}
-            onChange={(e) => setAnnTitle(e.target.value)}
-          />
+        <textarea
+          className="w-full p-3 border rounded-lg mb-3"
+          placeholder="Announcement Message"
+          rows="3"
+          value={annMessage}
+          onChange={(e) => setAnnMessage(e.target.value)}
+        />
 
-          <textarea
-            className="w-full p-3 border rounded-lg mb-3"
-            placeholder="Announcement Message"
-            rows="3"
-            value={annMessage}
-            onChange={(e) => setAnnMessage(e.target.value)}
-          ></textarea>
+        {/* ✅ NEW BATCH INPUT */}
+        <input
+          className="w-full p-3 border rounded-lg mb-3"
+          placeholder="Batch name (e.g. GREEN_BATCH_1)"
+          value={selectedBatch}
+          onChange={(e) => setSelectedBatch(e.target.value)}
+        />
 
-          <button
-            onClick={saveAnnouncement}
-            className="bg-yellow-600 hover:bg-yellow-700 text-white px-5 py-2 rounded-lg shadow"
-          >
-            Post Announcement
-          </button>
-        </div>
+        <button
+          onClick={saveAnnouncement}
+          className="bg-yellow-600 text-white px-5 py-2 rounded-lg"
+        >
+          Post Announcement
+        </button>
+      </section>
 
         {/* UPCOMING CLASS FORM */}
         <h3 className="font-bold text-lg mb-2">Upcoming Class Details</h3>
