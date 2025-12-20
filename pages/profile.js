@@ -36,7 +36,7 @@ export default function StudentProfile() {
 
     // course
     courseName: "",
-    batchName: "",
+    batch: "",
     batchTime: "",
     studentId: "",
     joinDate: "",
@@ -336,7 +336,7 @@ export default function StudentProfile() {
 
             <div className="form-group">
               <label>Batch Name</label>
-              <input name="batchName" value={profile.batchName} onChange={handleChange} />
+              <input name="batch" value={profile.batch} onChange={handleChange} />
             </div>
 
             <div className="form-group">
