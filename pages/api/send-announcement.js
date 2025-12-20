@@ -9,19 +9,31 @@ export default async function handler(req, res) {
 
   const { title, message, batch } = req.body;
 
-if (!title || !message || !batch) {
-  return res.status(400).json({ error: "Title, message and batch required" });
-}
+  // ✅ batch is OPTIONAL now
+  if (!title || !message) {
+    return res.status(400).json({ error: "Title and message required" });
+  }
 
   try {
     console.log("📢 Preparing announcement email broadcast...");
 
-    // 1️⃣ Fetch all APPROVED students
-    const q = query(
-      collection(db, "students"),
-      where("isApproved", "==", true),
-      where("batch", "==", batch)
-    );
+    let q;
+
+    // ✅ If batch is provided → batch-wise
+    if (batch && batch.trim() !== "") {
+      q = query(
+        collection(db, "students"),
+        where("isApproved", "==", true),
+        where("batch", "==", batch)
+      );
+    } 
+    // ✅ If batch is empty → ALL approved students
+    else {
+      q = query(
+        collection(db, "students"),
+        where("isApproved", "==", true)
+      );
+    }
 
     const snap = await getDocs(q);
     const students = snap.docs.map(doc => doc.data());
@@ -32,7 +44,6 @@ if (!title || !message || !batch) {
 
     console.log(`📬 Sending emails to ${students.length} students...`);
 
-    // 2️⃣ Configure SMTP
     const transporter = nodemailer.createTransport({
       host: "smtp.gmail.com",
       port: 465,
@@ -43,25 +54,22 @@ if (!title || !message || !batch) {
       }
     });
 
-    // 3️⃣ Send email to each approved student
     for (const student of students) {
       if (!student.email) continue;
 
-      const mailOptions = {
+      await transporter.sendMail({
         from: `"Odia IT Training Hub" <${process.env.MAIL_USER}>`,
         to: student.email,
         subject: `📢 Announcement: ${title}`,
         html: `
-          <p>Hello <strong>${student.name}</strong>,</p>
-          <p>There is a new announcement from <strong>Odia IT Training Hub</strong>:</p>
+          <p>Hello <strong>${student.name || "Student"}</strong>,</p>
           <h3>${title}</h3>
           <p>${message}</p>
           <br/>
           <p>Regards,<br/>Odia IT Training Hub Team</p>
         `
-      };
+      });
 
-      await transporter.sendMail(mailOptions);
       console.log("📨 Email sent to", student.email);
     }
 
