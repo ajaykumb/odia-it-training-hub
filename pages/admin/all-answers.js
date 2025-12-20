@@ -383,6 +383,88 @@ export default function AllAnswers() {
         </div>
       </section>
 
+{/* CHAT SUPPORT */}
+      <section className="bg-white shadow-xl rounded-2xl p-6 mb-10 border border-blue-100">
+        <h2 className="text-2xl font-bold text-blue-700 mb-4">💬 Student Chat Support</h2>
+
+        <div className="grid grid-cols-3 gap-6">
+          {/* STUDENT LIST */}
+          <div className="border rounded-xl p-4 shadow-sm h-[350px] overflow-y-auto bg-gray-50">
+            <h3 className="font-bold mb-3 text-gray-700">Students</h3>
+
+            {chatUsers.length === 0 && (
+              <p className="text-gray-500 text-sm">No students yet.</p>
+            )}
+
+            {chatUsers.map((u) => (
+              <div
+                key={u.id}
+                className={`p-3 mb-2 rounded-lg cursor-pointer shadow-sm border ${
+                  selectedStudent === u.id ? "bg-blue-100 border-blue-300" : "bg-white"
+                }`}
+                onClick={() => setSelectedStudent(u.id)}
+              >
+                <p className="font-semibold text-gray-800">
+                  {u.name || "Unknown Student"}
+                </p>
+                <p className="text-xs text-gray-500">{u.id}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* CHAT WINDOW */}
+          <div className="col-span-2 border rounded-xl p-4 shadow-sm flex flex-col bg-gray-50 h-[350px]">
+            <h3 className="font-bold text-gray-700 mb-3">
+              {selectedStudent ? `Chat with ${selectedStudent}` : "Select a student"}
+            </h3>
+
+            <div className="flex-1 overflow-y-auto bg-white rounded-lg p-3 shadow-inner mb-3">
+              {!selectedStudent && (
+                <p className="text-gray-500 text-center mt-10">
+                  Select a student to start chat.
+                </p>
+              )}
+
+              {messages.map((m) => (
+                <div
+                  key={m.id}
+                  className={`mb-3 flex ${
+                    m.sender === "teacher" ? "justify-end" : "justify-start"
+                  }`}
+                >
+                  <div
+                    className={`px-3 py-2 rounded-lg shadow max-w-xs ${
+                      m.sender === "teacher"
+                        ? "bg-blue-600 text-white"
+                        : "bg-gray-200 text-gray-800"
+                    }`}
+                  >
+                    {m.text}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {selectedStudent && (
+              <div className="flex gap-2">
+                <input
+                  className="border rounded-lg flex-1 px-3 py-2 shadow-sm"
+                  placeholder="Type your reply..."
+                  value={reply}
+                  onChange={(e) => setReply(e.target.value)}
+                />
+                <button
+                  onClick={sendTeacherReply}
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow"
+                >
+                  Send
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
+
       {/* FILTER BUTTONS */}
       <div className="flex gap-3 mb-8">
         {["all", "manual", "auto"].map((f) => (
