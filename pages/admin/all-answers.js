@@ -45,6 +45,7 @@ export default function AllAnswers() {
   // ---------------------------
   const [annTitle, setAnnTitle] = useState("");
   const [annMessage, setAnnMessage] = useState("");
+  const [selectedBatch, setSelectedBatch] = useState("");
 
   const [topic, setTopic] = useState("");
   const [teacher, setTeacher] = useState("");
