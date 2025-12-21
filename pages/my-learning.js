@@ -1,75 +1,93 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
+import { db } from "../utils/firebaseConfig";
 import {
   collection,
+  doc,
   getDocs,
   query,
   orderBy,
-  doc,
-  getDoc,
 } from "firebase/firestore";
-import { db } from "../utils/firebaseConfig";
 
 export default function MyLearning() {
   const router = useRouter();
 
+  const COURSE_ID = "PL-SQL"; // must match Firestore doc ID
+
   const [videos, setVideos] = useState([]);
-  const [currentVideo, setCurrentVideo] = useState(null);
-  const [progress, setProgress] = useState(0);
+  const [selectedVideo, setSelectedVideo] = useState(null);
 
-  const COURSE_ID = "PL-SQL"; // 🔹 Your course document ID
-
-  // 🔐 Login check
+  // ---------------------------
+  // LOGIN CHECK
+  // ---------------------------
   useEffect(() => {
     const token = localStorage.getItem("studentToken");
     if (!token) router.push("/login");
   }, [router]);
 
-  // 📚 Load videos
+  // ---------------------------
+  // LOAD VIDEOS FROM FIRESTORE
+  // ---------------------------
   useEffect(() => {
     const loadVideos = async () => {
-      const q = query(
-        collection(db, "courses", COURSE_ID, "videos"),
-        orderBy("order", "asc")
-      );
-      const snap = await getDocs(q);
-      const list = snap.docs.map((d) => ({
-        id: d.id,
-        ...d.data(),
-      }));
-      setVideos(list);
+      try {
+        const videosRef = collection(
+          db,
+          "courses",
+          COURSE_ID,
+          "videos"
+        );
+
+        const q = query(videosRef, orderBy("order", "asc"));
+        const snap = await getDocs(q);
+
+        const list = snap.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+
+        setVideos(list);
+      } catch (err) {
+        console.error("Error loading videos:", err);
+      }
     };
+
     loadVideos();
   }, []);
 
-  // 📊 Progress calculation (basic)
-  useEffect(() => {
-    if (videos.length === 0) return;
-    if (!currentVideo) return;
-    const completed = 1; // temporary (we’ll automate next)
-    setProgress(Math.round((completed / videos.length) * 100));
-  }, [currentVideo, videos]);
+  // ---------------------------
+  // PROGRESS CALCULATION
+  // (simple version for now)
+  // ---------------------------
+  const progress =
+    videos.length > 0 && selectedVideo
+      ? Math.round((1 / videos.length) * 100)
+      : 0;
 
   return (
-    <main className="min-h-screen bg-blue-100 p-6">
-      <h1 className="text-3xl font-bold text-blue-900 mb-4">
-        📘 My Learning – PL/SQL
+    <main className="min-h-screen bg-blue-100 p-8">
+      {/* HEADER */}
+      <h1 className="text-3xl font-bold text-blue-900 mb-6">
+        📘 My Learning — PL/SQL
       </h1>
 
-      {/* Progress */}
-      <div className="bg-white rounded-xl p-4 shadow mb-6">
-        <p className="font-semibold mb-2">Course Progress: {progress}%</p>
-        <div className="w-full h-2 bg-gray-200 rounded">
+      {/* PROGRESS BAR */}
+      <div className="bg-white p-4 rounded-lg shadow mb-6">
+        <p className="font-semibold mb-2">
+          Course Progress: {progress}%
+        </p>
+        <div className="w-full bg-gray-200 h-2 rounded">
           <div
-            className="h-2 bg-blue-600 rounded"
+            className="bg-blue-600 h-2 rounded"
             style={{ width: `${progress}%` }}
-          />
+          ></div>
         </div>
       </div>
 
-      <div className="grid md:grid-cols-3 gap-6">
+      {/* CONTENT */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* VIDEO LIST */}
-        <div className="bg-white rounded-xl p-4 shadow">
+        <div className="bg-white p-4 rounded-lg shadow">
           <h2 className="font-bold text-lg mb-3">📚 Video Lessons</h2>
 
           {videos.length === 0 && (
@@ -79,41 +97,42 @@ export default function MyLearning() {
           {videos.map((v) => (
             <div
               key={v.id}
-              onClick={() => setCurrentVideo(v)}
-              className={`p-3 mb-2 rounded-lg cursor-pointer border ${
-                currentVideo?.id === v.id
+              onClick={() => setSelectedVideo(v)}
+              className={`p-3 mb-2 rounded cursor-pointer border ${
+                selectedVideo?.id === v.id
                   ? "bg-blue-100 border-blue-400"
                   : "bg-gray-50 hover:bg-gray-100"
               }`}
             >
-              ▶ {v.title}
+              <p className="font-semibold">{v.title}</p>
+              <p className="text-xs text-gray-500">
+                Lesson {v.order}
+              </p>
             </div>
           ))}
         </div>
 
         {/* VIDEO PLAYER */}
-        <div className="md:col-span-2 bg-white rounded-xl p-4 shadow">
-          {!currentVideo && (
-            <p className="text-gray-500 text-center mt-10">
+        <div className="md:col-span-2 bg-white p-4 rounded-lg shadow">
+          {!selectedVideo ? (
+            <p className="text-gray-500 text-center mt-20">
               Select a video to start learning
             </p>
-          )}
-
-          {currentVideo && (
+          ) : (
             <>
               <h2 className="font-bold text-xl mb-4">
-                ▶ {currentVideo.title}
+                🎬 {selectedVideo.title}
               </h2>
 
               <div className="aspect-video w-full">
                 <iframe
-                  className="w-full h-full rounded-lg"
-                  src={`https://www.youtube.com/embed/${currentVideo.youtubeId}`}
-                  title={currentVideo.title}
+                  className="w-full h-full rounded"
+                  src={`https://www.youtube.com/embed/${selectedVideo.youtubeId}`}
+                  title={selectedVideo.title}
                   frameBorder="0"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
-                />
+                ></iframe>
               </div>
             </>
           )}
