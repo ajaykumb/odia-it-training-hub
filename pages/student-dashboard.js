@@ -140,6 +140,11 @@ export default function StudentDashboard() {
             <a className="flex items-center gap-3 hover:text-blue-600" href="#">
               <HomeIcon className="w-5 h-5" /> Dashboard
             </a>
+        
+            <a className="flex items-center gap-3 hover:text-blue-600"
+             href="/my-learning">
+            <BookOpenIcon className="w-5 h-5" /> My Learning
+            </a>
 
             <a className="flex items-center gap-3 hover:text-blue-600" href="/class-notes">
               <BookOpenIcon className="w-5 h-5" /> Class Notes
@@ -315,6 +320,36 @@ export default function StudentDashboard() {
                 </div>
               )}
             </div>
+
+{/* MY LEARNING  CARD*/} 
+<div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 hover:shadow-lg transition-all duration-200">
+  <h3 className="text-xl font-semibold flex items-center gap-2">
+    🎬 My Learning
+  </h3>
+  <p className="text-gray-500 text-sm mb-4">
+    Continue watching course videos
+  </p>
+
+  <div className="mb-3">
+    <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+      <div
+        className="h-2 bg-blue-600"
+        style={{ width: `${progress}%` }}
+      />
+    </div>
+    <p className="text-xs text-gray-500 mt-1">
+      {progress}% completed
+    </p>
+  </div>
+
+  <a
+    href="/my-learning"
+    className="inline-block bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 shadow"
+  >
+    Continue Learning
+  </a>
+</div>
+
 
             {/* CERTIFICATE */}
             <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 hover:shadow-lg transition-all duration-200">
