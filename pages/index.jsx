@@ -3,6 +3,25 @@ import { BoltIcon, AcademicCapIcon, MapPinIcon, GlobeAltIcon, UsersIcon, CheckCi
 export default function Home() {
   // Use icons for courses to make them more visually appealing
   const courses = [
+    // 🎄 Festive Popup state
+const [showFestivePopup, setShowFestivePopup] = useState(false);
+
+useEffect(() => {
+  const today = new Date();
+  const disableDate = new Date("2026-01-01"); // Auto-disable after Jan 1, 2026
+
+  if (today < disableDate) {
+    setShowFestivePopup(true);
+
+    // Auto close after 10 seconds
+    const timer = setTimeout(() => {
+      setShowFestivePopup(false);
+    }, 10000);
+
+    return () => clearTimeout(timer);
+  }
+}, []);
+
     { title: "Oracle SQL & PL/SQL", icon: <BoltIcon className="w-6 h-6 text-yellow-500" /> },
     { title: "Unix/Linux & Shell Scripting", icon: <AcademicCapIcon className="w-6 h-6 text-green-500" /> },
     { title: "ITIL & Batch Tools (Autosys, Control-M)", icon: <UsersIcon className="w-6 h-6 text-red-500" /> },
@@ -548,6 +567,55 @@ export default function Home() {
 
       {/* 📄 Footer */}
       <footer className="bg-gray-900 text-gray-400 text-center py-8">
+        {/* 🎄🎉 Festive Popup */}
+{showFestivePopup && (
+  <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/60 backdrop-blur-sm">
+
+    {/* ❄️ Snowflakes */}
+    {[...Array(20)].map((_, i) => (
+      <div
+        key={i}
+        className="snowflake"
+        style={{
+          left: `${Math.random() * 100}vw`,
+          animationDuration: `${5 + Math.random() * 5}s`,
+          fontSize: `${12 + Math.random() * 10}px`,
+        }}
+      >
+        ❄
+      </div>
+    ))}
+
+    {/* Popup Card */}
+    <div className="relative bg-white rounded-2xl shadow-2xl max-w-md w-[90%] overflow-hidden animate-scale-in">
+
+      {/* ❌ Close */}
+      <button
+        onClick={() => setShowFestivePopup(false)}
+        className="absolute top-3 right-3 bg-red-600 text-white w-8 h-8 rounded-full font-bold"
+      >
+        ✕
+      </button>
+
+      {/* 🎄 Image */}
+      <img
+        src="/images/christmas-newyear-popup.jpg"
+        alt="Merry Christmas and Happy New Year"
+        className="w-full"
+      />
+
+      <div className="p-6 text-center">
+        <h3 className="text-2xl font-extrabold text-red-600">
+          🎄 Merry Christmas
+        </h3>
+        <h4 className="text-xl font-bold text-blue-700">
+          🎉 Happy New Year 2026
+        </h4>
+      </div>
+    </div>
+  </div>
+)}
+
         <div className="max-w-6xl mx-auto px-6">
           <p>© 2022 Odia IT Training Hub. All rights reserved.</p>
           <p className="mt-2 text-sm">Empowering the next generation of IT professionals.</p>
