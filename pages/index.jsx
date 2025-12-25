@@ -571,23 +571,11 @@ export default function Home() {
   />
   <span className="font-bold text-lg">Chat Now</span>
 </a>
-
-      {/* 📄 Footer */}
-      <footer className="bg-gray-900 text-gray-400 text-center py-8">
-        <div className="max-w-6xl mx-auto px-6">
-          <p>© 2022 Odia IT Training Hub. All rights reserved.</p>
-          <p className="mt-2 text-sm">Empowering the next generation of IT professionals.</p>
-        </div>
-      </footer>
-    </main>
-  );
-}
-
-{/* ================= FESTIVE POPUP (NEW) ================= */}
+      
+      {/* ================= FESTIVE POPUP (FIXED LOCATION) ================= */}
       {showFestivePopup && (
         <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/60 backdrop-blur-sm">
 
-          {/* ❄️ Snowflakes */}
           {[...Array(20)].map((_, i) => (
             <div
               key={i}
@@ -602,7 +590,6 @@ export default function Home() {
             </div>
           ))}
 
-          {/* Popup */}
           <div className="relative bg-white rounded-2xl shadow-2xl max-w-md w-[90%] overflow-hidden animate-scale-in">
             <button
               onClick={() => setShowFestivePopup(false)}
@@ -625,6 +612,13 @@ export default function Home() {
         </div>
       )}
 
+      {/* 📄 Footer */}
+      <footer className="bg-gray-900 text-gray-400 text-center py-8">
+        <div className="max-w-6xl mx-auto px-6">
+          <p>© 2022 Odia IT Training Hub. All rights reserved.</p>
+          <p className="mt-2 text-sm">Empowering the next generation of IT professionals.</p>
+        </div>
+      </footer>
     </main>
   );
 }
