@@ -112,7 +112,7 @@ export default async function handler(req, res) {
           <tr>
             <td style="background:#1e3a8a; padding:20px; text-align:center; color:#ffffff;">
               <img
-                src="https://firebasestorage.googleapis.com/v0/b/odiaittraininghub.appspot.com/o/logo.png?alt=media"
+                src="https://www.odiaittraininghub.in/images/logo.png"
                 style="max-width:120px; margin-bottom:10px;"
               />
               <h2 style="margin:0;">Odia IT Training Hub</h2>
