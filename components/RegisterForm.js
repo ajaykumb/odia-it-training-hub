@@ -15,6 +15,7 @@ export default function RegisterForm() {
     name: "",
     email: "",
     phone: "",
+    candidateType: "New Student", // ✅ mandatory & fixed
   });
 
   const [loading, setLoading] = useState(false);
@@ -35,12 +36,10 @@ export default function RegisterForm() {
         createdAt: serverTimestamp(),
       });
 
-      // ✅ 2) SEND THANK YOU EMAIL (NEW)
+      // ✅ 2) SEND THANK YOU EMAIL
       await fetch("/api/sendRegistrationThankYou", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           toEmail: form.email,
           name: form.name,
@@ -53,7 +52,12 @@ export default function RegisterForm() {
       );
 
       // ✅ 4) RESET FORM
-      setForm({ name: "", email: "", phone: "" });
+      setForm({
+        name: "",
+        email: "",
+        phone: "",
+        candidateType: "New Student",
+      });
     } catch (error) {
       console.error("Registration error:", error);
       alert("Registration failed. Please try again.");
@@ -166,6 +170,29 @@ export default function RegisterForm() {
                   placeholder="10-digit mobile number"
                 />
               </div>
+            </div>
+
+            {/* Candidate Type – Mandatory Single Option */}
+            <div>
+              <label className="text-sm font-medium text-gray-600 mb-1 block">
+                Candidate Type <span className="text-red-500">*</span>
+              </label>
+
+              <div className="flex items-center gap-2 border rounded-lg p-3 bg-gray-50">
+                <input
+                  type="radio"
+                  checked
+                  readOnly
+                  className="accent-blue-600"
+                />
+                <span className="text-gray-800 font-medium">
+                  New Student
+                </span>
+              </div>
+
+              <p className="text-xs text-gray-500 mt-1">
+                Currently, registrations are open only for new students.
+              </p>
             </div>
 
             {/* Submit */}
