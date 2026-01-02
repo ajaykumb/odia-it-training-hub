@@ -16,6 +16,8 @@ export default function Home() {
 
   /* ================= FESTIVE POPUP STATE ================= */
   const [showFestivePopup, setShowFestivePopup] = useState(false);
+    /* ================= ACCESS PORTAL DROPDOWN ================= */
+  const [openAccess, setOpenAccess] = useState(false);
 
   useEffect(() => {
     const today = new Date();
