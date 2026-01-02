@@ -7,9 +7,11 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { title, message, batch } = req.body;
+  // ✅ ADDED target (does NOT break existing calls)
+  const { title, message, batch, target } = req.body;
+  // target = "students" | "newStudents"
 
-  // ✅ batch OPTIONAL
+  // ✅ batch OPTIONAL (unchanged)
   if (!title || !message) {
     return res.status(400).json({ error: "Title and message required" });
   }
@@ -17,32 +19,54 @@ export default async function handler(req, res) {
   try {
     console.log("📢 Preparing announcement email broadcast...");
 
-    let q;
+    let recipients = [];
 
-    // ✅ Batch-wise OR All approved students
-    if (batch && batch.trim() !== "") {
-      q = query(
-        collection(db, "students"),
-        where("isApproved", "==", true),
-        where("batch", "==", batch)
+    // =====================================================
+    // ✅ NEW ADDITION: SEND TO NEW STUDENTS (registrations)
+    // =====================================================
+    if (target === "newStudents") {
+      console.log("🎯 Targeting NEW STUDENTS from registrations");
+
+      const q = query(
+        collection(db, "registrations"),
+        where("candidateType", "==", "New Student")
       );
-    } else {
-      q = query(
-        collection(db, "students"),
-        where("isApproved", "==", true)
-      );
+
+      const snap = await getDocs(q);
+      recipients = snap.docs.map(doc => doc.data());
     }
 
-    const snap = await getDocs(q);
-    const students = snap.docs.map(doc => doc.data());
+    // =====================================================
+    // ✅ EXISTING LOGIC (APPROVED STUDENTS) – UNCHANGED
+    // =====================================================
+    else {
+      let q;
 
-    if (students.length === 0) {
+      // ✅ Batch-wise OR All approved students
+      if (batch && batch.trim() !== "") {
+        q = query(
+          collection(db, "students"),
+          where("isApproved", "==", true),
+          where("batch", "==", batch)
+        );
+      } else {
+        q = query(
+          collection(db, "students"),
+          where("isApproved", "==", true)
+        );
+      }
+
+      const snap = await getDocs(q);
+      recipients = snap.docs.map(doc => doc.data());
+    }
+
+    if (recipients.length === 0) {
       return res.status(200).json({ success: true, sent: 0 });
     }
 
-    console.log(`📬 Sending emails to ${students.length} students...`);
+    console.log(`📬 Sending emails to ${recipients.length} users...`);
 
-    // ✅ SMTP
+    // ✅ SMTP (UNCHANGED)
     const transporter = nodemailer.createTransport({
       host: "smtp.gmail.com",
       port: 465,
@@ -53,7 +77,7 @@ export default async function handler(req, res) {
       }
     });
 
-    // ✅ PROFESSIONAL HTML TEMPLATE FUNCTION
+    // ✅ EMAIL TEMPLATE (UNCHANGED)
     const buildEmailTemplate = (name) => `
 <!DOCTYPE html>
 <html>
@@ -72,7 +96,7 @@ export default async function handler(req, res) {
           <tr>
             <td style="background:#1e3a8a; padding:20px; text-align:center; color:#ffffff;">
               <img
-                src="https://www.odiaittraininghub.in/images/logo.png"
+                src="https://firebasestorage.googleapis.com/v0/b/odiaittraininghub.appspot.com/o/logo.png?alt=media"
                 alt="Odia IT Training Hub"
                 style="max-width:120px; margin-bottom:10px;"
               />
@@ -121,7 +145,7 @@ export default async function handler(req, res) {
           <!-- FOOTER -->
           <tr>
             <td style="background:#f1f5f9; padding:15px; text-align:center; font-size:12px; color:#555;">
-              © 2025 Odia IT Training Hub. All rights reserved.<br/>
+              © 2026 Odia IT Training Hub. All rights reserved.<br/>
               <a href="https://www.odiaittraininghub.in" style="color:#1e3a8a; text-decoration:none;">
                 www.odiaittraininghub.in
               </a>
@@ -137,23 +161,23 @@ export default async function handler(req, res) {
 </html>
 `;
 
-    // ✅ SEND EMAILS
-    for (const student of students) {
-      if (!student.email) continue;
+    // ✅ SEND EMAILS (UNCHANGED LOOP)
+    for (const user of recipients) {
+      if (!user.email) continue;
 
       await transporter.sendMail({
         from: `"Odia IT Training Hub" <${process.env.MAIL_USER}>`,
-        to: student.email,
+        to: user.email,
         subject: `📢 ${title}`,
-        html: buildEmailTemplate(student.name || "Student")
+        html: buildEmailTemplate(user.name || "Student")
       });
 
-      console.log("📨 Email sent to", student.email);
+      console.log("📨 Email sent to", user.email);
     }
 
     return res.status(200).json({
       success: true,
-      sent: students.length
+      sent: recipients.length
     });
 
   } catch (error) {
