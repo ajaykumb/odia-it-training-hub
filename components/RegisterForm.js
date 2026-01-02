@@ -28,15 +28,34 @@ export default function RegisterForm() {
     setLoading(true);
 
     try {
+      // ✅ 1) SAVE REGISTRATION TO FIREBASE
       await addDoc(collection(db, "registrations"), {
         ...form,
         source: "website",
         createdAt: serverTimestamp(),
       });
 
-      setSuccess("Registration successful! Our team will contact you shortly.");
+      // ✅ 2) SEND THANK YOU EMAIL (NEW)
+      await fetch("/api/sendRegistrationThankYou", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          toEmail: form.email,
+          name: form.name,
+        }),
+      });
+
+      // ✅ 3) SUCCESS MESSAGE
+      setSuccess(
+        "Registration successful! A confirmation email has been sent to your email address."
+      );
+
+      // ✅ 4) RESET FORM
       setForm({ name: "", email: "", phone: "" });
-    } catch {
+    } catch (error) {
+      console.error("Registration error:", error);
       alert("Registration failed. Please try again.");
     }
 
