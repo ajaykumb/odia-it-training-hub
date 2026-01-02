@@ -93,7 +93,7 @@ body: JSON.stringify({
   title: annTitle,
   message: annMessage,
   target: announcementTarget,
-  batch: announcementTarget === "students" ? selectedBatch : "",
+  batch: announcementTarget === "batch" ? selectedBatch : "",
 }),
 
       });
@@ -323,12 +323,22 @@ body: JSON.stringify({
 
   <div className="flex gap-6">
     <label className="flex items-center gap-2">
-      <input
-        type="radio"
-        checked={announcementTarget === "students"}
-        onChange={() => setAnnouncementTarget("students")}
-      />
-      Approved Students
+<input
+  type="radio"
+  checked={announcementTarget === "all"}
+  onChange={() => setAnnouncementTarget("all")}
+/>
+All Approved Students
+
+  <label className="flex items-center gap-2">
+  <input
+    type="radio"
+    checked={announcementTarget === "batch"}
+    onChange={() => setAnnouncementTarget("batch")}
+  />
+  Specific Batch
+</label>
+
     </label>
 
     <label className="flex items-center gap-2">
