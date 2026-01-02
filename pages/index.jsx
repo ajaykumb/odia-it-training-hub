@@ -77,28 +77,25 @@ export default function Home() {
       
       {/* 🚀 Header - Sticky and Blurry */}
 <header className="sticky top-0 z-50 bg-blue-700/95 backdrop-blur-sm text-white py-4 shadow-xl">
-  <div className="w-full max-w-7xl mx-auto flex justify-between items-center px-4">
+  <div className="max-w-7xl mx-auto flex justify-between items-center px-4">
 
-    <a href="#" className="flex items-center space-x-4 group">
-      {/* Logo */}
-      <img
-        src="/images/logo.png"
-        alt="Odia IT Training Hub Logo"
-        className="w-12 h-12 md:w-13 md:h-13"
-      />
-      <span className="text-xl md:text-2xl font-extrabold text-yellow-300">
+    {/* LOGO */}
+    <a href="#" className="flex items-center space-x-3">
+      <img src="/images/logo.png" alt="Logo" className="w-10 h-10" />
+      <span className="text-xl font-extrabold text-yellow-300">
         Odia IT Training Hub
       </span>
     </a>
 
-    <nav className="space-x-8 text-lg font-medium hidden md:flex items-center">
+    {/* DESKTOP NAV */}
+    <nav className="hidden md:flex items-center space-x-8 text-lg font-medium">
       <a href="#about">About</a>
       <a href="#courses">Courses</a>
       <a href="#developer-focus">New Batch</a>
       <a href="#placement">Success</a>
       <a href="#contact">Contact</a>
 
-      {/* Dropdown */}
+      {/* DESKTOP ACCESS PORTAL */}
       <div className="relative">
         <button
           onClick={() => setOpenAccess(!openAccess)}
@@ -108,10 +105,14 @@ export default function Home() {
         </button>
 
         {openAccess && (
-          <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-xl">
-            <a href="/login" className="block px-5 py-3">🎓 Student Login</a>
-            <a href="/admin/all-answers" className="block px-5 py-3">🛡️ Admin Login</a>
-            <a href="/register" className="block px-5 py-3 font-bold bg-yellow-100">
+          <div className="absolute right-0 mt-2 w-56 bg-white text-gray-800 rounded-xl shadow-xl overflow-hidden">
+            <a href="/login" className="block px-5 py-3 hover:bg-blue-50">
+              🎓 Student Login
+            </a>
+            <a href="/admin/all-answers" className="block px-5 py-3 hover:bg-red-50">
+              🛡️ Admin Login
+            </a>
+            <a href="/register" className="block px-5 py-3 bg-yellow-100 font-bold">
               📝 New Student Register
             </a>
           </div>
@@ -119,8 +120,16 @@ export default function Home() {
       </div>
     </nav>
 
+    {/* 📱 MOBILE HAMBURGER */}
+    <button
+      onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+      className="md:hidden bg-yellow-400 text-blue-800 px-4 py-2 rounded-lg font-bold"
+    >
+      ☰
+    </button>
   </div>
 </header>
+
 
 
       {/* 🌟 Hero Section - High Impact with Image Placeholder */}
