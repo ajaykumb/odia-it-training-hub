@@ -107,13 +107,13 @@ export default function Home() {
         {openAccess && (
           <div className="absolute right-0 mt-2 w-56 bg-white text-gray-800 rounded-xl shadow-xl overflow-hidden">
             <a href="/login" className="block px-5 py-3 hover:bg-blue-50">
-              🎓 Student Login
+              🎓Student Login
             </a>
             <a href="/admin/all-answers" className="block px-5 py-3 hover:bg-red-50">
-              🛡️ Admin Login
+              🛡️Admin Login
             </a>
             <a href="/register" className="block px-5 py-3 bg-yellow-100 font-bold">
-              📝 New Student Register
+              📝New Student Register
             </a>
           </div>
         )}
@@ -133,21 +133,17 @@ export default function Home() {
 {mobileMenuOpen && (
   <div className="md:hidden bg-blue-700 text-white px-6 py-6 space-y-4 shadow-xl">
 
-    <a href="#about" onClick={() => setMobileMenuOpen(false)}>About</a>
-
-    <a href="#developer-focus" onClick={() => setMobileMenuOpen(false)}>New Batch</a>
-    
-    <a href="#contact" onClick={() => setMobileMenuOpen(false)}>Contact</a>
+  <a href="#contact" onClick={() => setMobileMenuOpen(false)}>Contact</a>
 
     <div className="pt-4 border-t border-blue-500">
       <a href="/login" className="block bg-white text-blue-800 px-4 py-2 rounded-lg mb-2">
-        🎓 Student Login
+        🎓Student Login
       </a>
       <a href="/admin/all-answers" className="block bg-white text-red-700 px-4 py-2 rounded-lg mb-2">
-        🛡️ Admin Login
+        🛡️Admin Login
       </a>
       <a href="/register" className="block bg-yellow-400 text-blue-900 px-4 py-2 rounded-lg font-bold">
-        📝 New Student Register
+        📝New Student Register
       </a>
     </div>
   </div>
