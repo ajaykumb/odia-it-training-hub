@@ -92,37 +92,40 @@ export default function Home() {
   <a href="#contact" className="hover:text-yellow-300 transition">Contact</a>
 
   {/* ⭐ Login Button */}
-  <a
-    href="/login"
-    className="ml-6 bg-white text-blue-700 px-5 py-2 rounded-full font-bold hover:bg-gray-200 transition-all shadow-md"
+  <div className="relative">
+  <button
+    onClick={() => setOpenAccess(!openAccess)}
+    className="bg-yellow-400 text-blue-800 px-5 py-2 rounded-full font-bold shadow-md hover:bg-yellow-300 transition flex items-center gap-2"
   >
-    Students Login
-  </a>
-  {/* ⭐ Admin Login */}
+    Access Portal
+    <span className="text-lg">▾</span>
+  </button>
+
+  {openAccess && (
+    <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-xl overflow-hidden z-50">
+      <a
+        href="/login"
+        className="block px-5 py-3 text-gray-700 hover:bg-blue-50 font-medium"
+      >
+        🎓 Student Login
+      </a>
+
       <a
         href="/admin/all-answers"
-        className="ml-2 bg-white text-red-600 px-5 py-2 rounded-full font-bold hover:bg-gray-200 transition-all shadow-md"
+        className="block px-5 py-3 text-gray-700 hover:bg-red-50 font-medium"
       >
-        Admin Login
+        🛡️ Admin Login
       </a>
-</nav>
-  <a
-  href="/register"
-  className="bg-yellow-400 text-blue-800 px-5 py-2 rounded-full font-bold hover:bg-yellow-300 transition-all shadow-md"
->
-  New Student Register
-</a>
 
-
-    {/* Mobile Login Button */}
-    <a
-      href="/login"
-      className="md:hidden bg-white text-blue-700 px-4 py-2 rounded-lg font-bold text-sm shadow-md hover:bg-gray-200 transition"
-    >
-      Students Login
-    </a>
-        </div>
-      </header>
+      <a
+        href="/register"
+        className="block px-5 py-3 text-blue-700 font-bold bg-yellow-100 hover:bg-yellow-200"
+      >
+        📝 New Student Register
+      </a>
+    </div>
+  )}
+</div>
 
       {/* 🌟 Hero Section - High Impact with Image Placeholder */}
       <section className="bg-blue-800 text-white relative overflow-hidden py-32 md:py-40">
