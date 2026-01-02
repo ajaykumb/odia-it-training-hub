@@ -16,12 +16,14 @@ export default function Home() {
 
   /* ================= FESTIVE POPUP STATE ================= */
   const [showFestivePopup, setShowFestivePopup] = useState(false);
-    /* ================= ACCESS PORTAL DROPDOWN ================= */
+
+  // ✅ ADD THIS LINE HERE
   const [openAccess, setOpenAccess] = useState(false);
 
   useEffect(() => {
     const today = new Date();
-    const disableDate = new Date("2026-01-01"); // auto-disable
+    const disableDate = new Date("2026-01-01");
+
 
     if (today < disableDate) {
       setShowFestivePopup(true);
