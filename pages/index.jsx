@@ -75,61 +75,52 @@ export default function Home() {
 
       
       {/* 🚀 Header - Sticky and Blurry */}
-      <header className="sticky top-0 z-50 bg-blue-700/95 backdrop-blur-sm text-white py-4 shadow-xl">
-        <div className="w-full max-w-7xl mx-auto flex justify-between items-center px-4 overflow-x-hidden">
-          
-<a href="#" className="flex items-center space-x-4 group">
-  <img 
-    src="/images/logo.png"   // your actual filename
-    alt="Odia IT Training Hub Logo"
-    className="w-12 h-12 md:w-13 md:h-13"
-  />
-  <span className="text-xl md:text-2xl font-extrabold text-yellow-300 group-hover:text-yellow-400 transition">
-    Odia IT Training Hub
-  </span>
-</a>
-          <nav className="space-x-8 text-lg font-medium hidden md:flex items-center">
-  <a href="#about" className="hover:text-yellow-300 transition">About</a>
-  <a href="#courses" className="hover:text-yellow-300 transition">Courses</a>
-  <a href="#developer-focus" className="hover:text-red-300 transition">New Batch</a>
-  <a href="#placement" className="hover:text-yellow-300 transition">Success</a>
-  <a href="#contact" className="hover:text-yellow-300 transition">Contact</a>
+<header className="sticky top-0 z-50 bg-blue-700/95 backdrop-blur-sm text-white py-4 shadow-xl">
+  <div className="w-full max-w-7xl mx-auto flex justify-between items-center px-4">
 
-  {/* ⭐ Login Button */}
-  <div className="relative">
-  <button
-    onClick={() => setOpenAccess(!openAccess)}
-    className="bg-yellow-400 text-blue-800 px-5 py-2 rounded-full font-bold shadow-md hover:bg-yellow-300 transition flex items-center gap-2"
-  >
-    Access Portal
-    <span className="text-lg">▾</span>
-  </button>
+    <a href="#" className="flex items-center space-x-4 group">
+      {/* Logo */}
+      <img
+        src="/images/logo.png"
+        alt="Odia IT Training Hub Logo"
+        className="w-12 h-12 md:w-13 md:h-13"
+      />
+      <span className="text-xl md:text-2xl font-extrabold text-yellow-300">
+        Odia IT Training Hub
+      </span>
+    </a>
 
-  {openAccess && (
-    <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-xl overflow-hidden z-50">
-      <a
-        href="/login"
-        className="block px-5 py-3 text-gray-700 hover:bg-blue-50 font-medium"
-      >
-        🎓 Student Login
-      </a>
+    <nav className="space-x-8 text-lg font-medium hidden md:flex items-center">
+      <a href="#about">About</a>
+      <a href="#courses">Courses</a>
+      <a href="#developer-focus">New Batch</a>
+      <a href="#placement">Success</a>
+      <a href="#contact">Contact</a>
 
-      <a
-        href="/admin/all-answers"
-        className="block px-5 py-3 text-gray-700 hover:bg-red-50 font-medium"
-      >
-        🛡️ Admin Login
-      </a>
+      {/* Dropdown */}
+      <div className="relative">
+        <button
+          onClick={() => setOpenAccess(!openAccess)}
+          className="bg-yellow-400 text-blue-800 px-5 py-2 rounded-full font-bold flex items-center gap-2"
+        >
+          Access Portal ▾
+        </button>
 
-      <a
-        href="/register"
-        className="block px-5 py-3 text-blue-700 font-bold bg-yellow-100 hover:bg-yellow-200"
-      >
-        📝 New Student Register
-      </a>
-    </div>
-  )}
-</div>
+        {openAccess && (
+          <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-xl">
+            <a href="/login" className="block px-5 py-3">🎓 Student Login</a>
+            <a href="/admin/all-answers" className="block px-5 py-3">🛡️ Admin Login</a>
+            <a href="/register" className="block px-5 py-3 font-bold bg-yellow-100">
+              📝 New Student Register
+            </a>
+          </div>
+        )}
+      </div>
+    </nav>
+
+  </div>
+</header>
+
 
       {/* 🌟 Hero Section - High Impact with Image Placeholder */}
       <section className="bg-blue-800 text-white relative overflow-hidden py-32 md:py-40">
