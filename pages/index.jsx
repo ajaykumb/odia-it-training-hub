@@ -19,6 +19,7 @@ export default function Home() {
 
   // ✅ ADD THIS LINE HERE
   const [openAccess, setOpenAccess] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const today = new Date();
