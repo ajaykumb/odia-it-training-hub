@@ -134,9 +134,9 @@ export default function Home() {
   <div className="md:hidden bg-blue-700 text-white px-6 py-6 space-y-4 shadow-xl">
 
     <a href="#about" onClick={() => setMobileMenuOpen(false)}>About</a>
-    <a href="#courses" onClick={() => setMobileMenuOpen(false)}>Courses</a>
+
     <a href="#developer-focus" onClick={() => setMobileMenuOpen(false)}>New Batch</a>
-    <a href="#placement" onClick={() => setMobileMenuOpen(false)}>Success</a>
+    
     <a href="#contact" onClick={() => setMobileMenuOpen(false)}>Contact</a>
 
     <div className="pt-4 border-t border-blue-500">
