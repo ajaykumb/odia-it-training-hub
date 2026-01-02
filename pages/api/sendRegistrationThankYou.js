@@ -69,6 +69,29 @@ export default async function handler(req, res) {
         </ul>
       </div>
 
+      <!-- WHATSAPP JOIN SECTION -->
+      <div style="text-align:center;margin:30px 0">
+        <p style="font-size:14px;margin-bottom:10px">
+          📢 Join our official WhatsApp group for instant updates:
+        </p>
+        <a
+          href="https://chat.whatsapp.com/KcJLuxqS6X0LZWJXPPQMcf"
+          target="_blank"
+          style="
+            display:inline-block;
+            background:#25D366;
+            color:#ffffff;
+            text-decoration:none;
+            padding:12px 22px;
+            border-radius:6px;
+            font-weight:bold;
+            font-size:14px;
+          "
+        >
+          👉 Join WhatsApp Group
+        </a>
+      </div>
+
       <p>
         For more information, please visit our website:
         <br />
