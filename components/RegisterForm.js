@@ -107,7 +107,7 @@ export default function RegisterForm() {
           {/* LOGO */}
           <div className="absolute top-6 right-6">
             <img
-              src="/logo.png"
+              src="https://www.odiaittraininghub.in/images/logo.png"
               alt="Odia IT Training Hub"
               className="h-10 opacity-90"
             />
