@@ -15,7 +15,7 @@ export default function RegisterForm() {
     name: "",
     email: "",
     phone: "",
-    candidateType: "New Student", // ✅ mandatory & fixed
+    candidateType: "New Student",
   });
 
   const [loading, setLoading] = useState(false);
@@ -29,14 +29,12 @@ export default function RegisterForm() {
     setLoading(true);
 
     try {
-      // ✅ 1) SAVE REGISTRATION TO FIREBASE
       await addDoc(collection(db, "registrations"), {
         ...form,
         source: "website",
         createdAt: serverTimestamp(),
       });
 
-      // ✅ 2) SEND THANK YOU EMAIL
       await fetch("/api/sendRegistrationThankYou", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -46,12 +44,10 @@ export default function RegisterForm() {
         }),
       });
 
-      // ✅ 3) SUCCESS MESSAGE
       setSuccess(
-        "Registration successful! A confirmation email has been sent to your email address."
+        "🎉 Registration successful! Please check your email for confirmation."
       );
 
-      // ✅ 4) RESET FORM
       setForm({
         name: "",
         email: "",
@@ -68,10 +64,10 @@ export default function RegisterForm() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-100 flex items-center justify-center px-4">
-      <div className="max-w-6xl w-full bg-white rounded-2xl shadow-xl grid md:grid-cols-2 overflow-hidden">
+      <div className="max-w-6xl w-full bg-white rounded-2xl shadow-2xl grid md:grid-cols-2 overflow-hidden">
 
         {/* LEFT BRAND SECTION */}
-        <div className="bg-blue-700 text-white p-10 flex flex-col justify-between">
+        <div className="bg-blue-800 text-white p-10 flex flex-col justify-between">
           <div>
             <div className="flex items-center gap-3 mb-6">
               <AcademicCapIcon className="w-10 h-10" />
@@ -80,7 +76,7 @@ export default function RegisterForm() {
               </h1>
             </div>
 
-            <p className="text-lg mb-6 leading-relaxed">
+            <p className="text-lg mb-6 leading-relaxed opacity-95">
               Industry-focused IT training with real-time projects,
               interview preparation, and continuous job support.
             </p>
@@ -106,9 +102,19 @@ export default function RegisterForm() {
         </div>
 
         {/* RIGHT FORM SECTION */}
-        <div className="p-10">
-          <h2 className="text-3xl font-bold text-gray-800 mb-2">
-            Candidate Registration
+        <div className="p-10 relative">
+
+          {/* LOGO */}
+          <div className="absolute top-6 right-6">
+            <img
+              src="/logo.png"
+              alt="Odia IT Training Hub"
+              className="h-10 opacity-90"
+            />
+          </div>
+
+          <h2 className="text-3xl font-bold text-gray-800 mb-1">
+            Student Registration
           </h2>
           <p className="text-gray-500 mb-8">
             Register once. Our team will guide you end-to-end.
@@ -172,26 +178,21 @@ export default function RegisterForm() {
               </div>
             </div>
 
-            {/* Candidate Type – Mandatory Single Option */}
+            {/* Candidate Type */}
             <div>
               <label className="text-sm font-medium text-gray-600 mb-1 block">
-                Candidate Type <span className="text-red-500">*</span>
+                Candidate Type
               </label>
 
               <div className="flex items-center gap-2 border rounded-lg p-3 bg-gray-50">
-                <input
-                  type="radio"
-                  checked
-                  readOnly
-                  className="accent-blue-600"
-                />
+                <input type="radio" checked readOnly className="accent-blue-600" />
                 <span className="text-gray-800 font-medium">
                   New Student
                 </span>
               </div>
 
               <p className="text-xs text-gray-500 mt-1">
-                Currently, registrations are open only for new students.
+                Registrations are currently open for new students only.
               </p>
             </div>
 
