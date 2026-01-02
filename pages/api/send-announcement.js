@@ -7,25 +7,24 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  // ✅ ADDED target (does NOT break existing calls)
   const { title, message, batch, target } = req.body;
-  // target = "students" | "newStudents"
+  // target: "all" | "batch" | "newStudents"
 
-  // ✅ batch OPTIONAL (unchanged)
   if (!title || !message) {
     return res.status(400).json({ error: "Title and message required" });
   }
 
   try {
     console.log("📢 Preparing announcement email broadcast...");
+    console.log("➡️ Target:", target, "Batch:", batch);
 
     let recipients = [];
 
     // =====================================================
-    // ✅ NEW ADDITION: SEND TO NEW STUDENTS (registrations)
+    // 🎯 NEW STUDENTS (registrations collection)
     // =====================================================
     if (target === "newStudents") {
-      console.log("🎯 Targeting NEW STUDENTS from registrations");
+      console.log("🎯 Targeting NEW STUDENTS (registrations)");
 
       const q = query(
         collection(db, "registrations"),
@@ -37,36 +36,53 @@ export default async function handler(req, res) {
     }
 
     // =====================================================
-    // ✅ EXISTING LOGIC (APPROVED STUDENTS) – UNCHANGED
+    // 🎯 SPECIFIC BATCH (students collection)
+    // =====================================================
+    else if (target === "batch") {
+      console.log("🎯 Targeting APPROVED STUDENTS by batch:", batch);
+
+      if (!batch || !batch.trim()) {
+        return res.status(400).json({ error: "Batch name is required" });
+      }
+
+      const q = query(
+        collection(db, "students"),
+        where("isApproved", "==", true),
+        where("batch", "==", batch)
+      );
+
+      const snap = await getDocs(q);
+      recipients = snap.docs.map(doc => doc.data());
+    }
+
+    // =====================================================
+    // 🎯 ALL APPROVED STUDENTS
     // =====================================================
     else {
-      let q;
+      console.log("🎯 Targeting ALL APPROVED STUDENTS");
 
-      // ✅ Batch-wise OR All approved students
-      if (batch && batch.trim() !== "") {
-        q = query(
-          collection(db, "students"),
-          where("isApproved", "==", true),
-          where("batch", "==", batch)
-        );
-      } else {
-        q = query(
-          collection(db, "students"),
-          where("isApproved", "==", true)
-        );
-      }
+      const q = query(
+        collection(db, "students"),
+        where("isApproved", "==", true)
+      );
 
       const snap = await getDocs(q);
       recipients = snap.docs.map(doc => doc.data());
     }
 
     if (recipients.length === 0) {
+      console.log("⚠️ No recipients found");
       return res.status(200).json({ success: true, sent: 0 });
     }
 
-    console.log(`📬 Sending emails to ${recipients.length} users...`);
+    console.log(
+      "📧 Emails will be sent to:",
+      recipients.map(u => u.email)
+    );
 
-    // ✅ SMTP (UNCHANGED)
+    // =====================================================
+    // 📬 SMTP CONFIG
+    // =====================================================
     const transporter = nodemailer.createTransport({
       host: "smtp.gmail.com",
       port: 465,
@@ -77,7 +93,9 @@ export default async function handler(req, res) {
       }
     });
 
-    // ✅ EMAIL TEMPLATE (UNCHANGED)
+    // =====================================================
+    // 📄 EMAIL TEMPLATE
+    // =====================================================
     const buildEmailTemplate = (name) => `
 <!DOCTYPE html>
 <html>
@@ -88,16 +106,13 @@ export default async function handler(req, res) {
   <table width="100%" cellpadding="0" cellspacing="0">
     <tr>
       <td align="center">
-
         <table width="600" cellpadding="0" cellspacing="0"
           style="background:#ffffff; margin:20px; border-radius:8px; overflow:hidden;">
 
-          <!-- HEADER -->
           <tr>
             <td style="background:#1e3a8a; padding:20px; text-align:center; color:#ffffff;">
               <img
                 src="https://firebasestorage.googleapis.com/v0/b/odiaittraininghub.appspot.com/o/logo.png?alt=media"
-                alt="Odia IT Training Hub"
                 style="max-width:120px; margin-bottom:10px;"
               />
               <h2 style="margin:0;">Odia IT Training Hub</h2>
@@ -107,53 +122,30 @@ export default async function handler(req, res) {
             </td>
           </tr>
 
-          <!-- CONTENT -->
           <tr>
-            <td style="padding:30px; color:#333333;">
-              <p style="font-size:16px;">Hello <strong>${name}</strong>,</p>
+            <td style="padding:30px; color:#333;">
+              <p>Hello <strong>${name}</strong>,</p>
 
-              <p style="font-size:15px;">
-                Please find the latest update from <strong>Odia IT Training Hub</strong>:
-              </p>
-
-              <div style="
-                background:#f1f5f9;
-                padding:16px;
-                border-left:4px solid #1e3a8a;
-                margin:20px 0;
-              ">
-                <h3 style="margin:0 0 8px; color:#1e3a8a;">
-                  ${title}
-                </h3>
-                <p style="margin:0; font-size:14px; line-height:1.6;">
-                  ${message}
-                </p>
+              <div style="background:#f1f5f9; padding:16px; border-left:4px solid #1e3a8a;">
+                <h3 style="margin:0 0 8px;">${title}</h3>
+                <p style="margin:0;">${message}</p>
               </div>
 
-              <p style="font-size:14px;">
-                For any queries, feel free to contact us.
-              </p>
-
-              <p style="margin-top:25px; font-size:14px;">
+              <p style="margin-top:20px;">
                 Regards,<br/>
                 <strong>Odia IT Training Hub Team</strong><br/>
-                📞 <strong>9437401378</strong>
+                📞 9437401378
               </p>
             </td>
           </tr>
 
-          <!-- FOOTER -->
           <tr>
-            <td style="background:#f1f5f9; padding:15px; text-align:center; font-size:12px; color:#555;">
-              © 2026 Odia IT Training Hub. All rights reserved.<br/>
-              <a href="https://www.odiaittraininghub.in" style="color:#1e3a8a; text-decoration:none;">
-                www.odiaittraininghub.in
-              </a>
+            <td style="background:#f1f5f9; padding:15px; text-align:center; font-size:12px;">
+              © 2026 Odia IT Training Hub
             </td>
           </tr>
 
         </table>
-
       </td>
     </tr>
   </table>
@@ -161,7 +153,9 @@ export default async function handler(req, res) {
 </html>
 `;
 
-    // ✅ SEND EMAILS (UNCHANGED LOOP)
+    // =====================================================
+    // ✉️ SEND EMAILS
+    // =====================================================
     for (const user of recipients) {
       if (!user.email) continue;
 
@@ -172,7 +166,7 @@ export default async function handler(req, res) {
         html: buildEmailTemplate(user.name || "Student")
       });
 
-      console.log("📨 Email sent to", user.email);
+      console.log("📨 Sent to:", user.email);
     }
 
     return res.status(200).json({
