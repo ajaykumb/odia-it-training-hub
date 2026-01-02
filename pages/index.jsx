@@ -106,6 +106,13 @@ export default function Home() {
         Admin Login
       </a>
 </nav>
+  <a
+  href="/register"
+  className="bg-yellow-400 text-blue-800 px-5 py-2 rounded-full font-bold hover:bg-yellow-300 transition-all shadow-md"
+>
+  New Student Register
+</a>
+
 
     {/* Mobile Login Button */}
     <a
@@ -131,12 +138,13 @@ export default function Home() {
           <p className="text-2xl mb-10 max-w-3xl mx-auto">
             Upskill with practical training designed for freshers & working professionals, delivered in Odia,English & Hindi.
           </p>
-          <a
-            href="#contact"
-            className="bg-yellow-400 text-blue-800 px-10 py-4 rounded-full font-bold text-xl shadow-2xl hover:bg-yellow-300 transition-all transform hover:scale-105 animate-pulse"
-          >
-            Get Started Now <ArrowRightIcon className="w-5 h-5 inline ml-2" />
-          </a>
+         <a
+  href="/register"
+  className="bg-yellow-400 text-blue-800 px-10 py-4 rounded-full font-bold text-xl shadow-2xl hover:bg-yellow-300 transition-all transform hover:scale-105 animate-pulse"
+>
+  Register Now <ArrowRightIcon className="w-5 h-5 inline ml-2" />
+</a>
+          
         </div>
       </section>
 
@@ -302,6 +310,12 @@ export default function Home() {
               <PhoneIcon className="w-7 h-7 mr-3 animate-wiggle" />
               Call to Enroll: 9437401378
             </a>
+            <a
+  href="/register"
+  className="inline-flex items-center mt-6 bg-yellow-400 text-indigo-900 px-8 py-4 rounded-full font-black text-xl shadow-xl hover:bg-yellow-300 transition-all transform hover:scale-105"
+>
+  🎓 Register for Upcoming Batch
+</a>
           </div>
         </div>
       </section>
