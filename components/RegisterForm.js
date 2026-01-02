@@ -29,12 +29,14 @@ export default function RegisterForm() {
     setLoading(true);
 
     try {
+      // 1️⃣ Save registration
       await addDoc(collection(db, "registrations"), {
         ...form,
         source: "website",
         createdAt: serverTimestamp(),
       });
 
+      // 2️⃣ Send thank-you email
       await fetch("/api/sendRegistrationThankYou", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -63,10 +65,10 @@ export default function RegisterForm() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-100 flex items-center justify-center px-4">
-      <div className="max-w-6xl w-full bg-white rounded-2xl shadow-2xl grid md:grid-cols-2 overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-slate-100 via-blue-100 to-slate-100 flex items-center justify-center px-4">
+      <div className="max-w-6xl w-full bg-white rounded-3xl shadow-2xl grid md:grid-cols-2 overflow-hidden">
 
-        {/* LEFT BRAND SECTION */}
+        {/* LEFT – BRAND / INFO */}
         <div className="bg-blue-800 text-white p-10 flex flex-col justify-between">
           <div>
             <div className="flex items-center gap-3 mb-6">
@@ -78,7 +80,7 @@ export default function RegisterForm() {
 
             <p className="text-lg mb-6 leading-relaxed opacity-95">
               Industry-focused IT training with real-time projects,
-              interview preparation, and continuous job support.
+              interview preparation, and guaranteed job support.
             </p>
 
             <ul className="space-y-4 text-sm">
@@ -90,9 +92,9 @@ export default function RegisterForm() {
                 <UsersIcon className="w-5 h-5" />
                 Dedicated student & admin portals
               </li>
-              <li>✔ Real-time project exposure</li>
-              <li>✔ Interview & resume support</li>
-              <li>✔ 100% job assistance</li>
+              <li>✔ Real-time industry projects</li>
+              <li>✔ Resume & interview preparation</li>
+              <li>✔ Continuous job assistance</li>
             </ul>
           </div>
 
@@ -101,7 +103,7 @@ export default function RegisterForm() {
           </p>
         </div>
 
-        {/* RIGHT FORM SECTION */}
+        {/* RIGHT – FORM */}
         <div className="p-10 relative">
 
           {/* LOGO */}
@@ -109,7 +111,7 @@ export default function RegisterForm() {
             <img
               src="https://www.odiaittraininghub.in/images/logo.png"
               alt="Odia IT Training Hub"
-              className="h-10 opacity-90"
+              className="h-10"
             />
           </div>
 
@@ -122,7 +124,7 @@ export default function RegisterForm() {
 
           <form onSubmit={handleSubmit} className="space-y-5">
 
-            {/* Full Name */}
+            {/* Name */}
             <div>
               <label className="text-sm font-medium text-gray-600">
                 Full Name
@@ -178,21 +180,19 @@ export default function RegisterForm() {
               </div>
             </div>
 
-            {/* Candidate Type */}
+            {/* Candidate Type (LOCKED) */}
             <div>
               <label className="text-sm font-medium text-gray-600 mb-1 block">
                 Candidate Type
               </label>
-
               <div className="flex items-center gap-2 border rounded-lg p-3 bg-gray-50">
                 <input type="radio" checked readOnly className="accent-blue-600" />
                 <span className="text-gray-800 font-medium">
                   New Student
                 </span>
               </div>
-
               <p className="text-xs text-gray-500 mt-1">
-                Registrations are currently open for new students only.
+                Currently accepting registrations for new students only.
               </p>
             </div>
 
@@ -207,7 +207,7 @@ export default function RegisterForm() {
           </form>
 
           {success && (
-            <p className="text-green-600 font-medium text-center mt-5">
+            <p className="text-green-600 font-semibold text-center mt-5">
               {success}
             </p>
           )}
