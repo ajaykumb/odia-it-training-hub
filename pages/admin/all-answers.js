@@ -51,6 +51,7 @@ export default function AllAnswers() {
   const [teacher, setTeacher] = useState("");
   const [nextClassTime, setNextClassTime] = useState("");
   const [isUpcomingLive, setIsUpcomingLive] = useState(false);
+  const [announcementTarget, setAnnouncementTarget] = useState("students");
 
   // Load upcoming class for admin edit
   useEffect(() => {
@@ -88,11 +89,13 @@ export default function AllAnswers() {
       const res = await fetch("/api/send-announcement", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title: annTitle,
-          message: annMessage,
-           batch: selectedBatch,
-        }),
+body: JSON.stringify({
+  title: annTitle,
+  message: annMessage,
+  target: announcementTarget,
+  batch: announcementTarget === "students" ? selectedBatch : "",
+}),
+
       });
 
       const result = await res.json();
@@ -312,13 +315,41 @@ export default function AllAnswers() {
             value={annMessage}
             onChange={(e) => setAnnMessage(e.target.value)}
           ></textarea>
+              {/* ADD THIS BLOCK */}
+<div className="mb-3">
+  <p className="font-semibold text-sm mb-2">
+    Send Announcement To:
+  </p>
+
+  <div className="flex gap-6">
+    <label className="flex items-center gap-2">
+      <input
+        type="radio"
+        checked={announcementTarget === "students"}
+        onChange={() => setAnnouncementTarget("students")}
+      />
+      Approved Students
+    </label>
+
+    <label className="flex items-center gap-2">
+      <input
+        type="radio"
+        checked={announcementTarget === "newStudents"}
+        onChange={() => setAnnouncementTarget("newStudents")}
+      />
+      New Students (Registrations)
+    </label>
+  </div>
+</div>
 
               <input
-          className="w-full p-3 border rounded-lg mb-3"
-          placeholder="Batch name (e.g. GREEN_BATCH_1)"
-          value={selectedBatch}
-          onChange={(e) => setSelectedBatch(e.target.value)}
-        />
+  className="w-full p-3 border rounded-lg mb-3"
+  placeholder="Batch name (e.g. GREEN_BATCH_1)"
+  value={selectedBatch}
+  disabled={announcementTarget === "newStudents"}
+  onChange={(e) => setSelectedBatch(e.target.value)}
+/>
+
 
           <button
             onClick={saveAnnouncement}
