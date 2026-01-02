@@ -35,7 +35,7 @@ export default async function handler(req, res) {
     <!-- HEADER -->
     <div style="background:#1f3c88;padding:25px;text-align:center">
       <img
-        src="https://www.odiaittraininghub.in/logo.png"
+        src="public/images/logo.png"
         alt="Odia IT Training Hub"
         style="height:60px;margin-bottom:10px"
       />
