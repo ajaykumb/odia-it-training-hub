@@ -16,6 +16,9 @@ export default function Home() {
 
   /* ================= FESTIVE POPUP STATE ================= */
   const [showFestivePopup, setShowFestivePopup] = useState(false);
+  // ================= NEW BATCH POPUP =================
+const [showBatchPopup, setShowBatchPopup] = useState(false);
+
 
   // ✅ ADD THIS LINE HERE
   const [openAccess, setOpenAccess] = useState(false);
@@ -651,6 +654,54 @@ export default function Home() {
           </div>
         </div>
       )}
+
+            {/* ================= JAN 20 NEW BATCH POPUP ================= */}
+{showBatchPopup && (
+  <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/70 backdrop-blur-sm">
+
+    <div className="relative bg-white rounded-2xl shadow-2xl w-[90%] max-w-md animate-scale-in">
+
+      {/* Close Button */}
+      <button
+        onClick={() => setShowBatchPopup(false)}
+        className="absolute top-3 right-3 bg-red-600 text-white w-8 h-8 rounded-full font-bold hover:bg-red-700"
+      >
+        ✕
+      </button>
+
+      {/* Content */}
+      <div className="p-8 text-center">
+        <h3 className="text-2xl font-extrabold text-blue-700 mb-2">
+          🎓 New Batch Started
+        </h3>
+
+        <p className="text-lg font-semibold text-gray-700 mb-4">
+          Batch Starts from <span className="text-red-600">20th January 2026</span>
+        </p>
+
+        <ul className="text-left text-gray-600 space-y-2 mb-6">
+          <li>✅ Job-Oriented IT Training</li>
+          <li>✅ Real-Time Project Exposure</li>
+          <li>✅ Interview Preparation Support</li>
+        </ul>
+
+        <a
+          href="/register"
+          className="inline-block bg-yellow-400 text-blue-900 px-8 py-3 rounded-full font-extrabold text-lg shadow-xl hover:bg-yellow-300 transition transform hover:scale-105"
+        >
+          📝 Register Now
+        </a>
+      </div>
+
+    </div>
+  </div>
+)}
+
+
+      {/* 📄 Footer */}
+      <footer className="bg-gray-900 text-gray-400 text-center py-8">
+        ...
+      </footer>
 
       {/* 📄 Footer */}
       <footer className="bg-gray-900 text-gray-400 text-center py-8">
