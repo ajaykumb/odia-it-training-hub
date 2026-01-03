@@ -18,6 +18,10 @@ export default function Home() {
   const [showFestivePopup, setShowFestivePopup] = useState(false);
   // ================= NEW BATCH POPUP =================
 const [showBatchPopup, setShowBatchPopup] = useState(false);
+useEffect(() => {
+  // Show batch popup on every page refresh
+  setShowBatchPopup(true);
+}, []);
 
 
   // ✅ ADD THIS LINE HERE
