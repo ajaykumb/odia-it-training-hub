@@ -1,9 +1,7 @@
 if (typeof window !== "undefined") {
   (function () {
-    const candidate =
-      JSON.parse(localStorage.getItem("candidateData"));
-    const candidateId =
-      localStorage.getItem("candidateId");
+    const candidate = JSON.parse(localStorage.getItem("candidateData"));
+    const candidateId = localStorage.getItem("candidateId");
 
     if (!candidate || !candidateId) {
       window.location.href = "/interviewregister";
@@ -18,7 +16,10 @@ if (typeof window !== "undefined") {
       "02:30 PM - 03:00 PM",
     ];
 
-    /* ========== PAGE STYLES ========== */
+    let selectedDate = "";
+    let selectedTime = "";
+
+    /* ================= PAGE BASE ================= */
     document.body.style.background =
       "linear-gradient(135deg,#1f3c88,#4f6df5)";
     document.body.style.minHeight = "100vh";
@@ -35,15 +36,13 @@ if (typeof window !== "undefined") {
       "0 20px 50px rgba(0,0,0,0.25)";
 
     container.innerHTML = `
-      <h2 style="color:#1f3c88;text-align:center">
+      <h2 style="text-align:center;color:#1f3c88">
         Book Interview Slot
       </h2>
-
-      <p style="text-align:center;color:#555;font-size:14px">
-        Step 2 of 2 · Select your preferred date & time
+      <p style="text-align:center;font-size:14px;color:#555">
+        Step 2 of 2 · Select Date & Time
       </p>
 
-      <!-- Candidate Summary -->
       <div style="
         background:#f5f7ff;
         padding:15px;
@@ -56,53 +55,50 @@ if (typeof window !== "undefined") {
         📱 ${candidate.phone}
       </div>
 
-      <!-- Date Picker -->
-      <label style="font-size:14px;font-weight:bold">
-        Select Interview Date
-      </label>
-      <input
-        type="date"
-        id="date"
+      <label><strong>Select Interview Date</strong></label>
+      <input type="date" id="date"
+        style="width:100%;padding:10px;margin:8px 0 15px;border-radius:6px;border:1px solid #ccc"/>
+
+      <div id="slots"
+        style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px">
+      </div>
+
+      <button id="submitBtn"
+        disabled
         style="
           width:100%;
-          padding:10px;
-          margin:8px 0 15px;
+          margin-top:20px;
+          padding:12px;
+          border:none;
           border-radius:6px;
-          border:1px solid #ccc"
-      />
-
-      <!-- Slots -->
-      <div
-        id="slots"
-        style="
-          display:grid;
-          grid-template-columns:repeat(2,1fr);
-          gap:10px"
-      ></div>
-
-      <!-- Info -->
-      <div style="
-        margin-top:20px;
-        background:#f1f5ff;
-        padding:12px;
-        border-radius:8px;
-        font-size:13px">
-        ✔ Instant email confirmation<br/>
-        ✔ Expert interview support & representation<br/>
-        ✔ Professional & confidential process
-      </div>
+          background:#ccc;
+          color:#fff;
+          font-size:15px;
+          cursor:not-allowed">
+        Confirm Slot
+      </button>
     `;
 
     document.body.appendChild(container);
 
     document
       .getElementById("date")
-      .addEventListener("change", loadSlots);
+      .addEventListener("change", async (e) => {
+        selectedDate = e.target.value;
+        selectedTime = "";
+        document.getElementById("submitBtn").disabled = true;
+        document.getElementById("submitBtn").style.background = "#ccc";
+        document.getElementById("submitBtn").style.cursor = "not-allowed";
 
-    function loadSlots(e) {
-      const date = e.target.value;
+        await loadSlots(selectedDate);
+      });
+
+    /* ================= LOAD SLOTS (WITH FIRESTORE CHECK) ================= */
+    async function loadSlots(date) {
       const slotsDiv = document.getElementById("slots");
       slotsDiv.innerHTML = "";
+
+      const bookedSlots = await fetchBookedSlots(date);
 
       TIME_SLOTS.forEach((time) => {
         const slot = document.createElement("button");
@@ -110,61 +106,118 @@ if (typeof window !== "undefined") {
         slot.style.padding = "10px";
         slot.style.borderRadius = "6px";
         slot.style.border = "1px solid #1f3c88";
-        slot.style.background = "#fff";
-        slot.style.color = "#1f3c88";
-        slot.style.cursor = "pointer";
         slot.style.fontSize = "13px";
 
-        slot.onmouseenter = () => {
-          slot.style.background = "#1f3c88";
-          slot.style.color = "#fff";
-        };
-        slot.onmouseleave = () => {
+        if (bookedSlots.includes(time)) {
+          // ❌ Already booked
+          slot.disabled = true;
+          slot.style.background = "#eee";
+          slot.style.color = "#999";
+          slot.style.cursor = "not-allowed";
+          slot.innerText += " (Booked)";
+        } else {
+          // ✅ Available
           slot.style.background = "#fff";
           slot.style.color = "#1f3c88";
-        };
+          slot.style.cursor = "pointer";
 
-        slot.onclick = () => bookSlot(date, time);
+          slot.onclick = () => selectSlot(slot, time);
+        }
+
         slotsDiv.appendChild(slot);
       });
     }
 
-    async function bookSlot(date, time) {
-      if (!date) {
-        alert("Please select a date first");
-        return;
-      }
+    function selectSlot(slot, time) {
+      selectedTime = time;
 
-      await window.firebaseAddBooking({
-        candidateId,
-        ...candidate,
-        date,
-        timeSlot: time,
+      document
+        .querySelectorAll("#slots button")
+        .forEach((btn) => {
+          btn.style.background = "#fff";
+          btn.style.color = "#1f3c88";
+        });
+
+      slot.style.background = "#1f3c88";
+      slot.style.color = "#fff";
+
+      const submitBtn = document.getElementById("submitBtn");
+      submitBtn.disabled = false;
+      submitBtn.style.background = "#1f3c88";
+      submitBtn.style.cursor = "pointer";
+    }
+
+    /* ================= CONFIRM BOOKING ================= */
+    document
+      .getElementById("submitBtn")
+      .addEventListener("click", async () => {
+        if (!selectedDate || !selectedTime) return;
+
+        await window.firebaseAddBooking({
+          candidateId,
+          ...candidate,
+          date: selectedDate,
+          timeSlot: selectedTime,
+        });
+
+        showSuccess();
       });
 
+    /* ================= SUCCESS + RESCHEDULE ================= */
+    function showSuccess() {
       container.innerHTML = `
-        <h2 style="color:#1f3c88;text-align:center">
+        <h2 style="text-align:center;color:#1f3c88">
           ✅ Slot Confirmed
         </h2>
-        <p style="text-align:center">
-          Your interview slot has been successfully booked.
-        </p>
 
         <div style="
           background:#f5f7ff;
           padding:15px;
           border-radius:8px;
-          margin-top:20px;
+          margin:20px 0;
           font-size:14px">
-          <strong>Date:</strong> ${date}<br/>
-          <strong>Time:</strong> ${time}
+          <strong>Date:</strong> ${selectedDate}<br/>
+          <strong>Time:</strong> ${selectedTime}
         </div>
 
-        <p style="text-align:center;margin-top:20px;font-size:13px">
-          📧 Confirmation email has been sent.<br/>
+        <p style="text-align:center;font-size:13px">
+          📧 Confirmation email sent.<br/>
           Please be available on time.
         </p>
+
+        <button id="rescheduleBtn"
+          style="
+            width:100%;
+            margin-top:15px;
+            padding:10px;
+            border-radius:6px;
+            border:1px solid #1f3c88;
+            background:#fff;
+            color:#1f3c88;
+            cursor:pointer">
+          Reschedule Interview
+        </button>
       `;
+
+      document
+        .getElementById("rescheduleBtn")
+        .onclick = () => {
+          document.body.innerHTML = "";
+          location.reload(); // re-enable all logic
+        };
+    }
+
+    /* ================= FIRESTORE QUERY ================= */
+    async function fetchBookedSlots(date) {
+      try {
+        const res = await fetch(
+          `/api/getBookedSlots?date=${date}`
+        );
+        const data = await res.json();
+        return data.bookedSlots || [];
+      } catch {
+        return [];
+      }
     }
   })();
 }
