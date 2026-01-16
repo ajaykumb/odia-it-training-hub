@@ -5,7 +5,7 @@ import { useEffect } from "react";
 export default function BookSlotPage() {
   useEffect(() => {
     const script = document.createElement("script");
-    script.src = "/bookslot.js";
+    script.src = "/bookslot.js"; // from public folder
     script.defer = true;
     document.body.appendChild(script);
   }, []);
