@@ -28,7 +28,7 @@ export default function InterviewRegister() {
       }
     );
 
-    // Store data for booking page
+    // Save for booking page
     localStorage.setItem("candidateId", docRef.id);
     localStorage.setItem("candidateData", JSON.stringify(form));
 
@@ -36,23 +36,26 @@ export default function InterviewRegister() {
   };
 
   return (
-    <div>
+    <div style={{ maxWidth: 400, margin: "40px auto" }}>
       <h2>Interview Registration</h2>
 
       <input
         placeholder="Full Name"
         onChange={(e) => setForm({ ...form, name: e.target.value })}
       />
+      <br /><br />
 
       <input
         placeholder="Email ID"
         onChange={(e) => setForm({ ...form, email: e.target.value })}
       />
+      <br /><br />
 
       <input
         placeholder="Contact Number"
         onChange={(e) => setForm({ ...form, phone: e.target.value })}
       />
+      <br /><br />
 
       <button onClick={submit}>
         Proceed to Slot Booking
