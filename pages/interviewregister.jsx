@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
-import { db } from "../src/firebase";
+import { db } from "../utils/firebaseConfig"; // ✅ CORRECT
 import { useRouter } from "next/router";
 
 export default function InterviewRegister() {
@@ -28,7 +28,7 @@ export default function InterviewRegister() {
       }
     );
 
-    // Save for booking page
+    // Store for booking page
     localStorage.setItem("candidateId", docRef.id);
     localStorage.setItem("candidateData", JSON.stringify(form));
 
@@ -41,19 +41,25 @@ export default function InterviewRegister() {
 
       <input
         placeholder="Full Name"
-        onChange={(e) => setForm({ ...form, name: e.target.value })}
+        onChange={(e) =>
+          setForm({ ...form, name: e.target.value })
+        }
       />
       <br /><br />
 
       <input
         placeholder="Email ID"
-        onChange={(e) => setForm({ ...form, email: e.target.value })}
+        onChange={(e) =>
+          setForm({ ...form, email: e.target.value })
+        }
       />
       <br /><br />
 
       <input
         placeholder="Contact Number"
-        onChange={(e) => setForm({ ...form, phone: e.target.value })}
+        onChange={(e) =>
+          setForm({ ...form, phone: e.target.value })
+        }
       />
       <br /><br />
 
