@@ -14,26 +14,19 @@ export default function InterviewRegister() {
 
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
-
   const router = useRouter();
 
   const validate = () => {
-    const newErrors = {};
+    const e = {};
 
-    if (!form.name.trim()) {
-      newErrors.name = "Please enter your full name";
-    }
+    if (!form.name.trim()) e.name = "Please enter your full name";
+    if (!/^\S+@\S+\.\S+$/.test(form.email))
+      e.email = "Please enter a valid email address";
+    if (!/^[6-9]\d{9}$/.test(form.phone))
+      e.phone = "Please enter a valid 10-digit mobile number";
 
-    if (!/^\S+@\S+\.\S+$/.test(form.email)) {
-      newErrors.email = "Please enter a valid email address";
-    }
-
-    if (!/^[6-9]\d{9}$/.test(form.phone)) {
-      newErrors.phone = "Please enter a valid 10-digit mobile number";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    setErrors(e);
+    return Object.keys(e).length === 0;
   };
 
   const submit = async () => {
@@ -56,86 +49,94 @@ export default function InterviewRegister() {
   };
 
   return (
-    <div style={styles.page}>
-      <div style={styles.card}>
-        {/* LOGO */}
-        <img
-          src="/images/logo.png"
-          alt="Odia IT Training Hub"
-          style={styles.logo}
-        />
+    <>
+      {/* Animation */}
+      <style>{`
+        @keyframes fadeUp {
+          from { opacity: 0; transform: translateY(16px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
 
-        <h2 style={styles.title}>Interview Registration</h2>
-        <p style={styles.subtitle}>
-          For freshers, job seekers & working professionals
-        </p>
+      <div style={styles.page}>
+        <div style={styles.card}>
+          {/* LOGO */}
+          <img
+            src="/images/logo.png"
+            alt="Odia IT Training Hub"
+            style={styles.logo}
+          />
 
-        {/* STEP INDICATOR */}
-        <div style={styles.step}>
-          Step 1 of 2 · Registration
+          <h2 style={styles.title}>Interview Registration</h2>
+          <p style={styles.subtitle}>
+            For freshers, job seekers & working professionals
+          </p>
+
+          <div style={styles.step}>
+            Step 1 of 2 · Registration
+          </div>
+
+          {/* INPUTS */}
+          <input
+            style={styles.input}
+            placeholder="👤 Full Name"
+            onChange={(e) =>
+              setForm({ ...form, name: e.target.value })
+            }
+          />
+          {errors.name && <p style={styles.error}>{errors.name}</p>}
+
+          <input
+            style={styles.input}
+            placeholder="📧 Email Address"
+            onChange={(e) =>
+              setForm({ ...form, email: e.target.value })
+            }
+          />
+          {errors.email && <p style={styles.error}>{errors.email}</p>}
+
+          <input
+            style={styles.input}
+            placeholder="📱 Mobile Number"
+            onChange={(e) =>
+              setForm({ ...form, phone: e.target.value })
+            }
+          />
+          {errors.phone && <p style={styles.error}>{errors.phone}</p>}
+
+          {/* BUTTON */}
+          <button
+            style={{
+              ...styles.button,
+              opacity: loading ? 0.7 : 1,
+            }}
+            onClick={submit}
+            disabled={loading}
+          >
+            {loading ? "Submitting..." : "Proceed to Book Slot →"}
+          </button>
+
+          {/* WHAT HAPPENS NEXT */}
+          <div style={styles.next}>
+            <p style={styles.nextTitle}>What happens next?</p>
+            <ul style={styles.list}>
+              <li>✔ Choose your interview date & time</li>
+              <li>✔ Get instant email confirmation</li>
+              <li>✔ Attend interview as scheduled</li>
+            </ul>
+          </div>
+
+          {/* TRUST & SUPPORT */}
+          <p style={styles.footer}>
+            🔒 We respect your privacy. No spam. No sharing.
+          </p>
+
+          <p style={styles.support}>
+            Need help? 📞 <strong>9437401378</strong> | WhatsApp available
+          </p>
         </div>
-
-        {/* INPUTS */}
-        <input
-          style={styles.input}
-          placeholder="👤 Full Name"
-          onChange={(e) =>
-            setForm({ ...form, name: e.target.value })
-          }
-        />
-        {errors.name && <p style={styles.error}>{errors.name}</p>}
-
-        <input
-          style={styles.input}
-          placeholder="📧 Email Address"
-          onChange={(e) =>
-            setForm({ ...form, email: e.target.value })
-          }
-        />
-        {errors.email && <p style={styles.error}>{errors.email}</p>}
-
-        <input
-          style={styles.input}
-          placeholder="📱 Mobile Number"
-          onChange={(e) =>
-            setForm({ ...form, phone: e.target.value })
-          }
-        />
-        {errors.phone && <p style={styles.error}>{errors.phone}</p>}
-
-        {/* BUTTON */}
-        <button
-          style={{
-            ...styles.button,
-            opacity: loading ? 0.7 : 1,
-            cursor: loading ? "not-allowed" : "pointer",
-          }}
-          onClick={submit}
-          disabled={loading}
-        >
-          {loading ? "Submitting..." : "Proceed to Book Slot →"}
-        </button>
-
-        {/* WHAT HAPPENS NEXT */}
-        <div style={styles.next}>
-          <p style={styles.nextTitle}>What happens next?</p>
-          <ul style={styles.list}>
-            <li>✔ Choose your interview date & time</li>
-            <li>✔ Get instant email confirmation</li>
-            <li>✔ Attend interview as scheduled</li>
-          </ul>
-        </div>
-
-        {/* TRUST + SUPPORT */}
-        <p style={styles.footer}>
-          🔒 We respect your privacy. No spam. No sharing.
-        </p>
-
-        <p style={styles.support}>
-          Need help? 📞 <strong>9437401378</strong> | WhatsApp available
-        </p>
       </div>
-    </div>
+    </>
   );
 }
 
@@ -144,20 +145,32 @@ export default function InterviewRegister() {
 const styles = {
   page: {
     minHeight: "100vh",
-    background: "linear-gradient(135deg, #1f3c88, #4f6df5)",
+    backgroundImage: `
+      linear-gradient(
+        rgba(15, 30, 80, 0.65),
+        rgba(15, 30, 80, 0.65)
+      ),
+      url("/images/interview-bg.jpg")
+    `,
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+    backgroundRepeat: "no-repeat",
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
     padding: "20px",
   },
   card: {
-    background: "#fff",
+    background: "rgba(255,255,255,0.96)",
+    backdropFilter: "blur(6px)",
+    WebkitBackdropFilter: "blur(6px)",
     width: "100%",
     maxWidth: "420px",
     padding: "30px",
-    borderRadius: "12px",
-    boxShadow: "0 15px 40px rgba(0,0,0,0.15)",
+    borderRadius: "14px",
+    boxShadow: "0 20px 50px rgba(0,0,0,0.25)",
     textAlign: "center",
+    animation: "fadeUp 0.6s ease",
   },
   logo: {
     height: "60px",
@@ -170,13 +183,13 @@ const styles = {
   subtitle: {
     fontSize: "14px",
     color: "#555",
-    marginBottom: "15px",
+    marginBottom: "14px",
   },
   step: {
     fontSize: "13px",
     color: "#1f3c88",
     background: "#eef2ff",
-    padding: "6px 12px",
+    padding: "6px 14px",
     borderRadius: "20px",
     display: "inline-block",
     marginBottom: "20px",
@@ -204,6 +217,7 @@ const styles = {
     borderRadius: "6px",
     fontSize: "15px",
     marginTop: "10px",
+    cursor: "pointer",
   },
   next: {
     background: "#f5f7ff",
