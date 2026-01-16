@@ -153,12 +153,19 @@ if (typeof window !== "undefined") {
       .addEventListener("click", async () => {
         if (!selectedDate || !selectedTime) return;
 
-        await window.firebaseAddBooking({
-          candidateId,
-          ...candidate,
-          date: selectedDate,
-          timeSlot: selectedTime,
-        });
+try {
+  await window.firebaseAddBooking({
+    candidateId,
+    candidate,
+    date: selectedDate,
+    timeSlot: selectedTime,
+  });
+  showSuccess();
+} catch {
+  alert("❌ Slot already booked. Please select another time.");
+  await loadSlots(selectedDate);
+}
+
 
         showSuccess();
       });
