@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
-import { db } from "../utils/firebaseConfig"; // ✅ CORRECT
+import { db } from "../utils/firebaseConfig";
 import { useRouter } from "next/router";
 
 export default function InterviewRegister() {
@@ -36,7 +36,7 @@ export default function InterviewRegister() {
   };
 
   return (
-    <div style={{ maxWidth: 400, margin: "40px auto" }}>
+    <div style={{ maxWidth: 420, margin: "40px auto" }}>
       <h2>Interview Registration</h2>
 
       <input
