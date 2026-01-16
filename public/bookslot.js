@@ -1,14 +1,3 @@
-import {
-  addDoc,
-  collection,
-  query,
-  where,
-  getDocs,
-  serverTimestamp,
-} from "firebase/firestore";
-import { db } from "../src/firebase";
-import { sendTeacherMail, sendStudentMail } from "../src/email";
-
 if (typeof window !== "undefined") {
   (function () {
     const candidate =
@@ -30,11 +19,15 @@ if (typeof window !== "undefined") {
     ];
 
     const container = document.createElement("div");
+    container.style.maxWidth = "400px";
+    container.style.margin = "40px auto";
+
     container.innerHTML = `
       <h2>Book Interview Slot</h2>
       <input type="date" id="date"/>
       <div id="slots"></div>
     `;
+
     document.body.appendChild(container);
 
     document
@@ -47,49 +40,43 @@ if (typeof window !== "undefined") {
       slotsDiv.innerHTML = "";
 
       for (const time of TIME_SLOTS) {
-        const q = query(
-          collection(db, "bookings"),
-          where("date", "==", date),
-          where("timeSlot", "==", time)
-        );
+        const slot = document.createElement("div");
+        slot.style.padding = "8px";
+        slot.style.margin = "6px 0";
+        slot.style.cursor = "pointer";
+        slot.style.background = "#e3f2fd";
+        slot.innerText = time;
 
-        const snap = await getDocs(q);
-        const div = document.createElement("div");
-        div.innerText = time;
+        // TODO: optional Firestore check to disable booked slots
 
-        if (!snap.empty) {
-          div.innerText += " (Booked)";
-          div.style.background = "#ffcdd2";
-        } else {
-          div.onclick = () => bookSlot(date, time);
-        }
-
-        slotsDiv.appendChild(div);
+        slot.onclick = () => bookSlot(date, time);
+        slotsDiv.appendChild(slot);
       }
     }
 
     async function bookSlot(date, time) {
-      await addDoc(collection(db, "bookings"), {
+      // Save booking
+      await window.firebaseAddBooking({
         candidateId,
         ...candidate,
         date,
         timeSlot: time,
-        createdAt: serverTimestamp(),
       });
 
-      await sendTeacherMail({
+      // Send emails
+      await window.sendTeacherMail({
         ...candidate,
         date,
         time,
       });
 
-      await sendStudentMail({
+      await window.sendStudentMail({
         ...candidate,
         date,
         time,
       });
 
-      alert("✅ Slot booked successfully. Email sent.");
+      alert("✅ Slot booked successfully. Confirmation email sent.");
     }
   })();
 }
