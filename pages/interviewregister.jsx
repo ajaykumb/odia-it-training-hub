@@ -69,7 +69,6 @@ export default function InterviewRegister() {
 
           <h2 style={styles.title}>Interview Registration</h2>
           <p style={styles.subtitle}>
-            Interview Support by Industry Experts.
             Candidates receive expert-led interview support and professional representation.
           </p>
 
