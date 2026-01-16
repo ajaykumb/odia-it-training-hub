@@ -19,7 +19,7 @@ if (typeof window !== "undefined") {
     ];
 
     const container = document.createElement("div");
-    container.style.maxWidth = "400px";
+    container.style.maxWidth = "420px";
     container.style.margin = "40px auto";
     container.style.fontFamily = "Arial";
 
@@ -43,10 +43,11 @@ if (typeof window !== "undefined") {
       TIME_SLOTS.forEach((time) => {
         const slot = document.createElement("div");
         slot.innerText = time;
-        slot.style.padding = "8px";
+        slot.style.padding = "10px";
         slot.style.margin = "6px 0";
         slot.style.cursor = "pointer";
         slot.style.background = "#e3f2fd";
+        slot.style.borderRadius = "4px";
 
         slot.onclick = () => bookSlot(date, time);
         slotsDiv.appendChild(slot);
@@ -61,20 +62,8 @@ if (typeof window !== "undefined") {
         timeSlot: time,
       });
 
-      await window.sendTeacherMail({
-        ...candidate,
-        date,
-        time,
-      });
-
-      await window.sendStudentMail({
-        ...candidate,
-        date,
-        time,
-      });
-
       alert(
-        "✅ Slot booked successfully. Confirmation email sent."
+        "✅ Slot booked successfully.\nConfirmation email sent."
       );
     }
   })();
