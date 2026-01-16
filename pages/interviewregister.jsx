@@ -249,3 +249,14 @@ const styles = {
     color: "#333",
   },
 };
+
+{/* 📄 Footer */}
+<footer style={styles.footer}>
+  <div style={styles.footerContainer}>
+    <p>© {new Date().getFullYear()} Odia IT Training Hub. All rights reserved.</p>
+    <p style={styles.footerSub}>
+      Empowering the next generation of IT professionals.
+    </p>
+  </div>
+</footer>
+
