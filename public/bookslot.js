@@ -21,6 +21,7 @@ if (typeof window !== "undefined") {
     const container = document.createElement("div");
     container.style.maxWidth = "400px";
     container.style.margin = "40px auto";
+    container.style.fontFamily = "Arial";
 
     container.innerHTML = `
       <h2>Book Interview Slot</h2>
@@ -34,28 +35,25 @@ if (typeof window !== "undefined") {
       .getElementById("date")
       .addEventListener("change", loadSlots);
 
-    async function loadSlots(e) {
+    function loadSlots(e) {
       const date = e.target.value;
       const slotsDiv = document.getElementById("slots");
       slotsDiv.innerHTML = "";
 
-      for (const time of TIME_SLOTS) {
+      TIME_SLOTS.forEach((time) => {
         const slot = document.createElement("div");
+        slot.innerText = time;
         slot.style.padding = "8px";
         slot.style.margin = "6px 0";
         slot.style.cursor = "pointer";
         slot.style.background = "#e3f2fd";
-        slot.innerText = time;
-
-        // TODO: optional Firestore check to disable booked slots
 
         slot.onclick = () => bookSlot(date, time);
         slotsDiv.appendChild(slot);
-      }
+      });
     }
 
     async function bookSlot(date, time) {
-      // Save booking
       await window.firebaseAddBooking({
         candidateId,
         ...candidate,
@@ -63,7 +61,6 @@ if (typeof window !== "undefined") {
         timeSlot: time,
       });
 
-      // Send emails
       await window.sendTeacherMail({
         ...candidate,
         date,
@@ -76,7 +73,9 @@ if (typeof window !== "undefined") {
         time,
       });
 
-      alert("✅ Slot booked successfully. Confirmation email sent.");
+      alert(
+        "✅ Slot booked successfully. Confirmation email sent."
+      );
     }
   })();
 }
