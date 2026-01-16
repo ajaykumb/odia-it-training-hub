@@ -7,7 +7,7 @@ export default async function handler(req, res) {
   if (!date) return res.status(400).json({ bookedSlots: [] });
 
   const q = query(
-    collection(db, "bookings"),
+    collection(db, "slotLocks"),
     where("date", "==", date)
   );
 
