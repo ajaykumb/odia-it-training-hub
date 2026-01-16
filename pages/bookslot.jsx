@@ -1,8 +1,14 @@
 "use client";
 
 import { useEffect } from "react";
-import "../src/scripts/bookslot.js";
 
 export default function BookSlotPage() {
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = "/bookslot.js";
+    script.defer = true;
+    document.body.appendChild(script);
+  }, []);
+
   return null;
 }
