@@ -19,7 +19,7 @@ if (typeof window !== "undefined") {
     let selectedDate = "";
     let selectedTime = "";
 
-    /* ================= PAGE BASE ================= */
+    /* ===== PAGE BASE ===== */
     document.body.style.background =
       "linear-gradient(135deg,#1f3c88,#4f6df5)";
     document.body.style.minHeight = "100vh";
@@ -36,19 +36,12 @@ if (typeof window !== "undefined") {
       "0 20px 50px rgba(0,0,0,0.25)";
 
     container.innerHTML = `
-      <h2 style="text-align:center;color:#1f3c88">
-        Book Interview Slot
-      </h2>
+      <h2 style="text-align:center;color:#1f3c88">Book Interview Slot</h2>
       <p style="text-align:center;font-size:14px;color:#555">
         Step 2 of 2 · Select Date & Time
       </p>
 
-      <div style="
-        background:#f5f7ff;
-        padding:15px;
-        border-radius:8px;
-        margin:20px 0;
-        font-size:14px">
+      <div style="background:#f5f7ff;padding:15px;border-radius:8px;margin:20px 0;font-size:14px">
         <strong>Candidate Details</strong><br/>
         👤 ${candidate.name}<br/>
         📧 ${candidate.email}<br/>
@@ -63,37 +56,28 @@ if (typeof window !== "undefined") {
         style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px">
       </div>
 
-      <button id="submitBtn"
-        disabled
-        style="
-          width:100%;
-          margin-top:20px;
-          padding:12px;
-          border:none;
-          border-radius:6px;
-          background:#ccc;
-          color:#fff;
-          font-size:15px;
-          cursor:not-allowed">
+      <button id="submitBtn" disabled
+        style="width:100%;margin-top:20px;padding:12px;border:none;border-radius:6px;background:#ccc;color:#fff;font-size:15px;cursor:not-allowed">
         Confirm Slot
       </button>
     `;
 
     document.body.appendChild(container);
 
-    document
-      .getElementById("date")
-      .addEventListener("change", async (e) => {
-        selectedDate = e.target.value;
-        selectedTime = "";
-        document.getElementById("submitBtn").disabled = true;
-        document.getElementById("submitBtn").style.background = "#ccc";
-        document.getElementById("submitBtn").style.cursor = "not-allowed";
+    document.getElementById("date").addEventListener("change", async (e) => {
+      selectedDate = e.target.value;
+      selectedTime = "";
+      disableSubmit();
+      await loadSlots(selectedDate);
+    });
 
-        await loadSlots(selectedDate);
-      });
+    function disableSubmit() {
+      const btn = document.getElementById("submitBtn");
+      btn.disabled = true;
+      btn.style.background = "#ccc";
+      btn.style.cursor = "not-allowed";
+    }
 
-    /* ================= LOAD SLOTS (WITH FIRESTORE CHECK) ================= */
     async function loadSlots(date) {
       const slotsDiv = document.getElementById("slots");
       slotsDiv.innerHTML = "";
@@ -109,18 +93,13 @@ if (typeof window !== "undefined") {
         slot.style.fontSize = "13px";
 
         if (bookedSlots.includes(time)) {
-          // ❌ Already booked
           slot.disabled = true;
           slot.style.background = "#eee";
           slot.style.color = "#999";
-          slot.style.cursor = "not-allowed";
           slot.innerText += " (Booked)";
         } else {
-          // ✅ Available
           slot.style.background = "#fff";
           slot.style.color = "#1f3c88";
-          slot.style.cursor = "pointer";
-
           slot.onclick = () => selectSlot(slot, time);
         }
 
@@ -131,95 +110,62 @@ if (typeof window !== "undefined") {
     function selectSlot(slot, time) {
       selectedTime = time;
 
-      document
-        .querySelectorAll("#slots button")
-        .forEach((btn) => {
-          btn.style.background = "#fff";
-          btn.style.color = "#1f3c88";
-        });
+      document.querySelectorAll("#slots button").forEach((b) => {
+        b.style.background = "#fff";
+        b.style.color = "#1f3c88";
+      });
 
       slot.style.background = "#1f3c88";
       slot.style.color = "#fff";
 
-      const submitBtn = document.getElementById("submitBtn");
-      submitBtn.disabled = false;
-      submitBtn.style.background = "#1f3c88";
-      submitBtn.style.cursor = "pointer";
+      const btn = document.getElementById("submitBtn");
+      btn.disabled = false;
+      btn.style.background = "#1f3c88";
+      btn.style.cursor = "pointer";
     }
 
-    /* ================= CONFIRM BOOKING ================= */
-    document
-      .getElementById("submitBtn")
-      .addEventListener("click", async () => {
-        if (!selectedDate || !selectedTime) return;
+    document.getElementById("submitBtn").addEventListener("click", async () => {
+      if (!selectedDate || !selectedTime) return;
 
-try {
-  await window.firebaseAddBooking({
-    candidateId,
-    candidate,
-    date: selectedDate,
-    timeSlot: selectedTime,
-  });
-  showSuccess();
-} catch {
-  alert("❌ Slot already booked. Please select another time.");
-  await loadSlots(selectedDate);
-}
+      try {
+        await window.firebaseAddBooking({
+          candidateId,
+          candidate,
+          date: selectedDate,
+          timeSlot: selectedTime,
+        });
 
+        showSuccess(); // ✅ ONLY here
+      } catch (err) {
+        alert("❌ Slot already booked. Please select another time.");
+        await loadSlots(selectedDate);
+      }
+    });
 
-        showSuccess();
-      });
-
-    /* ================= SUCCESS + RESCHEDULE ================= */
     function showSuccess() {
       container.innerHTML = `
-        <h2 style="text-align:center;color:#1f3c88">
-          ✅ Slot Confirmed
-        </h2>
-
-        <div style="
-          background:#f5f7ff;
-          padding:15px;
-          border-radius:8px;
-          margin:20px 0;
-          font-size:14px">
+        <h2 style="text-align:center;color:#1f3c88">✅ Slot Confirmed</h2>
+        <div style="background:#f5f7ff;padding:15px;border-radius:8px;margin:20px 0;font-size:14px">
           <strong>Date:</strong> ${selectedDate}<br/>
           <strong>Time:</strong> ${selectedTime}
         </div>
-
         <p style="text-align:center;font-size:13px">
-          📧 Confirmation email sent.<br/>
-          Please be available on time.
+          📧 Confirmation email sent.<br/>Please be available on time.
         </p>
-
         <button id="rescheduleBtn"
-          style="
-            width:100%;
-            margin-top:15px;
-            padding:10px;
-            border-radius:6px;
-            border:1px solid #1f3c88;
-            background:#fff;
-            color:#1f3c88;
-            cursor:pointer">
+          style="width:100%;margin-top:15px;padding:10px;border-radius:6px;border:1px solid #1f3c88;background:#fff;color:#1f3c88">
           Reschedule Interview
         </button>
       `;
 
-      document
-        .getElementById("rescheduleBtn")
-        .onclick = () => {
-          document.body.innerHTML = "";
-          location.reload(); // re-enable all logic
-        };
+      document.getElementById("rescheduleBtn").onclick = () => {
+        location.reload();
+      };
     }
 
-    /* ================= FIRESTORE QUERY ================= */
     async function fetchBookedSlots(date) {
       try {
-        const res = await fetch(
-          `/api/getBookedSlots?date=${date}`
-        );
+        const res = await fetch(`/api/getBookedSlots?date=${date}`);
         const data = await res.json();
         return data.bookedSlots || [];
       } catch {
