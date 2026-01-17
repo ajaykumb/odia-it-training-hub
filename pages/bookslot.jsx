@@ -4,7 +4,7 @@ import { useEffect } from "react";
 
 export default function BookSlotPage() {
   useEffect(() => {
-    // 🔐 Expose server booking function ONLY
+    // 🔐 Server-only booking (atomic)
     window.firebaseAddBooking = async (payload) => {
       const res = await fetch("/api/bookSlot", {
         method: "POST",
@@ -12,9 +12,13 @@ export default function BookSlotPage() {
         body: JSON.stringify(payload),
       });
 
+      const data = await res.json();
+
       if (!res.ok) {
-        throw new Error("SLOT_BOOKED");
+        throw new Error(data.error || "BOOKING_FAILED");
       }
+
+      return data;
     };
 
     const script = document.createElement("script");
