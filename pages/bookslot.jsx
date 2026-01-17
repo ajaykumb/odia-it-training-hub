@@ -1,24 +1,30 @@
 "use client";
 
 import { useEffect } from "react";
+import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import { db } from "../utils/firebaseConfig";
 
 export default function BookSlotPage() {
   useEffect(() => {
-    // 🔐 Server-only booking (atomic)
-    window.firebaseAddBooking = async (payload) => {
-      const res = await fetch("/api/bookSlot", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+    // expose simple booking function (NO LOCKING)
+    window.firebaseAddBooking = async (data) => {
+      await addDoc(collection(db, "bookings"), {
+        ...data,
+        createdAt: serverTimestamp(),
       });
 
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || "BOOKING_FAILED");
-      }
-
-      return data;
+      // send email
+      await fetch("/api/interviewSlotMail", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: data.name,
+          email: data.email,
+          phone: data.phone,
+          date: data.date,
+          time: data.timeSlot,
+        }),
+      });
     };
 
     const script = document.createElement("script");
