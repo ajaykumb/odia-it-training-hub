@@ -1,12 +1,14 @@
-import {
-  doc,
-  runTransaction,
-  collection,
-  serverTimestamp,
-} from "firebase/firestore";
-import { db } from "../../utils/firebaseConfig";
+import { adminDb } from "../../utils/firebaseAdmin";
 
 export default async function handler(req, res) {
+  // 🔒 Disable caching
+  res.setHeader(
+    "Cache-Control",
+    "no-store, no-cache, must-revalidate, proxy-revalidate"
+  );
+  res.setHeader("Pragma", "no-cache");
+  res.setHeader("Expires", "0");
+
   if (req.method !== "POST") {
     return res.status(405).end();
   }
@@ -18,33 +20,33 @@ export default async function handler(req, res) {
   }
 
   const lockId = `${date}__${timeSlot}`;
-  const lockRef = doc(db, "slotLocks", lockId);
+  const lockRef = adminDb.collection("slotLocks").doc(lockId);
+  const bookingRef = adminDb.collection("bookings").doc();
 
   try {
-    await runTransaction(db, async (tx) => {
+    await adminDb.runTransaction(async (tx) => {
       const lockSnap = await tx.get(lockRef);
 
       // ❌ Slot already booked
-      if (lockSnap.exists()) {
+      if (lockSnap.exists) {
         throw new Error("SLOT_BOOKED");
       }
 
-      // 🔒 Create lock
+      // 🔒 Create slot lock
       tx.set(lockRef, {
         date,
         timeSlot,
         bookedBy: candidateId,
-        createdAt: serverTimestamp(),
+        createdAt: new Date(),
       });
 
       // ✅ Save booking
-      const bookingRef = doc(collection(db, "bookings"));
       tx.set(bookingRef, {
         candidateId,
         ...candidate,
         date,
         timeSlot,
-        createdAt: serverTimestamp(),
+        createdAt: new Date(),
       });
     });
 
@@ -54,7 +56,7 @@ export default async function handler(req, res) {
       return res.status(409).json({ error: "Slot already booked" });
     }
 
-    console.error(err);
+    console.error("BOOK SLOT ERROR:", err);
     return res.status(500).json({ error: "Booking failed" });
   }
 }
