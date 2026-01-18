@@ -11,9 +11,9 @@ if (typeof window !== "undefined") {
     const TIME_SLOTS = [
       "10:00 AM - 10:30 AM",
       "10:30 AM - 11:00 AM",
-      "11:00 AM - 11:30 AM",
-      "02:00 PM - 02:30 PM",
-      "02:30 PM - 03:00 PM",
+      "03:30 PM - 04:00 PM",
+      "04:30 PM - 05:00 PM",
+      "05:30 PM - 06:00 PM"
     ];
 
     let selectedDate = "";
@@ -35,13 +35,14 @@ if (typeof window !== "undefined") {
       "0 20px 50px rgba(0,0,0,0.25)";
 
     container.innerHTML = `
-      <h2 style="text-align:center;color:#1f3c88">Book Interview Slot</h2>
+      <h2 style="text-align:center;color:#1f3c88">
+        Book Interview Slot
+      </h2>
 
       <div style="background:#f5f7ff;padding:15px;border-radius:8px;margin:20px 0;font-size:14px">
-        <strong>Candidate Details</strong><br/>
+        <strong>Candidate</strong><br/>
         👤 ${candidate.name}<br/>
-        📧 ${candidate.email}<br/>
-        📱 ${candidate.phone}
+        📧 ${candidate.email}
       </div>
 
       <label><strong>Select Date</strong></label>
@@ -60,14 +61,28 @@ if (typeof window !== "undefined") {
 
     document.body.appendChild(container);
 
-    document.getElementById("date").addEventListener("change", (e) => {
+    document.getElementById("date").onchange = async (e) => {
       selectedDate = e.target.value;
-      loadSlots();
-    });
+      selectedTime = "";
+      disableSubmit();
+      await loadSlots();
+    };
 
-    function loadSlots() {
+    function disableSubmit() {
+      const btn = document.getElementById("submitBtn");
+      btn.disabled = true;
+      btn.style.background = "#ccc";
+    }
+
+    async function loadSlots() {
       const slotsDiv = document.getElementById("slots");
       slotsDiv.innerHTML = "";
+
+      const res = await fetch(
+        `/api/getBookedSlots?date=${selectedDate}`
+      );
+      const data = await res.json();
+      const bookedSlots = data.bookedSlots || [];
 
       TIME_SLOTS.forEach((time) => {
         const btn = document.createElement("button");
@@ -75,27 +90,38 @@ if (typeof window !== "undefined") {
         btn.style.padding = "10px";
         btn.style.borderRadius = "6px";
         btn.style.border = "1px solid #1f3c88";
-        btn.style.background = "#fff";
-        btn.style.color = "#1f3c88";
 
-        btn.onclick = () => {
-          selectedTime = time;
-
-          document.querySelectorAll("#slots button").forEach((b) => {
-            b.style.background = "#fff";
-            b.style.color = "#1f3c88";
-          });
-
-          btn.style.background = "#1f3c88";
-          btn.style.color = "#fff";
-
-          const submitBtn = document.getElementById("submitBtn");
-          submitBtn.disabled = false;
-          submitBtn.style.background = "#1f3c88";
-        };
+        if (bookedSlots.includes(time)) {
+          // ❌ already booked
+          btn.disabled = true;
+          btn.innerText += " (Booked)";
+          btn.style.background = "#eee";
+          btn.style.color = "#999";
+        } else {
+          // ✅ available
+          btn.style.background = "#fff";
+          btn.style.color = "#1f3c88";
+          btn.onclick = () => selectSlot(btn, time);
+        }
 
         slotsDiv.appendChild(btn);
       });
+    }
+
+    function selectSlot(btn, time) {
+      selectedTime = time;
+
+      document.querySelectorAll("#slots button").forEach((b) => {
+        b.style.background = "#fff";
+        b.style.color = "#1f3c88";
+      });
+
+      btn.style.background = "#1f3c88";
+      btn.style.color = "#fff";
+
+      const submitBtn = document.getElementById("submitBtn");
+      submitBtn.disabled = false;
+      submitBtn.style.background = "#1f3c88";
     }
 
     document.getElementById("submitBtn").onclick = async () => {
@@ -109,14 +135,14 @@ if (typeof window !== "undefined") {
       });
 
       container.innerHTML = `
-        <h2 style="text-align:center;color:#1f3c88">✅ Slot Confirmed</h2>
+        <h2 style="text-align:center;color:#1f3c88">
+          ✅ Slot Confirmed
+        </h2>
         <p style="text-align:center">
-          Your interview is scheduled on
-          <strong>${selectedDate}</strong> at
-          <strong>${selectedTime}</strong>
+          ${selectedDate} · ${selectedTime}
         </p>
         <p style="text-align:center;font-size:13px">
-          📧 Confirmation email sent.
+          📧 Confirmation email sent
         </p>
       `;
     };
