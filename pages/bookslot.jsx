@@ -6,7 +6,6 @@ import { db } from "../utils/firebaseConfig";
 
 export default function BookSlotPage() {
   useEffect(() => {
-    // expose simple booking function (NO LOCKING)
     window.firebaseAddBooking = async (data) => {
       await addDoc(collection(db, "bookings"), {
         ...data,
