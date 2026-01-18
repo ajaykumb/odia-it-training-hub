@@ -755,8 +755,6 @@ useEffect(() => {
       Bengaluru, Karnataka 560037
     </p>
 
-    >
-
     {/* MAP LINK */}
     <p style={{ marginBottom: "14px" }}>
       <a
