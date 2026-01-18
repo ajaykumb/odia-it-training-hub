@@ -1,36 +1,30 @@
 "use client";
 
 import { useEffect } from "react";
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
-import { db } from "../utils/firebaseConfig";
 
 export default function BookSlotPage() {
   useEffect(() => {
-    window.firebaseAddBooking = async (data) => {
-      await addDoc(collection(db, "bookings"), {
-        ...data,
-        createdAt: serverTimestamp(),
-      });
-
-      // send email
-      await fetch("/api/interviewSlotMail", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: data.name,
-          email: data.email,
-          phone: data.phone,
-          date: data.date,
-          time: data.timeSlot,
-        }),
-      });
-    };
+    // Prevent duplicate script load
+    if (document.getElementById("bookslot-script")) return;
 
     const script = document.createElement("script");
+    script.id = "bookslot-script";
     script.src = "/bookslot.js";
     script.defer = true;
+
+    script.onerror = () => {
+      console.error("❌ bookslot.js failed to load");
+    };
+
     document.body.appendChild(script);
   }, []);
 
-  return null;
+  return (
+    <div
+      style={{
+        minHeight: "100vh",
+        background: "linear-gradient(135deg,#1f3c88,#4f6df5)",
+      }}
+    />
+  );
 }
