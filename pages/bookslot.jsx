@@ -13,14 +13,13 @@ import { db } from "../utils/firebaseConfig";
 
 export default function BookSlotPage() {
   useEffect(() => {
-    // ✅ Add booking
+    // 🔒 DEFINE HELPERS FIRST
     window.firebaseAddBooking = async (data) => {
       await addDoc(collection(db, "bookings"), {
         ...data,
         createdAt: serverTimestamp(),
       });
 
-      // send mail
       await fetch("/api/interviewSlotMail", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -34,7 +33,6 @@ export default function BookSlotPage() {
       });
     };
 
-    // ✅ Get booked slots (CLIENT SIDE)
     window.firebaseGetBookedSlots = async (date) => {
       const q = query(
         collection(db, "bookings"),
@@ -44,7 +42,7 @@ export default function BookSlotPage() {
       return snap.docs.map((d) => d.data().timeSlot);
     };
 
-    // load UI
+    // ✅ LOAD bookslot.js ONLY AFTER helpers exist
     const script = document.createElement("script");
     script.src = "/bookslot.js";
     script.defer = true;
@@ -52,6 +50,11 @@ export default function BookSlotPage() {
   }, []);
 
   return (
-    <div style={{ minHeight: "100vh", background: "#1f3c88" }} />
+    <div
+      style={{
+        minHeight: "100vh",
+        background: "linear-gradient(135deg,#1f3c88,#4f6df5)",
+      }}
+    />
   );
 }
