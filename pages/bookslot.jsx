@@ -50,14 +50,6 @@ export default function BookSlotPage() {
     document.body.appendChild(script);
   }, []);
 
-  // 🔥 IMPORTANT: empty body container only
-  return (
-    <div
-      id="bookslot-root"
-      style={{
-        minHeight: "100vh",
-        background: "linear-gradient(135deg,#1f3c88,#4f6df5)",
-      }}
-    />
-  );
+  // ✅ IMPORTANT: NO height, NO background here
+  return <div id="bookslot-root"></div>;
 }
