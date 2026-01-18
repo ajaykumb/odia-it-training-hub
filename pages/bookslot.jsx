@@ -49,12 +49,40 @@ export default function BookSlotPage() {
     document.body.appendChild(script);
   }, []);
 
+  /* ✅ IMPORTANT: SHOW LOADER UI INSTEAD OF EMPTY DIV */
   return (
-    <div
+    <main
       style={{
         minHeight: "100vh",
-        background: "linear-gradient(135deg,#1f3c88,#4f6df5)",
+        background: "radial-gradient(circle at top, #5b7cff 0%, #1f3c88 60%)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        fontFamily: "Arial, sans-serif",
       }}
-    />
+    >
+      <div
+        style={{
+          background: "#ffffff",
+          padding: "32px",
+          borderRadius: "16px",
+          width: "100%",
+          maxWidth: "520px",
+          boxShadow: "0 25px 60px rgba(0,0,0,0.3)",
+          textAlign: "center",
+        }}
+      >
+        <h2 style={{ color: "#1f3c88", marginBottom: "8px" }}>
+          Loading Interview Slots
+        </h2>
+        <p style={{ fontSize: "14px", color: "#666" }}>
+          Please wait while we prepare your booking page…
+        </p>
+
+        <div style={{ marginTop: "18px", color: "#999" }}>
+          ⏳ Loading…
+        </div>
+      </div>
+    </main>
   );
 }
