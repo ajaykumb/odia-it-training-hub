@@ -122,6 +122,10 @@ useEffect(() => {
             <a href="/register" className="block px-5 py-3 bg-yellow-100 font-bold">
               📝New Student Register
             </a>
+            <a href="/interviewregister" className="block px-5 py-3 hover:bg-green-50 font-bold text-green-700">
+             🎤 Interview Support (Free)
+            </a>
+
           </div>
         )}
       </div>
@@ -152,6 +156,11 @@ useEffect(() => {
       <a href="/register" className="block bg-yellow-400 text-blue-900 px-4 py-2 rounded-lg font-bold">
         📝New Student Register
       </a>
+      <a href="/interviewregister" onClick={() => setMobileMenuOpen(false)}
+       className="block bg-green-500 text-white px-4 py-3 rounded-lg font-bold">
+       🎯 Free Interview Support
+      </a>
+
     </div>
   </div>
 )}
@@ -354,6 +363,29 @@ useEffect(() => {
       </section>
 
       {/* --- */}
+
+      <section className="py-16 bg-gradient-to-r from-green-600 to-emerald-700 text-white text-center">
+  <h3 className="text-4xl font-extrabold mb-4">
+    🎤 Interview Support Program
+  </h3>
+
+  <p className="text-xl max-w-3xl mx-auto mb-8">
+    We conduct interviews on your behalf, guide you professionally, and help you
+    perform confidently in real company interviews.
+  </p>
+
+  <a
+    href="/interviewregister"
+    className="inline-flex items-center bg-yellow-400 text-green-900 px-10 py-4 rounded-full font-black text-xl shadow-xl hover:bg-yellow-300 transition transform hover:scale-105"
+  >
+    Book Free Interview Slot <ArrowRightIcon className="w-5 h-5 inline ml-2" />
+  </a>
+
+  <p className="mt-4 text-sm opacity-90">
+    ⚡ Limited slots · Advanced-level interview · 100% Free
+  </p>
+</section>
+
 
       {/* 🎓 Student Portal Preview Section (Add-on Feature Only) */}
 <section id="portal-preview" className="py-20 bg-white">
