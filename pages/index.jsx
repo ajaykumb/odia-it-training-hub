@@ -755,24 +755,7 @@ useEffect(() => {
       Bengaluru, Karnataka 560037
     </p>
 
-    {/* MAP PREVIEW IMAGE */}
-    <a
-      href="https://maps.app.goo.gl/p5a4uRjufDce239q6"
-      target="_blank"
-      rel="noopener noreferrer"
-      style={{ display: "inline-block", marginBottom: "14px" }}
     >
-      <img
-        src="https://maps.googleapis.com/maps/api/staticmap?center=Munnekollal,Bangalore&zoom=15&size=600x250&markers=color:red%7CMunnekollal,Bangalore"
-        alt="Interview Location Map"
-        style={{
-          width: "100%",
-          maxWidth: "420px",
-          borderRadius: "10px",
-          boxShadow: "0 8px 20px rgba(0,0,0,0.3)",
-        }}
-      />
-    </a>
 
     {/* MAP LINK */}
     <p style={{ marginBottom: "14px" }}>
