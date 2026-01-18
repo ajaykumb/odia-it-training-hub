@@ -7,7 +7,7 @@
     return;
   }
 
-  /* ================= BASIC CHECK ================= */
+  /* ================= DATA ================= */
   const candidateRaw = localStorage.getItem("candidateData");
   const candidateId = localStorage.getItem("candidateId");
 
@@ -29,27 +29,24 @@
   let selectedDate = "";
   let selectedTime = "";
 
-  /* ================= PAGE BASE ================= */
+  /* ================= BODY RESET ================= */
   document.body.style.margin = "0";
-  document.body.style.fontFamily = "Arial";
+  document.body.style.minHeight = "100vh";
+  document.body.style.fontFamily = "Arial, sans-serif";
   document.body.style.background =
     "linear-gradient(135deg,#1f3c88,#4f6df5)";
-  document.body.style.minHeight = "100vh";
+  document.body.style.display = "flex";
+  document.body.style.flexDirection = "column";
 
-  /* ================= TOP FIXED BANNER ================= */
+  /* ================= RUNNING TOP BANNER ================= */
   const banner = document.createElement("div");
-  banner.style.position = "fixed";
-  banner.style.top = "0";
-  banner.style.left = "0";
-  banner.style.width = "100%";
-  banner.style.zIndex = "1000";
   banner.style.background = "linear-gradient(90deg,#0f2a66,#1f3c88)";
   banner.style.color = "#fff";
   banner.style.padding = "10px 0";
   banner.style.overflow = "hidden";
   banner.style.whiteSpace = "nowrap";
   banner.style.fontSize = "14px";
-  banner.style.textAlign = "center";
+  banner.style.fontWeight = "500";
 
   banner.innerHTML = `
     <div style="
@@ -63,10 +60,6 @@
 
   document.body.appendChild(banner);
 
-  /* Reserve space for banner */
-  document.body.style.paddingTop = "44px";
-
-  /* ================= BANNER ANIMATION ================= */
   const style = document.createElement("style");
   style.innerHTML = `
     @keyframes scrollBanner {
@@ -76,12 +69,22 @@
   `;
   document.head.appendChild(style);
 
-  /* ================= MAIN CARD ================= */
+  /* ================= MAIN WRAPPER ================= */
+  const page = document.createElement("div");
+  page.style.flex = "1";
+  page.style.display = "flex";
+  page.style.alignItems = "center";
+  page.style.justifyContent = "center";
+  page.style.padding = "40px 16px";
+
+  document.body.appendChild(page);
+
+  /* ================= CARD ================= */
   const container = document.createElement("div");
+  container.style.width = "100%";
   container.style.maxWidth = "520px";
-  container.style.margin = "40px auto";
   container.style.background = "#fff";
-  container.style.padding = "30px";
+  container.style.padding = "32px";
   container.style.borderRadius = "14px";
   container.style.boxShadow = "0 20px 50px rgba(0,0,0,0.25)";
 
@@ -93,30 +96,17 @@
       Step 2 of 2 · Choose your interview date & time
     </p>
 
-    <div style="
-      background:#f5f7ff;
-      padding:14px;
-      border-radius:8px;
-      margin:20px 0">
+    <div style="background:#f5f7ff;padding:14px;border-radius:8px;margin:20px 0">
       <strong>${candidate.name}</strong><br/>
       <span style="font-size:13px">${candidate.email}</span>
     </div>
 
     <label style="font-weight:bold">Select Interview Date</label>
     <input type="date" id="date"
-      style="
-        width:100%;
-        padding:12px;
-        margin-top:6px;
-        border-radius:8px;
-        border:1px solid #ccc"/>
+      style="width:100%;padding:12px;margin-top:6px;border-radius:8px;border:1px solid #ccc"/>
 
     <div id="slots"
-      style="
-        margin-top:18px;
-        display:grid;
-        grid-template-columns:repeat(2,1fr);
-        gap:12px">
+      style="margin-top:18px;display:grid;grid-template-columns:repeat(2,1fr);gap:12px">
     </div>
 
     <button id="submitBtn" disabled
@@ -133,25 +123,23 @@
       Confirm Slot
     </button>
 
-    <p style="
-      text-align:center;
-      margin-top:12px;
-      font-size:12px;
-      color:#777">
+    <p style="text-align:center;margin-top:12px;font-size:12px;color:#777">
       🔒 Your information is safe. No spam. No sharing.
     </p>
   `;
 
-  document.body.appendChild(container);
+  page.appendChild(container);
 
+  /* ================= ELEMENTS ================= */
   const dateInput = container.querySelector("#date");
   const slotsDiv = container.querySelector("#slots");
   const submitBtn = container.querySelector("#submitBtn");
 
-  /* ================= DATE CHANGE ================= */
+  /* ================= EVENTS ================= */
   dateInput.onchange = async (e) => {
     selectedDate = e.target.value;
     selectedTime = "";
+
     submitBtn.disabled = true;
     submitBtn.style.background = "#ccc";
     submitBtn.style.cursor = "not-allowed";
@@ -165,7 +153,6 @@
     await loadSlots();
   };
 
-  /* ================= LOAD SLOTS ================= */
   async function loadSlots() {
     const bookedSlots =
       await window.firebaseGetBookedSlots(selectedDate);
@@ -179,7 +166,6 @@
       btn.style.borderRadius = "8px";
       btn.style.border = "1px solid #1f3c88";
       btn.style.background = "#fff";
-      btn.style.color = "#1f3c88";
       btn.style.cursor = "pointer";
 
       if (bookedSlots.includes(time)) {
@@ -196,7 +182,6 @@
     });
   }
 
-  /* ================= SELECT SLOT ================= */
   function selectSlot(btn, time) {
     selectedTime = time;
 
@@ -213,7 +198,6 @@
     submitBtn.style.cursor = "pointer";
   }
 
-  /* ================= CONFIRM BOOKING ================= */
   submitBtn.onclick = async () => {
     if (!selectedDate || !selectedTime) return;
 
@@ -234,20 +218,11 @@
     });
 
     container.innerHTML = `
-      <h2 style="text-align:center;color:#1f3c88">
-        ✅ Slot Confirmed
-      </h2>
-
-      <div style="
-        background:#f5f7ff;
-        padding:15px;
-        border-radius:8px;
-        margin:20px 0;
-        text-align:center">
+      <h2 style="text-align:center;color:#1f3c88">✅ Slot Confirmed</h2>
+      <div style="background:#f5f7ff;padding:15px;border-radius:8px;margin:20px 0;text-align:center">
         <strong>${selectedDate}</strong><br/>
         ${selectedTime}
       </div>
-
       <p style="text-align:center;font-size:13px">
         📧 Confirmation email sent
       </p>
