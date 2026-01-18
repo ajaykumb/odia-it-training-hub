@@ -13,7 +13,7 @@ import { db } from "../utils/firebaseConfig";
 
 export default function BookSlotPage() {
   useEffect(() => {
-    // 🔒 DEFINE HELPERS FIRST
+    // 🔒 Booking helper
     window.firebaseAddBooking = async (data) => {
       await addDoc(collection(db, "bookings"), {
         ...data,
@@ -33,6 +33,7 @@ export default function BookSlotPage() {
       });
     };
 
+    // 🔍 Fetch booked slots
     window.firebaseGetBookedSlots = async (date) => {
       const q = query(
         collection(db, "bookings"),
@@ -42,47 +43,21 @@ export default function BookSlotPage() {
       return snap.docs.map((d) => d.data().timeSlot);
     };
 
-    // ✅ LOAD bookslot.js ONLY AFTER helpers exist
+    // Load UI script
     const script = document.createElement("script");
     script.src = "/bookslot.js";
     script.defer = true;
     document.body.appendChild(script);
   }, []);
 
-  /* ✅ IMPORTANT: SHOW LOADER UI INSTEAD OF EMPTY DIV */
+  // 🔥 IMPORTANT: empty body container only
   return (
-    <main
+    <div
+      id="bookslot-root"
       style={{
         minHeight: "100vh",
-        background: "radial-gradient(circle at top, #5b7cff 0%, #1f3c88 60%)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        fontFamily: "Arial, sans-serif",
+        background: "linear-gradient(135deg,#1f3c88,#4f6df5)",
       }}
-    >
-      <div
-        style={{
-          background: "#ffffff",
-          padding: "32px",
-          borderRadius: "16px",
-          width: "100%",
-          maxWidth: "520px",
-          boxShadow: "0 25px 60px rgba(0,0,0,0.3)",
-          textAlign: "center",
-        }}
-      >
-        <h2 style={{ color: "#1f3c88", marginBottom: "8px" }}>
-          Loading Interview Slots
-        </h2>
-        <p style={{ fontSize: "14px", color: "#666" }}>
-          Please wait while we prepare your booking page…
-        </p>
-
-        <div style={{ marginTop: "18px", color: "#999" }}>
-          ⏳ Loading…
-        </div>
-      </div>
-    </main>
+    />
   );
 }
