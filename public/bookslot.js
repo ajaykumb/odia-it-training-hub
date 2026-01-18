@@ -7,6 +7,20 @@
     return;
   }
 
+  /* ================= RESET PAGE ================= */
+  document.documentElement.style.margin = "0";
+  document.documentElement.style.padding = "0";
+  document.body.style.margin = "0";
+  document.body.style.padding = "0";
+  document.body.style.minHeight = "100vh";
+  document.body.style.fontFamily = "Arial";
+  document.body.style.background =
+    "linear-gradient(135deg,#1f3c88,#4f6df5)";
+  document.body.style.display = "flex";
+  document.body.style.flexDirection = "column";
+  document.body.style.alignItems = "center";
+
+  /* ================= AUTH CHECK ================= */
   const candidateRaw = localStorage.getItem("candidateData");
   const candidateId = localStorage.getItem("candidateId");
 
@@ -28,53 +42,46 @@
   let selectedDate = "";
   let selectedTime = "";
 
-  document.body.style.margin = "0";
-  document.body.style.fontFamily = "Arial";
-
   /* ================= TOP RUNNING BANNER ================= */
-const banner = document.createElement("div");
-banner.style.position = "sticky";
-banner.style.top = "0";
-banner.style.zIndex = "999";
-banner.style.background = "linear-gradient(90deg,#0f2a66,#1f3c88)";
-banner.style.color = "#fff";
-banner.style.padding = "10px 0";
-banner.style.overflow = "hidden";
-banner.style.whiteSpace = "nowrap";
-banner.style.fontSize = "14px";
-banner.style.fontWeight = "500";
+  const banner = document.createElement("div");
+  banner.style.position = "sticky";
+  banner.style.top = "0";
+  banner.style.width = "100%";
+  banner.style.zIndex = "999";
+  banner.style.background = "linear-gradient(90deg,#0f2a66,#1f3c88)";
+  banner.style.color = "#fff";
+  banner.style.padding = "10px 0";
+  banner.style.whiteSpace = "nowrap";
+  banner.style.overflow = "hidden";
+  banner.style.fontSize = "14px";
 
-banner.innerHTML = `
-  <div style="
-    display:inline-block;
-    padding-left:100%;
-    animation: scrollBanner 18s linear infinite;
-  ">
-    📢 Limited interview slots available. Book early to avoid missing your opportunity.
-  </div>
-`;
+  banner.innerHTML = `
+    <div style="
+      display:inline-block;
+      padding-left:100%;
+      animation: scrollBanner 18s linear infinite;
+    ">
+      📢 Limited interview slots available. Book early to avoid missing your opportunity.
+    </div>
+  `;
+  document.body.appendChild(banner);
 
-document.body.prepend(banner);
+  const bannerStyle = document.createElement("style");
+  bannerStyle.innerHTML = `
+    @keyframes scrollBanner {
+      from { transform: translateX(0); }
+      to { transform: translateX(-100%); }
+    }
+  `;
+  document.head.appendChild(bannerStyle);
 
-/* ================= BANNER ANIMATION ================= */
-const style = document.createElement("style");
-style.innerHTML = `
-  @keyframes scrollBanner {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(-100%); }
-  }
-`;
-document.head.appendChild(style);
-
-  
-
-  const root = document.getElementById("bookslot-root");
-
+  /* ================= MAIN CARD ================= */
   const container = document.createElement("div");
+  container.style.width = "100%";
   container.style.maxWidth = "520px";
-  container.style.margin = "80px auto";
   container.style.background = "#fff";
   container.style.padding = "30px";
+  container.style.margin = "40px 16px";
   container.style.borderRadius = "14px";
   container.style.boxShadow = "0 20px 50px rgba(0,0,0,0.25)";
 
@@ -118,12 +125,13 @@ document.head.appendChild(style);
     </p>
   `;
 
-  root.appendChild(container);
+  document.body.appendChild(container);
 
   const dateInput = container.querySelector("#date");
   const slotsDiv = container.querySelector("#slots");
   const submitBtn = container.querySelector("#submitBtn");
 
+  /* ================= DATE CHANGE ================= */
   dateInput.onchange = async (e) => {
     selectedDate = e.target.value;
     selectedTime = "";
@@ -140,6 +148,7 @@ document.head.appendChild(style);
     await loadSlots();
   };
 
+  /* ================= LOAD SLOTS ================= */
   async function loadSlots() {
     const bookedSlots =
       await window.firebaseGetBookedSlots(selectedDate);
@@ -154,6 +163,7 @@ document.head.appendChild(style);
       btn.style.border = "1px solid #1f3c88";
       btn.style.background = "#fff";
       btn.style.cursor = "pointer";
+      btn.style.color = "#1f3c88";
 
       if (bookedSlots.includes(time)) {
         btn.disabled = true;
@@ -172,12 +182,10 @@ document.head.appendChild(style);
   function selectSlot(btn, time) {
     selectedTime = time;
 
-    document
-      .querySelectorAll("#slots button")
-      .forEach((b) => {
-        b.style.background = "#fff";
-        b.style.color = "#1f3c88";
-      });
+    document.querySelectorAll("#slots button").forEach((b) => {
+      b.style.background = "#fff";
+      b.style.color = "#1f3c88";
+    });
 
     btn.style.background = "#1f3c88";
     btn.style.color = "#fff";
@@ -187,6 +195,7 @@ document.head.appendChild(style);
     submitBtn.style.cursor = "pointer";
   }
 
+  /* ================= SUBMIT ================= */
   submitBtn.onclick = async () => {
     if (!selectedDate || !selectedTime) return;
 
@@ -217,4 +226,28 @@ document.head.appendChild(style);
       </p>
     `;
   };
+
+  /* ================= WHATSAPP FLOATING ICON ================= */
+  const whatsapp = document.createElement("a");
+  whatsapp.href = "https://wa.me/919437401378";
+  whatsapp.target = "_blank";
+  whatsapp.style.position = "fixed";
+  whatsapp.style.bottom = "22px";
+  whatsapp.style.right = "22px";
+  whatsapp.style.width = "56px";
+  whatsapp.style.height = "56px";
+  whatsapp.style.borderRadius = "50%";
+  whatsapp.style.background = "#25D366";
+  whatsapp.style.display = "flex";
+  whatsapp.style.alignItems = "center";
+  whatsapp.style.justifyContent = "center";
+  whatsapp.style.boxShadow = "0 10px 25px rgba(0,0,0,0.3)";
+  whatsapp.style.zIndex = "999";
+
+  whatsapp.innerHTML = `
+    <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg"
+         style="width:28px;height:28px"/>
+  `;
+
+  document.body.appendChild(whatsapp);
 })();
