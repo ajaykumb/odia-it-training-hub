@@ -145,8 +145,11 @@ export default function InterviewRegister() {
           </p>
 
           <p style={styles.support}>
-            Need help? 📞 <strong>9437401378</strong> | WhatsApp available
-            Please ping me directly if any query, Happy to help.
+            Need help? 📞 <strong>9437401378</strong> | WhatsApp available |
+            </p>
+          <p style={styles.support}>
+            📍Location:Munnekollal Main Rd, Laxminarayana Layout, Thubarahalli, Munnekollal,
+            Bengaluru, Karnataka 560037
           </p>
         </div>
       </div>
