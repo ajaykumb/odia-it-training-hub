@@ -34,13 +34,10 @@ export default function InterviewRegister() {
 
     setLoading(true);
 
-    const docRef = await addDoc(
-      collection(db, "interviewcandidate"),
-      {
-        ...form,
-        createdAt: serverTimestamp(),
-      }
-    );
+    const docRef = await addDoc(collection(db, "interviewcandidate"), {
+      ...form,
+      createdAt: serverTimestamp(),
+    });
 
     localStorage.setItem("candidateId", docRef.id);
     localStorage.setItem("candidateData", JSON.stringify(form));
@@ -50,11 +47,17 @@ export default function InterviewRegister() {
 
   return (
     <>
-      {/* Animation */}
+      {/* Animations */}
       <style>{`
         @keyframes fadeUp {
           from { opacity: 0; transform: translateY(16px); }
           to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+          0% { box-shadow: 0 0 0 0 rgba(255,152,0,0.6); }
+          70% { box-shadow: 0 0 0 10px rgba(255,152,0,0); }
+          100% { box-shadow: 0 0 0 0 rgba(255,152,0,0); }
         }
       `}</style>
 
@@ -67,14 +70,24 @@ export default function InterviewRegister() {
             style={styles.logo}
           />
 
+          {/* 🔔 NOTE BANNER (NEW) */}
+          <div style={styles.noteBanner}>
+            <span style={styles.noteIcon}>⚡</span>
+            <span>
+              <strong>Limited Interview Slots!</strong>
+              <br />
+              Advanced-level interviews · <strong>100% FREE</strong>
+            </span>
+          </div>
+
           <h2 style={styles.title}>Interview Registration</h2>
+
           <p style={styles.subtitle}>
-            Candidates receive expert-led interview support and professional representation.
+            Candidates receive expert-led interview support and professional
+            representation.
           </p>
 
-          <div style={styles.step}>
-            Step 1 of 2 · Registration
-          </div>
+          <div style={styles.step}>Step 1 of 2 · Registration</div>
 
           {/* INPUTS */}
           <input
@@ -133,6 +146,7 @@ export default function InterviewRegister() {
 
           <p style={styles.support}>
             Need help? 📞 <strong>9437401378</strong> | WhatsApp available
+            Please ping me directly if any query, Happy to help.
           </p>
         </div>
       </div>
@@ -175,6 +189,22 @@ const styles = {
   logo: {
     height: "60px",
     marginBottom: "10px",
+  },
+  noteBanner: {
+    background: "linear-gradient(90deg,#ff9800,#ffb74d)",
+    color: "#3e2723",
+    padding: "10px 14px",
+    borderRadius: "10px",
+    fontSize: "13px",
+    marginBottom: "16px",
+    display: "flex",
+    alignItems: "center",
+    gap: "10px",
+    textAlign: "left",
+    animation: "pulse 1.8s infinite",
+  },
+  noteIcon: {
+    fontSize: "18px",
   },
   title: {
     margin: "10px 0",
@@ -248,14 +278,3 @@ const styles = {
     color: "#333",
   },
 };
-
-{/* 📄 Footer */}
-<footer style={styles.footer}>
-  <div style={styles.footerContainer}>
-    <p>© {new Date().getFullYear()} Odia IT Training Hub. All rights reserved.</p>
-    <p style={styles.footerSub}>
-      Empowering the next generation of IT professionals.
-    </p>
-  </div>
-</footer>
-
