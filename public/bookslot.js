@@ -31,6 +31,43 @@
   document.body.style.margin = "0";
   document.body.style.fontFamily = "Arial";
 
+  /* ================= TOP RUNNING BANNER ================= */
+const banner = document.createElement("div");
+banner.style.position = "sticky";
+banner.style.top = "0";
+banner.style.zIndex = "999";
+banner.style.background = "linear-gradient(90deg,#0f2a66,#1f3c88)";
+banner.style.color = "#fff";
+banner.style.padding = "10px 0";
+banner.style.overflow = "hidden";
+banner.style.whiteSpace = "nowrap";
+banner.style.fontSize = "14px";
+banner.style.fontWeight = "500";
+
+banner.innerHTML = `
+  <div style="
+    display:inline-block;
+    padding-left:100%;
+    animation: scrollBanner 18s linear infinite;
+  ">
+    📢 Limited interview slots available. Book early to avoid missing your opportunity.
+  </div>
+`;
+
+document.body.prepend(banner);
+
+/* ================= BANNER ANIMATION ================= */
+const style = document.createElement("style");
+style.innerHTML = `
+  @keyframes scrollBanner {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-100%); }
+  }
+`;
+document.head.appendChild(style);
+
+  
+
   const root = document.getElementById("bookslot-root");
 
   const container = document.createElement("div");
