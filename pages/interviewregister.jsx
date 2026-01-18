@@ -76,7 +76,7 @@ export default function InterviewRegister() {
             <span>
               <strong>Limited Interview Slots!</strong>
               <br />
-              Advanced-level interviews · <strong>100% FREE</strong>
+              Book for interviews · <strong>100% FREE</strong>
             </span>
           </div>
 
