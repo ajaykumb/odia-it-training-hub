@@ -127,24 +127,39 @@ if (typeof window !== "undefined") {
     document.getElementById("submitBtn").onclick = async () => {
       if (!selectedDate || !selectedTime) return;
 
-      await window.firebaseAddBooking({
-        candidateId,
-        ...candidate,
-        date: selectedDate,
-        timeSlot: selectedTime,
-      });
+      document.getElementById("submitBtn").onclick = async () => {
+  if (!selectedDate || !selectedTime) return;
 
-      container.innerHTML = `
-        <h2 style="text-align:center;color:#1f3c88">
-          ✅ Slot Confirmed
-        </h2>
-        <p style="text-align:center">
-          ${selectedDate} · ${selectedTime}
-        </p>
-        <p style="text-align:center;font-size:13px">
-          📧 Confirmation email sent
-        </p>
-      `;
-    };
-  })();
-}
+  // 🔄 RE-CHECK latest bookings before saving
+  const res = await fetch(
+    `/api/getBookedSlots?date=${selectedDate}`
+  );
+  const data = await res.json();
+  const bookedSlots = data.bookedSlots || [];
+
+  if (bookedSlots.includes(selectedTime)) {
+    alert("❌ This slot was just booked. Please select another.");
+    await loadSlots(); // reload UI
+    return;
+  }
+
+  // ✅ Safe to book (best-effort)
+  await window.firebaseAddBooking({
+    candidateId,
+    ...candidate,
+    date: selectedDate,
+    timeSlot: selectedTime,
+  });
+
+  container.innerHTML = `
+    <h2 style="text-align:center;color:#1f3c88">
+      ✅ Slot Confirmed
+    </h2>
+    <p style="text-align:center">
+      ${selectedDate} · ${selectedTime}
+    </p>
+    <p style="text-align:center;font-size:13px">
+      📧 Confirmation email sent
+    </p>
+  `;
+};
