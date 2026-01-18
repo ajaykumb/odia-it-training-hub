@@ -29,7 +29,6 @@
   let selectedDate = "";
   let selectedTime = "";
 
-  document.body.innerHTML = "";
   document.body.style.background =
     "linear-gradient(135deg,#1f3c88,#4f6df5)";
   document.body.style.minHeight = "100vh";
