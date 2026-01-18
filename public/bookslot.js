@@ -7,20 +7,7 @@
     return;
   }
 
-  /* ================= RESET PAGE ================= */
-  document.documentElement.style.margin = "0";
-  document.documentElement.style.padding = "0";
-  document.body.style.margin = "0";
-  document.body.style.padding = "0";
-  document.body.style.minHeight = "100vh";
-  document.body.style.fontFamily = "Arial";
-  document.body.style.background =
-    "linear-gradient(135deg,#1f3c88,#4f6df5)";
-  document.body.style.display = "flex";
-  document.body.style.flexDirection = "column";
-  document.body.style.alignItems = "center";
-
-  /* ================= AUTH CHECK ================= */
+  /* ================= BASIC CHECK ================= */
   const candidateRaw = localStorage.getItem("candidateData");
   const candidateId = localStorage.getItem("candidateId");
 
@@ -42,18 +29,27 @@
   let selectedDate = "";
   let selectedTime = "";
 
-  /* ================= TOP RUNNING BANNER ================= */
+  /* ================= PAGE BASE ================= */
+  document.body.style.margin = "0";
+  document.body.style.fontFamily = "Arial";
+  document.body.style.background =
+    "linear-gradient(135deg,#1f3c88,#4f6df5)";
+  document.body.style.minHeight = "100vh";
+
+  /* ================= TOP FIXED BANNER ================= */
   const banner = document.createElement("div");
-  banner.style.position = "sticky";
+  banner.style.position = "fixed";
   banner.style.top = "0";
+  banner.style.left = "0";
   banner.style.width = "100%";
-  banner.style.zIndex = "999";
+  banner.style.zIndex = "1000";
   banner.style.background = "linear-gradient(90deg,#0f2a66,#1f3c88)";
   banner.style.color = "#fff";
   banner.style.padding = "10px 0";
-  banner.style.whiteSpace = "nowrap";
   banner.style.overflow = "hidden";
+  banner.style.whiteSpace = "nowrap";
   banner.style.fontSize = "14px";
+  banner.style.textAlign = "center";
 
   banner.innerHTML = `
     <div style="
@@ -64,24 +60,28 @@
       📢 Limited interview slots available. Book early to avoid missing your opportunity.
     </div>
   `;
+
   document.body.appendChild(banner);
 
-  const bannerStyle = document.createElement("style");
-  bannerStyle.innerHTML = `
+  /* Reserve space for banner */
+  document.body.style.paddingTop = "44px";
+
+  /* ================= BANNER ANIMATION ================= */
+  const style = document.createElement("style");
+  style.innerHTML = `
     @keyframes scrollBanner {
-      from { transform: translateX(0); }
-      to { transform: translateX(-100%); }
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-100%); }
     }
   `;
-  document.head.appendChild(bannerStyle);
+  document.head.appendChild(style);
 
   /* ================= MAIN CARD ================= */
   const container = document.createElement("div");
-  container.style.width = "100%";
   container.style.maxWidth = "520px";
+  container.style.margin = "40px auto";
   container.style.background = "#fff";
   container.style.padding = "30px";
-  container.style.margin = "40px 16px";
   container.style.borderRadius = "14px";
   container.style.boxShadow = "0 20px 50px rgba(0,0,0,0.25)";
 
@@ -93,17 +93,30 @@
       Step 2 of 2 · Choose your interview date & time
     </p>
 
-    <div style="background:#f5f7ff;padding:14px;border-radius:8px;margin:20px 0">
+    <div style="
+      background:#f5f7ff;
+      padding:14px;
+      border-radius:8px;
+      margin:20px 0">
       <strong>${candidate.name}</strong><br/>
       <span style="font-size:13px">${candidate.email}</span>
     </div>
 
     <label style="font-weight:bold">Select Interview Date</label>
     <input type="date" id="date"
-      style="width:100%;padding:12px;margin-top:6px;border-radius:8px;border:1px solid #ccc"/>
+      style="
+        width:100%;
+        padding:12px;
+        margin-top:6px;
+        border-radius:8px;
+        border:1px solid #ccc"/>
 
     <div id="slots"
-      style="margin-top:18px;display:grid;grid-template-columns:repeat(2,1fr);gap:12px">
+      style="
+        margin-top:18px;
+        display:grid;
+        grid-template-columns:repeat(2,1fr);
+        gap:12px">
     </div>
 
     <button id="submitBtn" disabled
@@ -120,7 +133,11 @@
       Confirm Slot
     </button>
 
-    <p style="text-align:center;margin-top:12px;font-size:12px;color:#777">
+    <p style="
+      text-align:center;
+      margin-top:12px;
+      font-size:12px;
+      color:#777">
       🔒 Your information is safe. No spam. No sharing.
     </p>
   `;
@@ -162,8 +179,8 @@
       btn.style.borderRadius = "8px";
       btn.style.border = "1px solid #1f3c88";
       btn.style.background = "#fff";
-      btn.style.cursor = "pointer";
       btn.style.color = "#1f3c88";
+      btn.style.cursor = "pointer";
 
       if (bookedSlots.includes(time)) {
         btn.disabled = true;
@@ -179,6 +196,7 @@
     });
   }
 
+  /* ================= SELECT SLOT ================= */
   function selectSlot(btn, time) {
     selectedTime = time;
 
@@ -195,7 +213,7 @@
     submitBtn.style.cursor = "pointer";
   }
 
-  /* ================= SUBMIT ================= */
+  /* ================= CONFIRM BOOKING ================= */
   submitBtn.onclick = async () => {
     if (!selectedDate || !selectedTime) return;
 
@@ -216,38 +234,23 @@
     });
 
     container.innerHTML = `
-      <h2 style="text-align:center;color:#1f3c88">✅ Slot Confirmed</h2>
-      <div style="background:#f5f7ff;padding:15px;border-radius:8px;margin:20px 0;text-align:center">
+      <h2 style="text-align:center;color:#1f3c88">
+        ✅ Slot Confirmed
+      </h2>
+
+      <div style="
+        background:#f5f7ff;
+        padding:15px;
+        border-radius:8px;
+        margin:20px 0;
+        text-align:center">
         <strong>${selectedDate}</strong><br/>
         ${selectedTime}
       </div>
+
       <p style="text-align:center;font-size:13px">
         📧 Confirmation email sent
       </p>
     `;
   };
-
-  /* ================= WHATSAPP FLOATING ICON ================= */
-  const whatsapp = document.createElement("a");
-  whatsapp.href = "https://wa.me/919437401378";
-  whatsapp.target = "_blank";
-  whatsapp.style.position = "fixed";
-  whatsapp.style.bottom = "22px";
-  whatsapp.style.right = "22px";
-  whatsapp.style.width = "56px";
-  whatsapp.style.height = "56px";
-  whatsapp.style.borderRadius = "50%";
-  whatsapp.style.background = "#25D366";
-  whatsapp.style.display = "flex";
-  whatsapp.style.alignItems = "center";
-  whatsapp.style.justifyContent = "center";
-  whatsapp.style.boxShadow = "0 10px 25px rgba(0,0,0,0.3)";
-  whatsapp.style.zIndex = "999";
-
-  whatsapp.innerHTML = `
-    <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg"
-         style="width:28px;height:28px"/>
-  `;
-
-  document.body.appendChild(whatsapp);
 })();
