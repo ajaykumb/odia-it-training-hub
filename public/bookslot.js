@@ -30,66 +30,72 @@
   let selectedTime = "";
 
   /* ================= PAGE BASE ================= */
+  document.body.style.margin = "0";
+  document.body.style.minHeight = "100vh";
+  document.body.style.fontFamily = "Arial, sans-serif";
   document.body.style.background =
     "linear-gradient(135deg,#1f3c88,#4f6df5)";
-  document.body.style.minHeight = "100vh";
-  document.body.style.margin = "0";
-  document.body.style.fontFamily = "Arial";
 
-  /* ================= WRAPPER (UI FIX) ================= */
+  /* ================= WRAPPER ================= */
   const wrapper = document.createElement("div");
   wrapper.style.minHeight = "100vh";
   wrapper.style.display = "flex";
   wrapper.style.alignItems = "center";
   wrapper.style.justifyContent = "center";
-  wrapper.style.padding = "20px";
+  wrapper.style.padding = "24px";
 
   /* ================= CARD ================= */
   const container = document.createElement("div");
-  container.style.maxWidth = "520px";
+  container.style.maxWidth = "560px";
   container.style.width = "100%";
-  container.style.background = "#fff";
-  container.style.padding = "30px";
-  container.style.borderRadius = "12px";
-  container.style.boxShadow = "0 20px 50px rgba(0,0,0,0.25)";
+  container.style.background = "#ffffff";
+  container.style.padding = "34px";
+  container.style.borderRadius = "16px";
+  container.style.boxShadow = "0 25px 60px rgba(0,0,0,0.3)";
 
   container.innerHTML = `
-    <h2 style="text-align:center;color:#1f3c88">
-      Book Interview Slot
-    </h2>
+    <div style="text-align:center;margin-bottom:22px">
+      <h2 style="color:#1f3c88;margin-bottom:6px">
+        Book Interview Slot
+      </h2>
+      <p style="font-size:13px;color:#666">
+        Step 2 of 2 · Choose your interview date & time
+      </p>
+    </div>
 
     <div style="
       background:#f5f7ff;
-      padding:15px;
-      border-radius:8px;
-      margin:20px 0;
+      padding:16px;
+      border-radius:10px;
+      margin-bottom:24px;
       font-size:14px">
       <strong>${candidate.name}</strong><br/>
       ${candidate.email}
     </div>
 
-    <label style="font-size:14px;font-weight:bold">
-      Select Date
+    <label style="font-weight:bold;font-size:14px">
+      Select Interview Date
     </label>
     <input
       type="date"
       id="date"
       style="
         width:100%;
-        padding:10px;
-        margin-top:6px;
-        border-radius:6px;
-        border:1px solid #ccc
+        padding:12px;
+        margin-top:8px;
+        border-radius:8px;
+        border:1px solid #ccc;
+        font-size:14px
       "
     />
 
     <div
       id="slots"
       style="
-        margin-top:18px;
+        margin-top:26px;
         display:grid;
         grid-template-columns:repeat(2,1fr);
-        gap:10px
+        gap:12px
       "
     ></div>
 
@@ -97,19 +103,28 @@
       id="submitBtn"
       disabled
       style="
-        margin-top:22px;
+        margin-top:28px;
         width:100%;
-        padding:12px;
+        padding:14px;
         background:#ccc;
         color:#fff;
         border:none;
-        border-radius:6px;
-        font-size:15px;
+        border-radius:8px;
+        font-size:16px;
+        font-weight:bold;
         cursor:not-allowed
       "
     >
       Confirm Slot
     </button>
+
+    <p style="
+      margin-top:20px;
+      font-size:12px;
+      text-align:center;
+      color:#777">
+      🔒 Your information is safe. No spam. No sharing.
+    </p>
   `;
 
   wrapper.appendChild(container);
@@ -123,9 +138,11 @@
   dateInput.onchange = async (e) => {
     selectedDate = e.target.value;
     selectedTime = "";
+
     submitBtn.disabled = true;
     submitBtn.style.background = "#ccc";
     submitBtn.style.cursor = "not-allowed";
+
     await loadSlots();
   };
 
@@ -145,10 +162,11 @@
     TIME_SLOTS.forEach((time) => {
       const btn = document.createElement("button");
       btn.innerText = time;
-      btn.style.padding = "10px";
-      btn.style.borderRadius = "6px";
+      btn.style.padding = "12px";
+      btn.style.borderRadius = "8px";
       btn.style.border = "1px solid #1f3c88";
-      btn.style.fontSize = "13px";
+      btn.style.fontSize = "14px";
+      btn.style.transition = "all 0.2s ease";
 
       if (bookedSlots.includes(time)) {
         btn.disabled = true;
@@ -205,25 +223,24 @@
     });
 
     container.innerHTML = `
-      <h2 style="text-align:center;color:#1f3c88">
-        ✅ Slot Confirmed
-      </h2>
+      <div style="text-align:center">
+        <h2 style="color:#1f3c88">✅ Slot Confirmed</h2>
 
-      <div style="
-        background:#f5f7ff;
-        padding:15px;
-        border-radius:8px;
-        margin:20px 0;
-        font-size:14px;
-        text-align:center">
-        <strong>${selectedDate}</strong><br/>
-        ${selectedTime}
+        <div style="
+          background:#f5f7ff;
+          padding:18px;
+          border-radius:10px;
+          margin:22px 0;
+          font-size:15px">
+          <strong>${selectedDate}</strong><br/>
+          ${selectedTime}
+        </div>
+
+        <p style="font-size:13px;color:#555">
+          📧 Confirmation email has been sent.<br/>
+          Please be available on time.
+        </p>
       </div>
-
-      <p style="text-align:center;font-size:13px">
-        📧 Confirmation email sent.<br/>
-        Please be available on time.
-      </p>
     `;
   };
 })();
