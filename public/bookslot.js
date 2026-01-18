@@ -34,7 +34,7 @@
   document.body.style.minHeight = "100vh";
   document.body.style.fontFamily = "Arial, sans-serif";
   document.body.style.background =
-    "linear-gradient(135deg,#1f3c88,#4f6df5)";
+  "radial-gradient(circle at top, #5b7cff 0%, #1f3c88 60%)";
 
   /* ================= WRAPPER ================= */
   const wrapper = document.createElement("div");
@@ -55,6 +55,13 @@
 
   container.innerHTML = `
     <div style="text-align:center;margin-bottom:22px">
+    <div style="
+  height:6px;
+  width:60px;
+  background:#1f3c88;
+  border-radius:4px;
+  margin:0 auto 14px auto;
+"></div>
       <h2 style="color:#1f3c88;margin-bottom:6px">
         Book Interview Slot
       </h2>
