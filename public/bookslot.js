@@ -74,12 +74,15 @@
   };
 
   async function loadSlots() {
-    slotsDiv.innerHTML = "Loading...";
+   slotsDiv.innerHTML = `
+  <div style="grid-column:1/-1;text-align:center;color:#666">
+    ⏳ Loading available slots...
+  </div>
+`;
+
 
     const bookedSlots =
       await window.firebaseGetBookedSlots(selectedDate);
-
-    slotsDiv.innerHTML = "";
 
     TIME_SLOTS.forEach((time) => {
       const btn = document.createElement("button");
