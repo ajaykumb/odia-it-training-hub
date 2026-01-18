@@ -735,30 +735,43 @@ useEffect(() => {
 
 
       {/* 📄 Footer */}
-      <footer className="bg-gray-900 text-gray-400 text-center py-8">
-        ...
-      </footer>
+<footer className="bg-gray-900 text-gray-400 text-center py-8">
+  <div className="max-w-6xl mx-auto px-6">
 
-      {/* 📄 Footer */}
-      <footer className="bg-gray-900 text-gray-400 text-center py-8">
-        <div className="max-w-6xl mx-auto px-6">
-           <p style="font-size:14px;color:#333;margin-top:8px;line-height:1.5;">
-<br/>
-Munnekollal Main Rd,<br/>
-Laxminarayana Layout,<br/>
-Thubarahalli, Munnekollal,<br/>
-Bengaluru, Karnataka 560037
-</p>
+    <p
+      style={{
+        fontSize: "14px",
+        color: "#d1d5db",
+        lineHeight: "1.6",
+        marginBottom: "10px",
+      }}
+    >
+      📍 <strong>Interview Location:</strong><br />
+      DXN Product Shop,<br />
+      Munnekollal Main Rd,<br />
+      Laxminarayana Layout,<br />
+      Thubarahalli, Munnekollal,<br />
+      Bengaluru, Karnataka 560037
+    </p>
 
-<p style="margin-top:10px;font-size:14px;font-weight:bold;">
-<a href="https://maps.app.goo.gl/p5a4uRjufDce239q6"
-style="color:#1f3c88;text-decoration:none;font-weight:bold;">
-👉 Open Map & Directions
-</a>
-          <p>© 2022 Odia IT Training Hub. All rights reserved.</p>
-          <p className="mt-2 text-sm">Empowering the next generation of IT professionals.</p>
-        </div>
-      </footer>
+    <p style={{ marginBottom: "12px" }}>
+      <a
+        href="https://maps.app.goo.gl/p5a4uRjufDce239q6"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-blue-400 font-semibold hover:underline"
+      >
+        👉 Open Map & Directions
+      </a>
+    </p>
+
+    <p>© {new Date().getFullYear()} Odia IT Training Hub. All rights reserved.</p>
+    <p className="mt-2 text-sm">
+      Empowering the next generation of IT professionals.
+    </p>
+
+  </div>
+</footer>
     </main>
   );
 }
