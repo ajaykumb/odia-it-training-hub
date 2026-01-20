@@ -707,31 +707,60 @@ useEffect(() => {
 
       {/* Content */}
       <div className="p-8 text-center">
-        <h3 className="text-2xl font-extrabold text-blue-700 mb-2">
-          🎓 New Batch Started
-        </h3>
 
-        <p className="text-lg font-semibold text-gray-700 mb-4">
-          Batch Starts from <span className="text-red-600">20th January 2026</span>
-        </p>
+        {isLive ? (
+          <>
+            <h3 className="text-3xl font-extrabold text-green-700 mb-2 animate-pulse">
+              🔴 LIVE CLASS NOW
+            </h3>
 
-        <ul className="text-left text-gray-600 space-y-2 mb-6">
-          <li>✅ Job-Oriented IT Training</li>
-          <li>✅ Real-Time Project Exposure</li>
-          <li>✅ Interview Preparation Support</li>
-        </ul>
+            <p className="text-lg font-semibold text-gray-700 mb-4">
+              Started Today • <span className="text-red-600">09:00 PM</span>
+            </p>
 
-        <a
-          href="/register"
-          className="inline-block bg-yellow-400 text-blue-900 px-8 py-3 rounded-full font-extrabold text-lg shadow-xl hover:bg-yellow-300 transition transform hover:scale-105"
-        >
-          📝 Register Now
-        </a>
+            <ul className="text-left text-gray-600 space-y-2 mb-6">
+              <li>✅ Live Instructor-Led Training</li>
+              <li>✅ Real-Time Project Discussion</li>
+              <li>✅ Career & Interview Guidance</li>
+            </ul>
+
+            <a
+              href="/register"
+              className="inline-block bg-red-500 text-white px-8 py-3 rounded-full font-extrabold text-lg shadow-xl hover:bg-red-600 transition transform hover:scale-105"
+            >
+              🚀 Join Live Now
+            </a>
+          </>
+        ) : (
+          <>
+            <h3 className="text-2xl font-extrabold text-blue-700 mb-2">
+              🎓 New Batch Starting Today
+            </h3>
+
+            <p className="text-lg font-semibold text-gray-700 mb-4">
+              <span className="text-red-600">20th January 2026 • 09:00 PM</span>
+            </p>
+
+            <ul className="text-left text-gray-600 space-y-2 mb-6">
+              <li>✅ Job-Oriented IT Training</li>
+              <li>✅ Real-Time Project Exposure</li>
+              <li>✅ Interview Preparation Support</li>
+            </ul>
+
+            <a
+              href="/register"
+              className="inline-block bg-yellow-400 text-blue-900 px-8 py-3 rounded-full font-extrabold text-lg shadow-xl hover:bg-yellow-300 transition transform hover:scale-105"
+            >
+              📝 Register Now
+            </a>
+          </>
+        )}
+
       </div>
-
     </div>
   </div>
 )}
+
 
 
       {/* 📄 Footer */}
