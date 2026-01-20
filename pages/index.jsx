@@ -691,77 +691,7 @@ useEffect(() => {
         </div>
       )}
 
-            {/* ================= JAN 20 NEW BATCH POPUP ================= */}
-{showBatchPopup && (
-  <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/70 backdrop-blur-sm">
-
-    <div className="relative bg-white rounded-2xl shadow-2xl w-[90%] max-w-md animate-scale-in">
-
-      {/* Close Button */}
-      <button
-        onClick={() => setShowBatchPopup(false)}
-        className="absolute top-3 right-3 bg-red-600 text-white w-8 h-8 rounded-full font-bold hover:bg-red-700"
-      >
-        ✕
-      </button>
-
-      {/* Content */}
-      <div className="p-8 text-center">
-
-        {isLive ? (
-          <>
-            <h3 className="text-3xl font-extrabold text-green-700 mb-2 animate-pulse">
-              🔴 LIVE CLASS NOW
-            </h3>
-
-            <p className="text-lg font-semibold text-gray-700 mb-4">
-              Started Today • <span className="text-red-600">09:00 PM</span>
-            </p>
-
-            <ul className="text-left text-gray-600 space-y-2 mb-6">
-              <li>✅ Live Instructor-Led Training</li>
-              <li>✅ Real-Time Project Discussion</li>
-              <li>✅ Career & Interview Guidance</li>
-            </ul>
-
-            <a
-              href="/register"
-              className="inline-block bg-red-500 text-white px-8 py-3 rounded-full font-extrabold text-lg shadow-xl hover:bg-red-600 transition transform hover:scale-105"
-            >
-              🚀 Join Live Now
-            </a>
-          </>
-        ) : (
-          <>
-            <h3 className="text-2xl font-extrabold text-blue-700 mb-2">
-              🎓 New Batch Starting Today
-            </h3>
-
-            <p className="text-lg font-semibold text-gray-700 mb-4">
-              <span className="text-red-600">20th January 2026 • 09:00 PM</span>
-            </p>
-
-            <ul className="text-left text-gray-600 space-y-2 mb-6">
-              <li>✅ Job-Oriented IT Training</li>
-              <li>✅ Real-Time Project Exposure</li>
-              <li>✅ Interview Preparation Support</li>
-            </ul>
-
-            <a
-              href="/register"
-              className="inline-block bg-yellow-400 text-blue-900 px-8 py-3 rounded-full font-extrabold text-lg shadow-xl hover:bg-yellow-300 transition transform hover:scale-105"
-            >
-              📝 Register Now
-            </a>
-          </>
-        )}
-
-      </div>
-    </div>
-  </div>
-)}
-
-
+           
 
       {/* 📄 Footer */}
 <footer className="bg-gray-900 text-gray-400 text-center py-8">
