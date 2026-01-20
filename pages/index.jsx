@@ -753,12 +753,24 @@ useEffect(() => {
               <li>✅ Interview Preparation Support</li>
             </ul>
 
-            <a
-              href="/register"
-              className="inline-block bg-yellow-400 text-blue-900 px-8 py-3 rounded-full font-extrabold text-lg shadow-xl hover:bg-yellow-300 transition transform hover:scale-105"
-            >
-              📝 Register Now
-            </a>
+            <div className="flex flex-col gap-4">
+  <a
+    href="https://meet.google.com/gze-iuxw-djh"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="inline-block bg-green-600 text-white px-8 py-3 rounded-full font-extrabold text-lg shadow-xl hover:bg-green-700 transition transform hover:scale-105"
+  >
+    🎥 Join Google Meet Now
+  </a>
+
+  <a
+    href="/register"
+    className="inline-block bg-yellow-400 text-blue-900 px-8 py-3 rounded-full font-extrabold text-lg shadow-xl hover:bg-yellow-300 transition transform hover:scale-105"
+  >
+    📝 Register (New Students)
+  </a>
+</div>
+
           </>
         )}
 
