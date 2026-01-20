@@ -18,6 +18,8 @@ export default function Home() {
   const [showFestivePopup, setShowFestivePopup] = useState(false);
   // ================= NEW BATCH POPUP =================
 const [showBatchPopup, setShowBatchPopup] = useState(false);
+    // ✅ ADD THIS (ONLY THIS WAS MISSING)
+  const [isLive, setIsLive] = useState(false);
 useEffect(() => {
   // Show batch popup on every page refresh
    // SAFE date check (client-side only)
@@ -27,8 +29,6 @@ useEffect(() => {
 
   setIsLive(now >= batchStartTime);
 }, []);
-  
-
 
   // ✅ ADD THIS LINE HERE
   const [openAccess, setOpenAccess] = useState(false);
