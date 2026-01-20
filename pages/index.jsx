@@ -638,6 +638,22 @@ useEffect(() => {
 
       {/* --- */}
 
+      {/* 📞 Floating Call Button */}
+<a
+  href="tel:+919437401378"
+  className="fixed bottom-6 right-24 bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 rounded-full shadow-xl flex items-center space-x-2 z-50 cursor-pointer transition transform hover:scale-105"
+>
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    fill="currentColor"
+    viewBox="0 0 24 24"
+    className="w-6 h-6"
+  >
+    <path d="M6.62 10.79a15.053 15.053 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V21a1 1 0 01-1 1C10.07 22 2 13.93 2 3a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.59a1 1 0 01-.25 1.01l-2.2 2.19z" />
+  </svg>
+  <span className="font-bold text-lg">Call Now</span>
+</a>
+
       {/* 📞 Floating WhatsApp Chat Button */}
 <a
   href="https://wa.me/919437401378?text=Hi%20Sir,%20I%20want%20to%20know%20about%20your%20IT%20training%20courses."
