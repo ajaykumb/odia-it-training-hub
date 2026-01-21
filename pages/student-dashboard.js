@@ -185,6 +185,12 @@ export default function StudentDashboard() {
           <h1 className="text-4xl font-bold text-blue-900 mb-10 drop-shadow">
             Welcome to Your Dashboard
           </h1>
+  <p className="text-sm text-gray-600 mt-2">
+  Batch: <span className="font-semibold text-blue-700">
+    {typeof window !== "undefined" && localStorage.getItem("batchId")}
+  </span>
+</p>
+
 
           {/* UPDATED SUMMARY CARDS */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
