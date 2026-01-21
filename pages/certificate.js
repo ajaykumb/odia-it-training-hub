@@ -9,19 +9,20 @@ import html2canvas from "html2canvas";
 export default function CertificatePage() {
   const [studentName, setStudentName] = useState("Loading...");
   const [certificateId, setCertificateId] = useState("Loading...");
+  const [isEligible, setIsEligible] = useState(null); // ⭐ NEW
 
   const courseName = "Application & Production Support (6 Months)";
   const date = new Date().toLocaleDateString("en-IN");
 
-  // ⭐ Generate Certificate ID: CERT-2025-33QKUKT2ODDV
+  // ⭐ Generate Certificate ID
   const generateCertificateId = (uid) => {
     if (!uid) return "CERT-UNKNOWN";
     const year = new Date().getFullYear();
-    const shortId = uid.substring(0, 12).toUpperCase(); // 12 chars
+    const shortId = uid.substring(0, 12).toUpperCase();
     return `CERT-${year}-${shortId}`;
   };
 
-  // ✔ Fetch student info + generate certificate ID
+  // ✔ Fetch student info + eligibility
   useEffect(() => {
     const fetchStudentData = async () => {
       const uid = localStorage.getItem("studentUID");
@@ -29,26 +30,58 @@ export default function CertificatePage() {
       if (!uid) {
         setStudentName("Unknown Student");
         setCertificateId("CERT-UNKNOWN");
+        setIsEligible(false);
         return;
       }
 
-      // ⭐ Set certificate ID
+      // ⭐ Generate certificate ID
       setCertificateId(generateCertificateId(uid));
 
       const ref = doc(db, "students", uid);
       const snap = await getDoc(ref);
 
       if (snap.exists()) {
-        setStudentName(snap.data().name || "No Name Found");
+        const data = snap.data();
+        setStudentName(data.name || "No Name Found");
+        setIsEligible(data.certificateEligible === true);
       } else {
         setStudentName("User Not Found");
+        setIsEligible(false);
       }
     };
 
     fetchStudentData();
   }, []);
 
-  // PDF Download
+  // ⏳ Loading state
+  if (isEligible === null) {
+    return (
+      <main className="min-h-screen flex items-center justify-center bg-gray-100">
+        <p className="text-lg text-gray-600">
+          Checking certificate eligibility...
+        </p>
+      </main>
+    );
+  }
+
+  // 🔒 Not eligible – block certificate
+  if (!isEligible) {
+    return (
+      <main className="min-h-screen flex flex-col items-center justify-center bg-gray-100 px-4">
+        <h1 className="text-3xl font-bold text-red-600 mb-4">
+          🔒 Certificate Locked
+        </h1>
+        <p className="text-gray-700 text-center max-w-xl">
+          Your certificate is not available yet.
+          <br />
+          Please complete the course and maintain minimum attendance
+          to unlock your certificate.
+        </p>
+      </main>
+    );
+  }
+
+  // 📄 PDF Download (UNCHANGED)
   const downloadPDF = async () => {
     const certificate = document.getElementById("certificate");
 
@@ -64,6 +97,7 @@ export default function CertificatePage() {
     pdf.save(`Certificate-${studentName}.pdf`);
   };
 
+  // ✅ Eligible – show certificate
   return (
     <main className="min-h-screen bg-gray-100 py-10">
 
@@ -71,7 +105,7 @@ export default function CertificatePage() {
         Your Course Certificate
       </h1>
 
-      {/* ⭐ SHOW CERTIFICATE ID ON SCREEN */}
+      {/* ⭐ SHOW CERTIFICATE ID */}
       <p className="text-center text-gray-700 mb-6 text-lg">
         Certificate ID: <strong>{certificateId}</strong>
       </p>
@@ -81,7 +115,7 @@ export default function CertificatePage() {
           studentName={studentName}
           courseName={courseName}
           date={date}
-          certificateId={certificateId}   // ⭐ Pass ID to component
+          certificateId={certificateId}
         />
 
         <button
