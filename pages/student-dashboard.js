@@ -189,11 +189,17 @@ export default function StudentDashboard() {
         </aside>
 
         {/* MAIN CONTENT */}
-<section className="flex-1 p-10">
-  <h1 className="text-4xl font-bold text-blue-900 mb-10 drop-shadow">
-    Welcome to <span className="text-green-700">{batchId}</span> Your Dashboard
-  </h1>
-</section>
+        <section className="flex-1 p-10">
+
+          <h1 className="text-4xl font-bold text-blue-900 mb-10 drop-shadow">
+            Welcome to
+            {batchId && (
+              <span className="mx-2 px-3 py-1 rounded-full bg-green-100 text-green-700 text-2xl">
+                {batchId}
+              </span>
+            )}
+            Your Dashboard
+          </h1>
 
 
           {/* UPDATED SUMMARY CARDS */}
