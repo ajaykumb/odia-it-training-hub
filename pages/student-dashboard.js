@@ -33,12 +33,20 @@ export default function StudentDashboard() {
   const [announcements, setAnnouncements] = useState([]);
   const [upcomingClass, setUpcomingClass] = useState(null);
   const [countdown, setCountdown] = useState("");
+  const [batchId, setBatchId] = useState("");
 
   // LOGIN CHECK
   useEffect(() => {
     const token = localStorage.getItem("studentToken");
     if (!token) router.push("/login");
   }, []);
+
+  useEffect(() => {
+  if (typeof window !== "undefined") {
+    setBatchId(localStorage.getItem("batchId") || "");
+  }
+}, []);
+
 
   // LIVE CLASS LISTENER
   useEffect(() => {
@@ -181,15 +189,11 @@ export default function StudentDashboard() {
         </aside>
 
         {/* MAIN CONTENT */}
-        <section className="flex-1 p-10">
-          <h1 className="text-4xl font-bold text-blue-900 mb-10 drop-shadow">
-            Welcome to Your Dashboard
-          </h1>
-  <p className="text-sm text-gray-600 mt-2">
-  Batch: <span className="font-semibold text-blue-700">
-    {typeof window !== "undefined" && localStorage.getItem("batchId")}
-  </span>
-</p>
+<section className="flex-1 p-10">
+  <h1 className="text-4xl font-bold text-blue-900 mb-10 drop-shadow">
+    Welcome to <span className="text-green-700">{batchId}</span> Your Dashboard
+  </h1>
+</section>
 
 
           {/* UPDATED SUMMARY CARDS */}
