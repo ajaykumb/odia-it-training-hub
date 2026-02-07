@@ -121,36 +121,52 @@ export default function MyLearning() {
 
         {/* VIDEO PLAYER */}
 <section className="lg:col-span-3 rounded-xl shadow border border-blue-200 
-  bg-gradient-to-br from-blue-50 via-blue-100 to-indigo-100
+  bg-gradient-to-br from-blue-50 to-blue-100
   p-6 sticky top-6 self-start">
 
   {!selectedVideo ? (
-    <div className="flex flex-col items-center justify-center h-[60vh] text-center">
+    <div className="flex items-center justify-center h-[60vh]">
+      
+      {/* NOTICE BOARD CARD */}
+      <div className="bg-white rounded-lg shadow-md border border-gray-200 
+        max-w-xl w-full flex">
 
-      {/* LOGO */}
-      <img
-        src="/images/logo.png"
-        alt="Odia IT Training Hub"
-        className="w-28 mb-4"
-      />
+        {/* LEFT ACCENT BAR */}
+        <div className="w-2 bg-blue-600 rounded-l-lg"></div>
 
-      <div className="text-4xl mb-3">📅</div>
+        {/* CONTENT */}
+        <div className="p-6 text-center w-full">
+          
+          {/* LOGO */}
+          <img
+            src="/images/logo.png"
+            alt="Odia IT Training Hub"
+            className="w-20 mx-auto mb-3"
+          />
 
-      <h3 className="text-2xl font-bold text-blue-900">
-        Today’s PL/SQL Class
-      </h3>
+          {/* NOTICE TITLE */}
+          <p className="text-sm font-semibold text-blue-600 uppercase tracking-wide">
+            📢 Class Notice
+          </p>
 
-      <p className="text-blue-800 mt-2">
-        Welcome to Odia IT Training Hub
-      </p>
+          <h3 className="text-2xl font-bold text-gray-800 mt-2">
+            Today’s PL/SQL Session
+          </h3>
 
-      <p className="text-blue-700 mt-1">
-        Select today’s lesson from the left panel to begin
-      </p>
+          <p className="text-gray-600 mt-3">
+            Please select today’s lesson from the left panel
+            to begin your class.
+          </p>
 
-      <p className="text-sm text-indigo-700 mt-4 font-medium">
-        💡 Learn step by step with real-time examples
-      </p>
+          <p className="text-sm text-gray-500 mt-2">
+            Real-time examples will be covered in this session.
+          </p>
+
+          <p className="text-sm text-blue-600 mt-4 font-medium">
+            ⏰ Be attentive • Practice along
+          </p>
+        </div>
+      </div>
     </div>
 
           ) : (
