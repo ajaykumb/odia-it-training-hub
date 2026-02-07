@@ -126,7 +126,7 @@ export default function MyLearning() {
 
       {/* LOGO */}
       <img
-        src="public/images/logo.png"
+        src="/images/logo.png"
         alt="Odia IT Training Hub"
         className="w-28 mb-4"
       />
