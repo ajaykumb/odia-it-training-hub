@@ -146,11 +146,11 @@ export default function MyLearning() {
 
           {/* NOTICE TITLE */}
           <p className="text-sm font-semibold text-blue-600 uppercase tracking-wide">
-            📢 Class Notice
+            📢 Class Video's 
           </p>
 
           <h3 className="text-2xl font-bold text-gray-800 mt-2">
-            Today’s PL/SQL Session
+            ODIA IT TRAINING HUB SESSIONS
           </h3>
 
           <p className="text-gray-600 mt-3">
