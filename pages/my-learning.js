@@ -123,14 +123,30 @@ export default function MyLearning() {
 <section className="lg:col-span-3 bg-white rounded-xl shadow border border-gray-200 p-6 sticky top-6 self-start">
   {!selectedVideo ? (
     <div className="flex flex-col items-center justify-center h-[60vh] text-center">
-      <div className="text-6xl mb-4">📘</div>
 
-      <h3 className="text-2xl font-semibold text-gray-800">
-        Course Dashboard
+      {/* LOGO */}
+      <img
+        src="public/images/logo.png"
+        alt="Odia IT Training Hub"
+        className="w-28 mb-4"
+      />
+
+      <div className="text-4xl mb-3">📅</div>
+
+      <h3 className="text-2xl font-bold text-gray-800">
+        Today’s PL/SQL Class
       </h3>
 
-      <p className="text-gray-500 mt-2">
-        Select a lesson to begin your PL/SQL training
+      <p className="text-gray-600 mt-2">
+        Welcome to Odia IT Training Hub
+      </p>
+
+      <p className="text-gray-500 mt-1">
+        Select today’s lesson from the left panel to begin
+      </p>
+
+      <p className="text-sm text-blue-600 mt-4 font-medium">
+        💡 Learn step by step with real-time examples
       </p>
     </div>
           ) : (
