@@ -120,7 +120,10 @@ export default function MyLearning() {
         </aside>
 
         {/* VIDEO PLAYER */}
-<section className="lg:col-span-3 bg-white rounded-xl shadow border border-gray-200 p-6 sticky top-6 self-start">
+<section className="lg:col-span-3 rounded-xl shadow border border-blue-200 
+  bg-gradient-to-br from-blue-50 via-blue-100 to-indigo-100
+  p-6 sticky top-6 self-start">
+
   {!selectedVideo ? (
     <div className="flex flex-col items-center justify-center h-[60vh] text-center">
 
@@ -133,22 +136,23 @@ export default function MyLearning() {
 
       <div className="text-4xl mb-3">📅</div>
 
-      <h3 className="text-2xl font-bold text-gray-800">
+      <h3 className="text-2xl font-bold text-blue-900">
         Today’s PL/SQL Class
       </h3>
 
-      <p className="text-gray-600 mt-2">
+      <p className="text-blue-800 mt-2">
         Welcome to Odia IT Training Hub
       </p>
 
-      <p className="text-gray-500 mt-1">
+      <p className="text-blue-700 mt-1">
         Select today’s lesson from the left panel to begin
       </p>
 
-      <p className="text-sm text-blue-600 mt-4 font-medium">
+      <p className="text-sm text-indigo-700 mt-4 font-medium">
         💡 Learn step by step with real-time examples
       </p>
     </div>
+
           ) : (
             <>
               <h2 className="text-2xl font-bold text-gray-900 mb-4">
