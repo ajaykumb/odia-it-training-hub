@@ -120,17 +120,19 @@ export default function MyLearning() {
         </aside>
 
         {/* VIDEO PLAYER */}
-<div className="flex flex-col items-center justify-center h-[60vh] text-center">
-  <div className="text-6xl mb-4">📘</div>
+<section className="lg:col-span-3 bg-white rounded-xl shadow border border-gray-200 p-6 sticky top-6 self-start">
+  {!selectedVideo ? (
+    <div className="flex flex-col items-center justify-center h-[60vh] text-center">
+      <div className="text-6xl mb-4">📘</div>
 
-  <h3 className="text-2xl font-semibold text-gray-800">
-    Course Dashboard
-  </h3>
+      <h3 className="text-2xl font-semibold text-gray-800">
+        Course Dashboard
+      </h3>
 
-  <p className="text-gray-500 mt-2">
-    Select a lesson to begin your PL/SQL training
-  </p>
-</div>
+      <p className="text-gray-500 mt-2">
+        Select a lesson to begin your PL/SQL training
+      </p>
+    </div>
           ) : (
             <>
               <h2 className="text-2xl font-bold text-gray-900 mb-4">
