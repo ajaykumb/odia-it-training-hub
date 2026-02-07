@@ -73,7 +73,14 @@ export default function MyLearning() {
           </div>
 
           {/* PROGRESS */}
-          <div className="mt-4 md:mt-0 w-full md:w-72">
+          <div className="mt-4 md:mt-0 w-full md:w-72 flex flex-col items-end">
+
+  {/* LOGO ABOVE PROGRESS */}
+  <img
+    src="/images/logo.png"
+    alt="Odia IT Training Hub"
+    className="w-12 mb-2 opacity-90"
+  />
             <p className="text-sm font-semibold text-blue-300 mb-1">
               Course Progress — {progress}%
             </p>
