@@ -49,16 +49,39 @@ export default function MyLearning() {
   }, []);
 
   // ---------------------------
-  // PROGRESS CALCULATION
+  // ✅ RESUME LAST WATCHED LESSON (ADDED)
+  // ---------------------------
+  useEffect(() => {
+    if (videos.length > 0) {
+      const lastVideoId = localStorage.getItem("lastWatchedVideoId");
+      if (lastVideoId) {
+        const lastVideo = videos.find((v) => v.id === lastVideoId);
+        if (lastVideo) {
+          setSelectedVideo(lastVideo);
+        }
+      }
+    }
+  }, [videos]);
+
+  // ---------------------------
+  // PROGRESS CALCULATION (UNCHANGED)
   // ---------------------------
   const progress =
     videos.length > 0 && selectedVideo
       ? Math.round((1 / videos.length) * 100)
       : 0;
 
+  // ---------------------------
+  // ✅ HANDLE VIDEO CLICK (ADDED)
+  // ---------------------------
+  const handleVideoSelect = (video) => {
+    setSelectedVideo(video);
+    localStorage.setItem("lastWatchedVideoId", video.id);
+  };
+
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-950 to-indigo-950">
-      
+
       {/* HEADER */}
       <div className="max-w-7xl mx-auto px-6 py-6">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between">
@@ -97,7 +120,6 @@ export default function MyLearning() {
 
         {/* VIDEO LIST */}
         <aside className="lg:col-span-1 bg-slate-900 rounded-xl shadow-lg border border-slate-700 h-[75vh] overflow-y-auto">
-          
           <div className="p-4 border-b border-slate-700 bg-slate-800 rounded-t-xl">
             <h2 className="font-bold text-lg text-white flex items-center gap-2">
               📚 Video Lessons
@@ -114,7 +136,7 @@ export default function MyLearning() {
             {videos.map((v) => (
               <div
                 key={v.id}
-                onClick={() => setSelectedVideo(v)}
+                onClick={() => handleVideoSelect(v)}
                 className={`p-3 mb-3 rounded-lg cursor-pointer border transition-all ${
                   selectedVideo?.id === v.id
                     ? "bg-blue-900 border-blue-500 shadow"
@@ -132,7 +154,7 @@ export default function MyLearning() {
           </div>
         </aside>
 
-        {/* VIDEO PLAYER */}
+ {/* VIDEO PLAYER */}
         <section className="lg:col-span-3 rounded-xl shadow-lg border border-slate-700
           bg-gradient-to-br from-slate-900 to-blue-900
           p-6 sticky top-6 self-start">
@@ -173,6 +195,7 @@ export default function MyLearning() {
                 </div>
               </div>
             </div>
+
           ) : (
             <>
               <h2 className="text-2xl font-bold text-white mb-4">
@@ -192,8 +215,6 @@ export default function MyLearning() {
 
               {/* ACTION BUTTONS */}
               <div className="flex gap-3 mt-6">
-                
-                {/* MARK COMPLETE */}
                 <button
                   onClick={() =>
                     alert(`✅ "${selectedVideo.title}" marked as completed`)
@@ -203,7 +224,6 @@ export default function MyLearning() {
                   Mark as Completed
                 </button>
 
-                {/* ASK DOUBT */}
                 <button
                   onClick={() =>
                     window.open(
@@ -216,7 +236,6 @@ export default function MyLearning() {
                   Ask Doubt
                 </button>
 
-                {/* NOTES */}
                 <button
                   onClick={() => {
                     const note = prompt(
