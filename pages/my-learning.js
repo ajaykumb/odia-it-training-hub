@@ -15,6 +15,7 @@ export default function MyLearning() {
 
   const [videos, setVideos] = useState([]);
   const [selectedVideo, setSelectedVideo] = useState(null);
+  const [completedVideos, setCompletedVideos] = useState([]);
 
   // ---------------------------
   // LOGIN CHECK
@@ -49,16 +50,39 @@ export default function MyLearning() {
   }, []);
 
   // ---------------------------
+  // RESUME LAST WATCHED LESSON
+  // ---------------------------
+  useEffect(() => {
+    if (videos.length > 0) {
+      const lastVideoId = localStorage.getItem("lastWatchedVideoId");
+      if (lastVideoId) {
+        const lastVideo = videos.find(v => v.id === lastVideoId);
+        if (lastVideo) {
+          setSelectedVideo(lastVideo);
+        }
+      }
+    }
+  }, [videos]);
+
+  // ---------------------------
   // PROGRESS CALCULATION
   // ---------------------------
   const progress =
-    videos.length > 0 && selectedVideo
-      ? Math.round((1 / videos.length) * 100)
+    videos.length > 0
+      ? Math.round((completedVideos.length / videos.length) * 100)
       : 0;
+
+  // ---------------------------
+  // HANDLE VIDEO CLICK
+  // ---------------------------
+  const handleVideoSelect = (video) => {
+    setSelectedVideo(video);
+    localStorage.setItem("lastWatchedVideoId", video.id); // ✅ SAVE
+  };
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-950 to-indigo-950">
-      
+
       {/* HEADER */}
       <div className="max-w-7xl mx-auto px-6 py-6">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between">
@@ -97,7 +121,6 @@ export default function MyLearning() {
 
         {/* VIDEO LIST */}
         <aside className="lg:col-span-1 bg-slate-900 rounded-xl shadow-lg border border-slate-700 h-[75vh] overflow-y-auto">
-          
           <div className="p-4 border-b border-slate-700 bg-slate-800 rounded-t-xl">
             <h2 className="font-bold text-lg text-white flex items-center gap-2">
               📚 Video Lessons
@@ -105,16 +128,10 @@ export default function MyLearning() {
           </div>
 
           <div className="p-4">
-            {videos.length === 0 && (
-              <p className="text-slate-400 text-sm">
-                No videos added yet
-              </p>
-            )}
-
             {videos.map((v) => (
               <div
                 key={v.id}
-                onClick={() => setSelectedVideo(v)}
+                onClick={() => handleVideoSelect(v)}
                 className={`p-3 mb-3 rounded-lg cursor-pointer border transition-all ${
                   selectedVideo?.id === v.id
                     ? "bg-blue-900 border-blue-500 shadow"
@@ -124,8 +141,12 @@ export default function MyLearning() {
                 <p className="font-semibold text-slate-100">
                   {v.order}. {v.title}
                 </p>
-                <p className="text-xs text-slate-400 mt-1">
+
+                <p className="text-xs text-slate-400 mt-1 flex items-center gap-1">
                   ▶ Video Lesson
+                  {completedVideos.includes(v.id) && (
+                    <span className="text-green-400">✔</span>
+                  )}
                 </p>
               </div>
             ))}
@@ -138,40 +159,8 @@ export default function MyLearning() {
           p-6 sticky top-6 self-start">
 
           {!selectedVideo ? (
-            <div className="flex items-center justify-center h-[60vh]">
-              
-              <div className="bg-slate-900 rounded-xl shadow-lg border border-slate-700 max-w-xl w-full flex">
-                <div className="w-2 bg-blue-500 rounded-l-xl"></div>
-
-                <div className="p-6 text-center w-full">
-                  <img
-                    src="/images/logo.png"
-                    alt="Odia IT Training Hub"
-                    className="w-20 mx-auto mb-3"
-                  />
-
-                  <p className="text-xs font-semibold text-blue-400 uppercase tracking-wider">
-                    Class Notice
-                  </p>
-
-                  <h3 className="text-2xl font-extrabold text-white mt-2">
-                    Odia IT Training Hub Sessions
-                  </h3>
-
-                  <p className="text-slate-300 mt-3">
-                    Please select today’s lesson from the left panel
-                    to begin your class.
-                  </p>
-
-                  <p className="text-sm text-slate-400 mt-2">
-                    Real-time examples will be covered in this session.
-                  </p>
-
-                  <p className="text-sm text-blue-400 mt-4 font-medium">
-                    ⏰ Be attentive • Practice along
-                  </p>
-                </div>
-              </div>
+            <div className="flex items-center justify-center h-[60vh] text-slate-400">
+              Select a lesson to start learning
             </div>
           ) : (
             <>
@@ -185,22 +174,29 @@ export default function MyLearning() {
                   src={`https://www.youtube.com/embed/${selectedVideo.youtubeId}`}
                   title={selectedVideo.title}
                   frameBorder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
                 />
               </div>
 
               {/* ACTION BUTTONS */}
               <div className="flex gap-3 mt-6">
-                
+
                 {/* MARK COMPLETE */}
                 <button
-                  onClick={() =>
-                    alert(`✅ "${selectedVideo.title}" marked as completed`)
-                  }
-                  className="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 shadow"
+                  disabled={completedVideos.includes(selectedVideo.id)}
+                  onClick={() => {
+                    setCompletedVideos([...completedVideos, selectedVideo.id]);
+                    alert(`✅ "${selectedVideo.title}" marked as completed`);
+                  }}
+                  className={`px-5 py-2 rounded-lg shadow transition ${
+                    completedVideos.includes(selectedVideo.id)
+                      ? "bg-green-600 text-white cursor-not-allowed"
+                      : "bg-blue-600 text-white hover:bg-blue-700"
+                  }`}
                 >
-                  Mark as Completed
+                  {completedVideos.includes(selectedVideo.id)
+                    ? "Completed"
+                    : "Mark as Completed"}
                 </button>
 
                 {/* ASK DOUBT */}
@@ -222,9 +218,7 @@ export default function MyLearning() {
                     const note = prompt(
                       `Write notes for:\n${selectedVideo.title}`
                     );
-                    if (note) {
-                      alert("📝 Note saved (temporarily)");
-                    }
+                    if (note) alert("📝 Note saved (temporarily)");
                   }}
                   className="bg-slate-800 border border-green-600 text-green-400 px-5 py-2 rounded-lg hover:bg-slate-700"
                 >
