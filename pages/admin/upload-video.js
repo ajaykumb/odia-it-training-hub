@@ -1,12 +1,21 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { db } from "../../utils/firebaseConfig";
 import {
   collection,
   addDoc,
+  getDocs,
+  updateDoc,
+  doc,
+  orderBy,
+  query,
   serverTimestamp,
 } from "firebase/firestore";
 
-export default function UploadVideo() {
+export default function AdminUploadAndDoubts() {
+
+  // ===============================
+  // VIDEO UPLOAD STATES
+  // ===============================
   const [courseId, setCourseId] = useState("PL-SQL");
   const [title, setTitle] = useState("");
   const [order, setOrder] = useState("");
@@ -14,6 +23,37 @@ export default function UploadVideo() {
   const [duration, setDuration] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // ===============================
+  // DOUBT STATES
+  // ===============================
+  const [doubts, setDoubts] = useState([]);
+  const [replyText, setReplyText] = useState("");
+
+  // ===============================
+  // LOAD DOUBTS
+  // ===============================
+  useEffect(() => {
+    const loadDoubts = async () => {
+      const q = query(
+        collection(db, "doubts"),
+        orderBy("createdAt", "desc")
+      );
+      const snap = await getDocs(q);
+
+      setDoubts(
+        snap.docs.map((d) => ({
+          id: d.id,
+          ...d.data(),
+        }))
+      );
+    };
+
+    loadDoubts();
+  }, []);
+
+  // ===============================
+  // UPLOAD VIDEO
+  // ===============================
   const submitVideo = async () => {
     if (!title || !order || !youtubeId) {
       alert("Please fill all required fields");
@@ -48,21 +88,41 @@ export default function UploadVideo() {
     }
   };
 
-  return (
-    <main className="min-h-screen bg-slate-900 text-white flex justify-center items-start py-10">
-      <div className="bg-slate-800 border border-slate-700 rounded-xl p-6 w-full max-w-xl">
-        <h1 className="text-2xl font-bold mb-6">
-          🎬 Admin – Upload Course Video
-        </h1>
+  // ===============================
+  // REPLY TO DOUBT
+  // ===============================
+  const replyDoubt = async (id) => {
+    if (!replyText.trim()) return;
 
-        {/* COURSE */}
-        <label className="block text-sm mb-1">
-          Course
-        </label>
+    await updateDoc(doc(db, "doubts", id), {
+      reply: replyText,
+      status: "Replied",
+      repliedAt: serverTimestamp(),
+    });
+
+    alert("Reply sent");
+    setReplyText("");
+  };
+
+  return (
+    <main className="min-h-screen bg-slate-900 text-white p-6">
+      <h1 className="text-3xl font-bold mb-6">
+        🎓 Admin / Trainer Dashboard
+      </h1>
+
+      {/* ===============================
+          VIDEO UPLOAD SECTION
+      =============================== */}
+      <div className="bg-slate-800 border border-slate-700 rounded-xl p-6 mb-10 max-w-xl">
+        <h2 className="text-xl font-semibold mb-4">
+          🎬 Upload Course Video
+        </h2>
+
+        <label className="text-sm">Course</label>
         <select
           value={courseId}
           onChange={(e) => setCourseId(e.target.value)}
-          className="w-full mb-4 bg-slate-900 border border-slate-600 rounded p-2"
+          className="w-full mb-3 bg-slate-900 border border-slate-600 rounded p-2"
         >
           <option value="PL-SQL">PL/SQL</option>
           <option value="SQL">SQL</option>
@@ -71,56 +131,39 @@ export default function UploadVideo() {
           <option value="SHELL SCRIPTING">Shell Scripting</option>
           <option value="JENKINS">Jenkins</option>
           <option value="SPLUNK">Splunk</option>
-          <option value="AUTOSYS-CONTROL-M">
-            Job Scheduling Tools
-          </option>
+          <option value="AUTOSYS-CONTROL-M">Job Scheduling Tools</option>
           <option value="PROJECT">Project Class</option>
         </select>
 
-        {/* TITLE */}
-        <label className="block text-sm mb-1">
-          Video Title
-        </label>
+        <label className="text-sm">Video Title</label>
         <input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          className="w-full mb-4 bg-slate-900 border border-slate-600 rounded p-2"
+          className="w-full mb-3 bg-slate-900 border border-slate-600 rounded p-2"
           placeholder="Linux Class 1 – Introduction"
         />
 
-        {/* ORDER */}
-        <label className="block text-sm mb-1">
-          Order
-        </label>
+        <label className="text-sm">Order</label>
         <input
           type="number"
           value={order}
           onChange={(e) => setOrder(e.target.value)}
-          className="w-full mb-4 bg-slate-900 border border-slate-600 rounded p-2"
-          placeholder="1"
+          className="w-full mb-3 bg-slate-900 border border-slate-600 rounded p-2"
         />
 
-        {/* YOUTUBE ID */}
-        <label className="block text-sm mb-1">
-          YouTube Video ID
-        </label>
+        <label className="text-sm">YouTube Video ID</label>
         <input
           value={youtubeId}
           onChange={(e) => setYoutubeId(e.target.value)}
-          className="w-full mb-4 bg-slate-900 border border-slate-600 rounded p-2"
-          placeholder="tXREBkHrVkY"
+          className="w-full mb-3 bg-slate-900 border border-slate-600 rounded p-2"
         />
 
-        {/* DURATION */}
-        <label className="block text-sm mb-1">
-          Duration (minutes)
-        </label>
+        <label className="text-sm">Duration (minutes)</label>
         <input
           type="number"
           value={duration}
           onChange={(e) => setDuration(e.target.value)}
-          className="w-full mb-6 bg-slate-900 border border-slate-600 rounded p-2"
-          placeholder="60"
+          className="w-full mb-4 bg-slate-900 border border-slate-600 rounded p-2"
         />
 
         <button
@@ -130,6 +173,55 @@ export default function UploadVideo() {
         >
           {loading ? "Uploading..." : "Upload Video"}
         </button>
+      </div>
+
+      {/* ===============================
+          DOUBTS SECTION
+      =============================== */}
+      <div className="max-w-3xl">
+        <h2 className="text-xl font-semibold mb-4">
+          ❓ Student Doubts
+        </h2>
+
+        {doubts.length === 0 && (
+          <p className="text-slate-400">
+            No doubts raised yet
+          </p>
+        )}
+
+        {doubts.map((d) => (
+          <div
+            key={d.id}
+            className="border border-slate-700 rounded p-4 mb-4"
+          >
+            <p className="text-sm text-blue-400">
+              Course: {d.courseId}
+            </p>
+            <p className="font-semibold mt-1">
+              Q: {d.question}
+            </p>
+
+            {d.status === "Replied" ? (
+              <p className="text-green-400 mt-2">
+                Reply: {d.reply}
+              </p>
+            ) : (
+              <>
+                <textarea
+                  onChange={(e) => setReplyText(e.target.value)}
+                  className="w-full mt-2 bg-slate-800 border border-slate-600 rounded p-2"
+                  placeholder="Type reply..."
+                />
+                <button
+                  onClick={() => replyDoubt(d.id)}
+                  className="mt-2 bg-blue-600 px-4 py-2 rounded"
+                >
+                  Send Reply
+                </button>
+              </>
+            )}
+          </div>
+        ))}
       </div>
     </main>
   );
