@@ -1,14 +1,6 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import {
-  doc,
-  onSnapshot,
-  collection,
-  query,
-  orderBy,
-  getDocs
-} from "firebase/firestore";
-import {
   HomeIcon,
   BookOpenIcon,
   UserIcon,
@@ -26,6 +18,7 @@ import {
   collection,
   query,
   orderBy,
+  getDocs
 } from "firebase/firestore";
 
 export default function StudentDashboard() {
