@@ -52,7 +52,7 @@ export default function AdminUploadAndDoubts() {
   }, []);
 
   // ===============================
-  // UPLOAD VIDEO (v1, v2, v3 ...)
+  // UPLOAD VIDEO (SAFE v1, v2, v10...)
   // ===============================
   const submitVideo = async () => {
     if (!title || !order || !youtubeId) {
@@ -63,15 +63,28 @@ export default function AdminUploadAndDoubts() {
     try {
       setLoading(true);
 
-      // 1️⃣ Get existing videos
+      // 1️⃣ Read existing videos
       const videosRef = collection(db, "courses", courseId, "videos");
       const snap = await getDocs(videosRef);
 
-      // 2️⃣ Generate next video ID (v1, v2, v3...)
-      const nextVideoNumber = snap.size + 1;
+      // 2️⃣ Find MAX v-number
+      let maxNumber = 0;
+
+      snap.docs.forEach((d) => {
+        const id = d.id; // v1, v9, v10
+        if (id.startsWith("v")) {
+          const num = parseInt(id.replace("v", ""), 10);
+          if (!isNaN(num) && num > maxNumber) {
+            maxNumber = num;
+          }
+        }
+      });
+
+      // 3️⃣ Next ID
+      const nextVideoNumber = maxNumber + 1;
       const videoDocId = `v${nextVideoNumber}`;
 
-      // 3️⃣ Create video document
+      // 4️⃣ Save video
       await setDoc(
         doc(db, "courses", courseId, "videos", videoDocId),
         {
