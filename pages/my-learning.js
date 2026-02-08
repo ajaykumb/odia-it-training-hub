@@ -135,9 +135,13 @@ export default function MyLearning() {
             className="bg-slate-800 border border-slate-600 text-white px-4 py-2 rounded-lg"
           >
             <option value="PL-SQL">PL/SQL</option>
-            <option value="SQL">SQL</option>
+            <option value="DEVOPS">Devops AWS</option>
             <option value="LINUX">Linux</option>
-            <option value="SHELL">Shell Scripting</option>
+            <option value="SHELL SCRIPTING">Shell Scripting</option>
+            <option value="JENKINS">Jenkins</option>
+            <option value="SPLUNK">Splunk</option>
+            <option value="AUTOSYS-CONTROL-M">Job Scheduling Tools</option>
+            <option value="PROJECT">Project Class</option>
           </select>
 
           {/* PROGRESS */}
