@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { db } from "../../utils/firebaseConfig";
 import {
   collection,
-  addDoc,
   getDocs,
+  setDoc,
   updateDoc,
   doc,
   orderBy,
@@ -52,7 +52,7 @@ export default function AdminUploadAndDoubts() {
   }, []);
 
   // ===============================
-  // UPLOAD VIDEO
+  // UPLOAD VIDEO (v1, v2, v3 ...)
   // ===============================
   const submitVideo = async () => {
     if (!title || !order || !youtubeId) {
@@ -63,8 +63,17 @@ export default function AdminUploadAndDoubts() {
     try {
       setLoading(true);
 
-      await addDoc(
-        collection(db, "courses", courseId, "videos"),
+      // 1️⃣ Get existing videos
+      const videosRef = collection(db, "courses", courseId, "videos");
+      const snap = await getDocs(videosRef);
+
+      // 2️⃣ Generate next video ID (v1, v2, v3...)
+      const nextVideoNumber = snap.size + 1;
+      const videoDocId = `v${nextVideoNumber}`;
+
+      // 3️⃣ Create video document
+      await setDoc(
+        doc(db, "courses", courseId, "videos", videoDocId),
         {
           title,
           order: Number(order),
@@ -79,7 +88,7 @@ export default function AdminUploadAndDoubts() {
       setYoutubeId("");
       setDuration("");
 
-      alert("✅ Video uploaded successfully");
+      alert(`✅ Video uploaded successfully as ${videoDocId}`);
     } catch (err) {
       console.error(err);
       alert("Error uploading video");
@@ -140,7 +149,7 @@ export default function AdminUploadAndDoubts() {
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           className="w-full mb-3 bg-slate-900 border border-slate-600 rounded p-2"
-          placeholder="Linux Class 1 – Introduction"
+          placeholder="SQL Class 10 – Joins"
         />
 
         <label className="text-sm">Order</label>
@@ -156,6 +165,7 @@ export default function AdminUploadAndDoubts() {
           value={youtubeId}
           onChange={(e) => setYoutubeId(e.target.value)}
           className="w-full mb-3 bg-slate-900 border border-slate-600 rounded p-2"
+          placeholder="3EOrXQePqBo"
         />
 
         <label className="text-sm">Duration (minutes)</label>
