@@ -16,6 +16,9 @@ export default function MyLearning() {
   const [videos, setVideos] = useState([]);
   const [selectedVideo, setSelectedVideo] = useState(null);
 
+  // ✅ ADDED (required for progress)
+  const [completedVideos, setCompletedVideos] = useState([]);
+
   // ---------------------------
   // LOGIN CHECK
   // ---------------------------
@@ -49,7 +52,16 @@ export default function MyLearning() {
   }, []);
 
   // ---------------------------
-  // ✅ RESUME LAST WATCHED LESSON (ADDED)
+  // ✅ LOAD COMPLETED VIDEOS (ADDED)
+  // ---------------------------
+  useEffect(() => {
+    const saved =
+      JSON.parse(localStorage.getItem(`completed_${COURSE_ID}`)) || [];
+    setCompletedVideos(saved);
+  }, []);
+
+  // ---------------------------
+  // ✅ RESUME LAST WATCHED LESSON
   // ---------------------------
   useEffect(() => {
     if (videos.length > 0) {
@@ -64,15 +76,15 @@ export default function MyLearning() {
   }, [videos]);
 
   // ---------------------------
-  // PROGRESS CALCULATION (UNCHANGED)
+  // ✅ PROGRESS CALCULATION (FIXED ONLY)
   // ---------------------------
   const progress =
-    videos.length > 0 && selectedVideo
-      ? Math.round((1 / videos.length) * 100)
-      : 0;
+    videos.length === 0
+      ? 0
+      : Math.round((completedVideos.length / videos.length) * 100);
 
   // ---------------------------
-  // ✅ HANDLE VIDEO CLICK (ADDED)
+  // HANDLE VIDEO CLICK
   // ---------------------------
   const handleVideoSelect = (video) => {
     setSelectedVideo(video);
@@ -145,6 +157,11 @@ export default function MyLearning() {
               >
                 <p className="font-semibold text-slate-100">
                   {v.order}. {v.title}
+                  {completedVideos.includes(v.id) && (
+                    <span className="text-green-400 text-xs ml-2">
+                      ✔ Completed
+                    </span>
+                  )}
                 </p>
                 <p className="text-xs text-slate-400 mt-1">
                   ▶ Video Lesson
@@ -154,48 +171,40 @@ export default function MyLearning() {
           </div>
         </aside>
 
- {/* VIDEO PLAYER */}
+        {/* VIDEO PLAYER */}
         <section className="lg:col-span-3 rounded-xl shadow-lg border border-slate-700
           bg-gradient-to-br from-slate-900 to-blue-900
           p-6 sticky top-6 self-start">
 
           {!selectedVideo ? (
             <div className="flex items-center justify-center h-[60vh]">
-              
               <div className="bg-slate-900 rounded-xl shadow-lg border border-slate-700 max-w-xl w-full flex">
                 <div className="w-2 bg-blue-500 rounded-l-xl"></div>
-
                 <div className="p-6 text-center w-full">
                   <img
                     src="/images/logo.png"
                     alt="Odia IT Training Hub"
                     className="w-20 mx-auto mb-3"
                   />
-
                   <p className="text-xs font-semibold text-blue-400 uppercase tracking-wider">
                     Class Notice
                   </p>
-
                   <h3 className="text-2xl font-extrabold text-white mt-2">
                     Odia IT Training Hub Sessions
                   </h3>
-
                   <p className="text-slate-300 mt-3">
                     Please select today’s lesson from the left panel
                     to begin your class.
                   </p>
-
                   <p className="text-sm text-slate-400 mt-2">
                     Real-time examples will be covered in this session.
                   </p>
-
                   <p className="text-sm text-blue-400 mt-4 font-medium">
                     ⏰ Be attentive • Practice along
                   </p>
                 </div>
               </div>
             </div>
-
           ) : (
             <>
               <h2 className="text-2xl font-bold text-white mb-4">
@@ -208,7 +217,6 @@ export default function MyLearning() {
                   src={`https://www.youtube.com/embed/${selectedVideo.youtubeId}`}
                   title={selectedVideo.title}
                   frameBorder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
                 />
               </div>
@@ -216,9 +224,17 @@ export default function MyLearning() {
               {/* ACTION BUTTONS */}
               <div className="flex gap-3 mt-6">
                 <button
-                  onClick={() =>
-                    alert(`✅ "${selectedVideo.title}" marked as completed`)
-                  }
+                  onClick={() => {
+                    if (!completedVideos.includes(selectedVideo.id)) {
+                      const updated = [...completedVideos, selectedVideo.id];
+                      setCompletedVideos(updated);
+                      localStorage.setItem(
+                        `completed_${COURSE_ID}`,
+                        JSON.stringify(updated)
+                      );
+                    }
+                    alert(`✅ "${selectedVideo.title}" marked as completed`);
+                  }}
                   className="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 shadow"
                 >
                   Mark as Completed
