@@ -22,6 +22,11 @@ export default function MyLearning() {
   const [selectedVideo, setSelectedVideo] = useState(null);
   const [completedVideos, setCompletedVideos] = useState([]);
 
+  // 🔽 ADDED: NOTES + DOUBTS STATE
+  const [notes, setNotes] = useState("");
+  const [doubtText, setDoubtText] = useState("");
+  const [doubts, setDoubts] = useState([]);
+
   // ===============================
   // LOGIN CHECK
   // ===============================
@@ -88,6 +93,29 @@ export default function MyLearning() {
   }, [videos, COURSE_ID]);
 
   // ===============================
+  // 🔽 ADDED: LOAD NOTES (PER VIDEO)
+  // ===============================
+  useEffect(() => {
+    if (!selectedVideo) return;
+
+    const savedNote = localStorage.getItem(
+      `notes_${COURSE_ID}_${selectedVideo.id}`
+    );
+    setNotes(savedNote || "");
+  }, [selectedVideo, COURSE_ID]);
+
+  // ===============================
+  // 🔽 ADDED: LOAD DOUBTS (COURSE-WISE)
+  // ===============================
+  useEffect(() => {
+    const saved =
+      JSON.parse(
+        localStorage.getItem(`doubts_${COURSE_ID}`)
+      ) || [];
+    setDoubts(saved);
+  }, [COURSE_ID]);
+
+  // ===============================
   // PROGRESS
   // ===============================
   const progress =
@@ -106,6 +134,32 @@ export default function MyLearning() {
       `lastWatched_${COURSE_ID}`,
       video.id
     );
+  };
+
+  // ===============================
+  // 🔽 ADDED: SUBMIT DOUBT
+  // ===============================
+  const submitDoubt = () => {
+    if (!doubtText.trim()) return;
+
+    const newDoubt = {
+      id: Date.now(),
+      video: selectedVideo?.title || "General",
+      text: doubtText,
+      status: "Pending",
+      time: new Date().toLocaleString(),
+    };
+
+    const updated = [newDoubt, ...doubts];
+    setDoubts(updated);
+
+    localStorage.setItem(
+      `doubts_${COURSE_ID}`,
+      JSON.stringify(updated)
+    );
+
+    setDoubtText("");
+    alert("✅ Doubt submitted");
   };
 
   return (
@@ -139,8 +193,10 @@ export default function MyLearning() {
             <option value="LINUX">Linux</option>
             <option value="SHELL SCRIPTING">Shell Scripting</option>
             <option value="JENKINS">Jenkins</option>
+            <option value="GIT & GITHUB">Git & Github</option>
             <option value="SPLUNK">Splunk</option>
             <option value="AUTOSYS-CONTROL-M">Job Scheduling Tools</option>
+            <option value="ITIL">ITIL Process</option>
             <option value="PROJECT">Project Class</option>
           </select>
 
@@ -187,7 +243,7 @@ export default function MyLearning() {
         </aside>
 
         {/* VIDEO PLAYER */}
- <section className="lg:col-span-3 rounded-xl shadow-lg border border-slate-700
+<section className="lg:col-span-3 rounded-xl shadow-lg border border-slate-700
           bg-gradient-to-br from-slate-900 to-blue-900
           p-6 sticky top-6 self-start">
 
@@ -256,6 +312,80 @@ export default function MyLearning() {
                 >
                   Mark Completed
                 </button>
+              </div>
+
+              {/* 🔽 NOTES SECTION */}
+              <div className="mt-6">
+                <h3 className="text-white font-semibold mb-2">
+                  📝 My Notes
+                </h3>
+                <textarea
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  className="w-full min-h-[120px] bg-slate-800 border border-slate-700 rounded p-3 text-white"
+                  placeholder="Write notes for this lesson..."
+                />
+                <button
+                  onClick={() => {
+                    localStorage.setItem(
+                      `notes_${COURSE_ID}_${selectedVideo.id}`,
+                      notes
+                    );
+                    alert("Notes saved");
+                  }}
+                  className="mt-2 bg-green-600 px-4 py-2 text-white rounded"
+                >
+                  Save Notes
+                </button>
+              </div>
+
+              {/* 🔽 DOUBT SECTION */}
+              <div className="mt-8">
+                <h3 className="text-white font-semibold mb-2">
+                  ❓ Ask a Doubt
+                </h3>
+                <textarea
+                  value={doubtText}
+                  onChange={(e) => setDoubtText(e.target.value)}
+                  className="w-full min-h-[80px] bg-slate-800 border border-slate-700 rounded p-3 text-white"
+                  placeholder="Type your doubt here..."
+                />
+                <div className="flex gap-3 mt-2">
+                  <button
+                    onClick={submitDoubt}
+                    className="bg-blue-600 px-4 py-2 text-white rounded"
+                  >
+                    Submit Doubt
+                  </button>
+                  <button
+                    onClick={() =>
+                      window.open(
+                        `https://wa.me/919437401378?text=Course:${COURSE_ID}%0ALesson:${selectedVideo.title}%0ADoubt:${doubtText}`,
+                        "_blank"
+                      )
+                    }
+                    className="bg-slate-700 px-4 py-2 text-white rounded"
+                  >
+                    WhatsApp
+                  </button>
+                </div>
+
+                {/* DOUBT HISTORY */}
+                <div className="mt-4">
+                  {doubts.map((d) => (
+                    <div
+                      key={d.id}
+                      className="bg-slate-800 border border-slate-700 rounded p-3 mb-2"
+                    >
+                      <p className="text-white text-sm">
+                        {d.text}
+                      </p>
+                      <p className="text-xs text-slate-400 mt-1">
+                        {d.video} • {d.time} • {d.status}
+                      </p>
+                    </div>
+                  ))}
+                </div>
               </div>
             </>
           )}
