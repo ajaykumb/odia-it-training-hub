@@ -1,6 +1,14 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import {
+  doc,
+  onSnapshot,
+  collection,
+  query,
+  orderBy,
+  getDocs
+} from "firebase/firestore";
+import {
   HomeIcon,
   BookOpenIcon,
   UserIcon,
@@ -27,7 +35,8 @@ export default function StudentDashboard() {
   const [meetingUrl, setMeetingUrl] = useState("");
   const [className, setClassName] = useState("");
 
-  const [progress] = useState(70);
+  const DEFAULT_COURSE_ID = "PL-SQL";
+  const [progress, setProgress] = useState(0);
   const [attendance] = useState(85);
 
   const [announcements, setAnnouncements] = useState([]);
@@ -39,6 +48,45 @@ export default function StudentDashboard() {
     const token = localStorage.getItem("studentToken");
     if (!token) router.push("/login");
   }, []);
+
+  // ===============================
+// REAL COURSE PROGRESS (SAME AS MY-LEARNING)
+// ===============================
+useEffect(() => {
+  const loadProgress = async () => {
+    try {
+      const COURSE_ID = DEFAULT_COURSE_ID;
+
+      // 1️⃣ Load total videos from Firestore
+      const videosRef = collection(db, "courses", COURSE_ID, "videos");
+      const q = query(videosRef, orderBy("order", "asc"));
+      const snap = await getDocs(q);
+
+      const totalVideos = snap.size;
+
+      // 2️⃣ Load completed videos from localStorage
+      const completed =
+        JSON.parse(localStorage.getItem(`completed_${COURSE_ID}`)) || [];
+
+      // 3️⃣ Calculate progress
+      const percent =
+        totalVideos === 0
+          ? 0
+          : Math.round((completed.length / totalVideos) * 100);
+
+      setProgress(percent);
+    } catch (err) {
+      console.error("Progress load failed:", err);
+    }
+  };
+
+  loadProgress();
+
+  // 🔄 Auto refresh when user returns from My Learning
+  window.addEventListener("focus", loadProgress);
+  return () => window.removeEventListener("focus", loadProgress);
+}, []);
+
 
 
   // LIVE CLASS LISTENER
