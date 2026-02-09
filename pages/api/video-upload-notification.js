@@ -49,7 +49,7 @@ export default async function handler(req, res) {
     const buildStudentMail = (name) => ({
       from: `"Odia IT Training Hub" <${process.env.MAIL_USER}>`,
       to: name.email,
-      subject: "🎬 New Class Video Uploaded | Odia IT Training Hub",
+      subject: "Yellow Batch🎬 New Class Video Uploaded",
       html: `
 <!DOCTYPE html>
 <html>
@@ -69,7 +69,7 @@ box-shadow:0 10px 30px rgba(0,0,0,0.08)">
 <img src="https://www.odiaittraininghub.in/images/logo.png"
 style="max-height:60px;margin-bottom:10px"/>
 <h2 style="color:#ffffff;margin:0;font-weight:500">
-New Class Video Uploaded
+Yellow Batch New Class Video Uploaded
 </h2>
 </td>
 </tr>
