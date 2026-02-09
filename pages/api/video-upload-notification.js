@@ -7,25 +7,16 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const {
-    courseId,
-    videoTitle,
-    batch
-  } = req.body;
+  const { courseId, videoTitle, batch } = req.body;
 
   if (!courseId || !videoTitle || !batch) {
-    return res.status(400).json({
-      error: "courseId, videoTitle and batch are required"
-    });
+    return res.status(400).json({ error: "Missing required fields" });
   }
 
   try {
-    console.log("🎬 Video upload notification started");
-    console.log("➡️ Course:", courseId, "Batch:", batch);
-
-    // =====================================================
-    // 🎯 FETCH APPROVED STUDENTS (BATCH-WISE)
-    // =====================================================
+    // =========================
+    // FETCH STUDENTS (BATCH-WISE)
+    // =========================
     const q = query(
       collection(db, "students"),
       where("isApproved", "==", true),
@@ -33,106 +24,160 @@ export default async function handler(req, res) {
     );
 
     const snap = await getDocs(q);
-
     if (snap.empty) {
-      console.log("⚠️ No students found for batch:", batch);
       return res.status(200).json({ success: true, sent: 0 });
     }
 
-    const students = snap.docs.map(doc => doc.data());
+    const students = snap.docs.map(d => d.data());
 
-    // =====================================================
-    // 📬 SMTP CONFIG (SAME AS YOUR SYSTEM)
-    // =====================================================
+    // =========================
+    // SMTP CONFIG
+    // =========================
     const transporter = nodemailer.createTransport({
       host: "smtp.gmail.com",
       port: 465,
       secure: true,
       auth: {
         user: process.env.MAIL_USER,
-        pass: process.env.MAIL_PASS
-      }
+        pass: process.env.MAIL_PASS,
+      },
     });
 
-    // =====================================================
-    // 📧 EMAIL TEMPLATE (VIDEO-SPECIFIC)
-    // =====================================================
-    const buildTemplate = (name) => `
+    // =========================
+    // EMAIL TEMPLATE
+    // =========================
+    const buildStudentMail = (name) => ({
+      from: `"Odia IT Training Hub" <${process.env.MAIL_USER}>`,
+      to: name.email,
+      subject: "🎬 New Class Video Uploaded | Odia IT Training Hub",
+      html: `
 <!DOCTYPE html>
 <html>
-<body style="margin:0;padding:0;background:#f4f6f8;font-family:Arial">
-  <table width="100%">
-    <tr>
-      <td align="center">
-        <table width="600" style="background:#ffffff;border-radius:8px;margin:20px">
-          <tr>
-            <td style="background:#0f172a;padding:20px;color:#fff;text-align:center">
-              <h2>🎬 New Class Video Uploaded</h2>
-            </td>
-          </tr>
+<body style="margin:0;padding:0;background:#f4f6fb;font-family:Arial,sans-serif">
 
-          <tr>
-            <td style="padding:25px;color:#333">
-              <p>Hello <b>${name}</b>,</p>
+<table width="100%" cellpadding="0" cellspacing="0">
+<tr>
+<td align="center" style="padding:30px 10px">
 
-              <p>
-                Today's session video has been uploaded to the portal.
-              </p>
+<table width="600" cellpadding="0" cellspacing="0"
+style="background:#ffffff;border-radius:10px;overflow:hidden;
+box-shadow:0 10px 30px rgba(0,0,0,0.08)">
 
-              <div style="background:#f1f5f9;padding:15px;border-left:4px solid #0f172a">
-                <p><b>Course:</b> ${courseId}</p>
-                <p><b>Topic:</b> ${videoTitle}</p>
-              </div>
+<!-- HEADER -->
+<tr>
+<td style="background:#1f3c88;padding:20px;text-align:center">
+<img src="https://www.odiaittraininghub.in/images/logo.png"
+style="max-height:60px;margin-bottom:10px"/>
+<h2 style="color:#ffffff;margin:0;font-weight:500">
+New Class Video Uploaded
+</h2>
+</td>
+</tr>
 
-              <p style="margin-top:20px">
-                Please login and watch the recording.
-              </p>
+<!-- BODY -->
+<tr>
+<td style="padding:30px;color:#333">
 
-              <p>
-                Regards,<br/>
-                <b>Odia IT Training Hub</b>
-              </p>
-            </td>
-          </tr>
+<p style="font-size:15px">
+Dear <strong>${name.name || "Student"}</strong>,
+</p>
 
-          <tr>
-            <td style="background:#f1f5f9;padding:10px;text-align:center;font-size:12px">
-              © 2026 Odia IT Training Hub
-            </td>
-          </tr>
-        </table>
-      </td>
-    </tr>
-  </table>
+<p style="font-size:15px;line-height:1.6">
+Your <strong>today’s class recording</strong> has been successfully uploaded.
+</p>
+
+<table width="100%" cellpadding="10"
+style="background:#f5f7ff;border-radius:8px;margin:20px 0">
+<tr>
+<td><strong>📘 Course:</strong></td>
+<td>${courseId}</td>
+</tr>
+<tr>
+<td><strong>🎥 Topic:</strong></td>
+<td>${videoTitle}</td>
+</tr>
+</table>
+
+<!-- CTA -->
+<div style="text-align:center;margin:30px 0">
+<a href="https://www.odiaittraininghub.in/my-learning"
+style="
+background:#1f3c88;
+color:#ffffff;
+padding:12px 24px;
+text-decoration:none;
+border-radius:6px;
+font-weight:bold;
+display:inline-block;">
+👉 Watch Video in My Learning
+</a>
+</div>
+
+<p style="font-size:14px;line-height:1.6">
+Please login to your <strong>My Learning</strong> section and watch the video at your convenience.
+</p>
+
+<p style="font-size:14px;margin-top:20px">
+If you face any issues, feel free to contact us:
+</p>
+
+<p style="font-size:14px;line-height:1.8">
+📲 <strong>WhatsApp:</strong>
+<a href="https://wa.me/919437401378"
+style="color:#1f3c88;text-decoration:none">
++91 94374 01378
+</a><br/>
+
+🌐 <strong>Website:</strong>
+<a href="https://www.odiaittraininghub.in/"
+style="color:#1f3c88;text-decoration:none">
+www.odiaittraininghub.in
+</a>
+</p>
+
+<p style="margin-top:30px;font-size:14px">
+Best regards,<br/>
+<strong>Odia IT Training Hub Team</strong><br/>
+Empowering the next generation of IT professionals
+</p>
+
+</td>
+</tr>
+
+<!-- FOOTER -->
+<tr>
+<td style="background:#f0f2f8;text-align:center;
+padding:15px;font-size:12px;color:#666">
+© ${new Date().getFullYear()} Odia IT Training Hub. All rights reserved.
+</td>
+</tr>
+
+</table>
+
+</td>
+</tr>
+</table>
+
 </body>
 </html>
-`;
+`,
+    });
 
-    // =====================================================
-    // ✉️ SEND EMAILS
-    // =====================================================
+    // =========================
+    // SEND EMAILS
+    // =========================
     for (const student of students) {
       if (!student.email) continue;
-
-      await transporter.sendMail({
-        from: `"Odia IT Training Hub" <${process.env.MAIL_USER}>`,
-        to: student.email,
-        subject: "🎬 Today's Class Video Uploaded",
-        html: buildTemplate(student.name || "Student")
-      });
-
-      console.log("📨 Sent to:", student.email);
+      await transporter.sendMail(buildStudentMail(student));
     }
 
     return res.status(200).json({
       success: true,
-      sent: students.length
+      sent: students.length,
     });
 
-  } catch (err) {
-    console.error("❌ Video mail error:", err);
-    return res.status(500).json({
-      error: "Failed to send video upload notifications"
-    });
+  } catch (error) {
+    console.error("❌ Video mail error:", error);
+    return res.status(500).json({ error: "Video email failed" });
   }
 }
