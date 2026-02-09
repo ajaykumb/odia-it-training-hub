@@ -23,8 +23,9 @@ export default function AdminUploadAndDoubts() {
   const [duration, setDuration] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // 🔔 NOTIFICATION TOGGLE
+  // 🔔 NOTIFICATION + BATCH
   const [notifyStudents, setNotifyStudents] = useState(true);
+  const [targetBatch, setTargetBatch] = useState("");
 
   // ===============================
   // DOUBT STATES
@@ -55,7 +56,7 @@ export default function AdminUploadAndDoubts() {
   }, []);
 
   // ===============================
-  // UPLOAD VIDEO + SEND NOTIFICATION
+  // UPLOAD VIDEO + NOTIFICATION
   // ===============================
   const submitVideo = async () => {
     if (!title || !order || !youtubeId) {
@@ -63,14 +64,19 @@ export default function AdminUploadAndDoubts() {
       return;
     }
 
+    if (notifyStudents && !targetBatch.trim()) {
+      alert("Please enter target batch for notification");
+      return;
+    }
+
     try {
       setLoading(true);
 
-      // 1️⃣ Read existing videos
+      // 1️⃣ READ EXISTING VIDEOS
       const videosRef = collection(db, "courses", courseId, "videos");
       const snap = await getDocs(videosRef);
 
-      // 2️⃣ Find MAX v-number
+      // 2️⃣ FIND MAX VIDEO NUMBER
       let maxNumber = 0;
       snap.docs.forEach((d) => {
         if (d.id.startsWith("v")) {
@@ -79,10 +85,10 @@ export default function AdminUploadAndDoubts() {
         }
       });
 
-      // 3️⃣ Next ID
+      // 3️⃣ NEXT VIDEO ID
       const videoDocId = `v${maxNumber + 1}`;
 
-      // 4️⃣ Save video in Firestore
+      // 4️⃣ SAVE VIDEO WITH CONFIRMATION DATA
       await setDoc(
         doc(db, "courses", courseId, "videos", videoDocId),
         {
@@ -91,7 +97,13 @@ export default function AdminUploadAndDoubts() {
           youtubeId,
           duration: Number(duration || 0),
           createdAt: serverTimestamp(),
-          notified: notifyStudents,
+
+          // ✅ CONFIRMATION
+          targetBatch: notifyStudents ? targetBatch : null,
+          notification: {
+            sent: notifyStudents,
+            sentAt: notifyStudents ? serverTimestamp() : null,
+          },
         }
       );
 
@@ -104,18 +116,20 @@ export default function AdminUploadAndDoubts() {
             body: JSON.stringify({
               courseId,
               videoTitle: title,
-              batch: courseId, // OR actual batch name if different
+              batch: targetBatch,
             }),
           });
         } catch (mailErr) {
-          console.error("Video notification email failed:", mailErr);
+          console.error("❌ Video email failed:", mailErr);
         }
       }
 
+      // RESET FORM
       setTitle("");
       setOrder("");
       setYoutubeId("");
       setDuration("");
+      setTargetBatch("");
 
       alert(`✅ Video uploaded successfully as ${videoDocId}`);
     } catch (err) {
@@ -205,7 +219,15 @@ export default function AdminUploadAndDoubts() {
           className="w-full mb-3 bg-slate-900 border border-slate-600 rounded p-2"
         />
 
-        {/* 🔔 NOTIFY CHECKBOX */}
+        {/* 🔔 BATCH + NOTIFICATION */}
+        <label className="text-sm">Target Batch (exact match)</label>
+        <input
+          value={targetBatch}
+          onChange={(e) => setTargetBatch(e.target.value)}
+          className="w-full mb-3 bg-slate-900 border border-slate-600 rounded p-2"
+          placeholder="Yellow"
+        />
+
         <label className="flex items-center gap-2 mb-4 text-sm">
           <input
             type="checkbox"
