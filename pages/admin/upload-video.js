@@ -108,6 +108,7 @@ export default function AdminUploadAndDoubts() {
             courseId,
             videoTitle: title,
             batch: notifyBatch, // used ONLY in API query
+            youtubeId,  
           }),
         });
       }
