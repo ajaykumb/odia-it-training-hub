@@ -11,6 +11,15 @@ import {
 export default function MyLearning() {
   const router = useRouter();
 
+  
+  // ===============================
+  // ✅ LOGOUT FUNCTION (ADDED)
+  // ===============================
+  const logout = () => {
+    localStorage.removeItem("studentToken");
+    router.push("/login");
+  };
+
   // ===============================
   // DEFAULT COURSE
   // ===============================
@@ -199,6 +208,15 @@ export default function MyLearning() {
             <option value="ITIL">ITIL Process</option>
             <option value="PROJECT">Project Class</option>
           </select>
+
+              {/* LOGOUT BUTTON */}
+            <button
+              onClick={logout}
+              className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold"
+            >
+              Logout
+            </button>
+          </div>
 
           {/* PROGRESS */}
           <div className="w-full md:w-64">
