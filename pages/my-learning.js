@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
+import jsPDF from "jspdf";
 import { db } from "../utils/firebaseConfig";
 import {
   collection,
@@ -93,7 +94,7 @@ export default function MyLearning() {
   }, [videos, COURSE_ID]);
 
   // ===============================
-  // 🔽 ADDED: LOAD NOTES (PER VIDEO)
+  // 🔽 LOAD NOTES (PER VIDEO)
   // ===============================
   useEffect(() => {
     if (!selectedVideo) return;
@@ -105,7 +106,7 @@ export default function MyLearning() {
   }, [selectedVideo, COURSE_ID]);
 
   // ===============================
-  // 🔽 ADDED: LOAD DOUBTS (COURSE-WISE)
+  // 🔽 LOAD DOUBTS (COURSE-WISE)
   // ===============================
   useEffect(() => {
     const saved =
@@ -137,7 +138,7 @@ export default function MyLearning() {
   };
 
   // ===============================
-  // 🔽 ADDED: SUBMIT DOUBT
+  // SUBMIT DOUBT
   // ===============================
   const submitDoubt = () => {
     if (!doubtText.trim()) return;
@@ -162,13 +163,94 @@ export default function MyLearning() {
     alert("✅ Doubt submitted");
   };
 
+  // ===============================
+  // 🔽 NOTES DOWNLOAD (TXT)
+  // ===============================
+  const downloadNotesTXT = () => {
+    if (!selectedVideo || !notes.trim()) {
+      alert("No notes available to download");
+      return;
+    }
+
+    const content = `
+Course : ${COURSE_ID}
+Lesson : ${selectedVideo.title}
+
+--------------------------------
+${notes}
+--------------------------------
+`;
+
+    const blob = new Blob([content], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${COURSE_ID}_${selectedVideo.title}_Notes.txt`;
+    a.click();
+
+    URL.revokeObjectURL(url);
+  };
+
+  // ===============================
+  // 🔽 NOTES DOWNLOAD (PDF)
+  // ===============================
+  const downloadNotesPDF = () => {
+    if (!selectedVideo || !notes.trim()) {
+      alert("No notes available to download");
+      return;
+    }
+
+    const doc = new jsPDF();
+
+    doc.setFontSize(14);
+    doc.text(`Course: ${COURSE_ID}`, 10, 15);
+    doc.text(`Lesson: ${selectedVideo.title}`, 10, 25);
+
+    doc.setFontSize(11);
+    doc.text(notes, 10, 40, { maxWidth: 180 });
+
+    doc.save(`${COURSE_ID}_${selectedVideo.title}_Notes.pdf`);
+  };
+
+  // ===============================
+  // 🔽 DOWNLOAD ALL NOTES (COURSE)
+  // ===============================
+  const downloadAllNotesTXT = () => {
+    let content = `Course: ${COURSE_ID}\n\n`;
+
+    videos.forEach((v) => {
+      const note = localStorage.getItem(
+        `notes_${COURSE_ID}_${v.id}`
+      );
+
+      if (note) {
+        content += `
+================================
+Lesson: ${v.title}
+--------------------------------
+${note}
+================================
+`;
+      }
+    });
+
+    const blob = new Blob([content], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${COURSE_ID}_ALL_NOTES.txt`;
+    a.click();
+
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-950 to-indigo-950">
-
       {/* HEADER */}
       <div className="max-w-7xl mx-auto px-6 py-6">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-
           <div>
             <p className="text-sm text-blue-300">My Learning</p>
             <h1 className="text-3xl font-extrabold text-white">
@@ -179,7 +261,6 @@ export default function MyLearning() {
             </p>
           </div>
 
-          {/* COURSE SELECT */}
           <select
             value={activeCourse}
             onChange={(e) => {
@@ -200,7 +281,6 @@ export default function MyLearning() {
             <option value="PROJECT">Project Class</option>
           </select>
 
-          {/* PROGRESS */}
           <div className="w-full md:w-64">
             <p className="text-sm text-blue-300 mb-1">
               Progress — {progress}%
@@ -217,8 +297,6 @@ export default function MyLearning() {
 
       {/* CONTENT */}
       <div className="max-w-7xl mx-auto px-6 pb-10 grid grid-cols-1 lg:grid-cols-4 gap-6">
-
-        {/* VIDEO LIST */}
         <aside className="bg-slate-900 rounded-xl border border-slate-700 p-4 h-[75vh] overflow-y-auto">
           {videos.map((v) => (
             <div
@@ -242,41 +320,13 @@ export default function MyLearning() {
           ))}
         </aside>
 
-        {/* VIDEO PLAYER */}
-<section className="lg:col-span-3 rounded-xl shadow-lg border border-slate-700
-          bg-gradient-to-br from-slate-900 to-blue-900
-          p-6 sticky top-6 self-start">
-
+        <section className="lg:col-span-3 rounded-xl shadow-lg border border-slate-700 bg-gradient-to-br from-slate-900 to-blue-900 p-6 sticky top-6 self-start">
           {!selectedVideo ? (
             <div className="flex items-center justify-center h-[60vh]">
-              <div className="bg-slate-900 rounded-xl shadow-lg border border-slate-700 max-w-xl w-full flex">
-                <div className="w-2 bg-blue-500 rounded-l-xl"></div>
-                <div className="p-6 text-center w-full">
-                  <img
-                    src="/images/logo.png"
-                    alt="Odia IT Training Hub"
-                    className="w-20 mx-auto mb-3"
-                  />
-                  <p className="text-xs font-semibold text-blue-400 uppercase tracking-wider">
-                    Class Notice
-                  </p>
-                  <h3 className="text-2xl font-extrabold text-white mt-2">
-                    Odia IT Training Hub Sessions
-                  </h3>
-                  <p className="text-slate-300 mt-3">
-                    Please select today’s lesson from the left panel
-                    to begin your class.
-                  </p>
-                  <p className="text-sm text-slate-400 mt-2">
-                    Real-time examples will be covered in this session.
-                  </p>
-                  <p className="text-sm text-blue-400 mt-4 font-medium">
-                    ⏰ Be attentive • Practice along
-                  </p>
-                </div>
-              </div>
+              <p className="text-slate-300">
+                Please select a lesson to start.
+              </p>
             </div>
-
           ) : (
             <>
               <h2 className="text-xl font-bold text-white mb-4">
@@ -291,30 +341,7 @@ export default function MyLearning() {
                 />
               </div>
 
-              {/* ACTIONS */}
-              <div className="flex gap-3 mt-4">
-                <button
-                  onClick={() => {
-                    if (!completedVideos.includes(selectedVideo.id)) {
-                      const updated = [
-                        ...completedVideos,
-                        selectedVideo.id,
-                      ];
-                      setCompletedVideos(updated);
-                      localStorage.setItem(
-                        `completed_${COURSE_ID}`,
-                        JSON.stringify(updated)
-                      );
-                    }
-                    alert("Video marked as completed");
-                  }}
-                  className="bg-blue-600 px-4 py-2 text-white rounded"
-                >
-                  Mark Completed
-                </button>
-              </div>
-
-              {/* 🔽 NOTES SECTION */}
+              {/* NOTES */}
               <div className="mt-6">
                 <h3 className="text-white font-semibold mb-2">
                   📝 My Notes
@@ -323,68 +350,42 @@ export default function MyLearning() {
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                   className="w-full min-h-[120px] bg-slate-800 border border-slate-700 rounded p-3 text-white"
-                  placeholder="Write notes for this lesson..."
                 />
-                <button
-                  onClick={() => {
-                    localStorage.setItem(
-                      `notes_${COURSE_ID}_${selectedVideo.id}`,
-                      notes
-                    );
-                    alert("Notes saved");
-                  }}
-                  className="mt-2 bg-green-600 px-4 py-2 text-white rounded"
-                >
-                  Save Notes
-                </button>
-              </div>
 
-              {/* 🔽 DOUBT SECTION */}
-              <div className="mt-8">
-                <h3 className="text-white font-semibold mb-2">
-                  ❓ Ask a Doubt
-                </h3>
-                <textarea
-                  value={doubtText}
-                  onChange={(e) => setDoubtText(e.target.value)}
-                  className="w-full min-h-[80px] bg-slate-800 border border-slate-700 rounded p-3 text-white"
-                  placeholder="Type your doubt here..."
-                />
-                <div className="flex gap-3 mt-2">
+                <div className="flex flex-wrap gap-3 mt-3">
                   <button
-                    onClick={submitDoubt}
-                    className="bg-blue-600 px-4 py-2 text-white rounded"
+                    onClick={() => {
+                      localStorage.setItem(
+                        `notes_${COURSE_ID}_${selectedVideo.id}`,
+                        notes
+                      );
+                      alert("Notes saved");
+                    }}
+                    className="bg-green-600 px-4 py-2 rounded text-white"
                   >
-                    Submit Doubt
+                    Save Notes
                   </button>
-                  <button
-                    onClick={() =>
-                      window.open(
-                        `https://wa.me/919437401378?text=Course:${COURSE_ID}%0ALesson:${selectedVideo.title}%0ADoubt:${doubtText}`,
-                        "_blank"
-                      )
-                    }
-                    className="bg-slate-700 px-4 py-2 text-white rounded"
-                  >
-                    WhatsApp
-                  </button>
-                </div>
 
-                {/* DOUBT HISTORY */}
-                <div className="mt-4">
-                  {doubts.map((d) => (
-                    <div
-                      key={d.id}
-                      className="bg-slate-800 border border-slate-700 rounded p-3 mb-2"
-                    >
-                      <p className="text-white text-sm">
-                        {d.text}
-                      </p>
-                      <p className="text-xs text-slate-400 mt-1">
-                        {d.video} • {d.time} • {d.status}
-                      </p>
-                    </div>
-                  ))}
+                  <button
+                    onClick={downloadNotesTXT}
+                    className="bg-slate-700 px-4 py-2 rounded text-white"
+                  >
+                    Download TXT
+                  </button>
+
+                  <button
+                    onClick={downloadNotesPDF}
+                    className="bg-red-600 px-4 py-2 rounded text-white"
+                  >
+                    Download PDF
+                  </button>
+
+                  <button
+                    onClick={downloadAllNotesTXT}
+                    className="bg-purple-600 px-4 py-2 rounded text-white"
+                  >
+                    All Notes
+                  </button>
                 </div>
               </div>
             </>
