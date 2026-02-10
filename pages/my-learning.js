@@ -45,6 +45,22 @@ export default function MyLearning() {
   }, [router]);
 
   // ===============================
+// AUTO LOGOUT ON TAB CLOSE / REFRESH
+// ===============================
+useEffect(() => {
+  const handleTabClose = () => {
+    localStorage.removeItem("studentToken");
+  };
+
+  window.addEventListener("beforeunload", handleTabClose);
+
+  return () => {
+    window.removeEventListener("beforeunload", handleTabClose);
+  };
+}, []);
+
+
+  // ===============================
   // LOAD VIDEOS (COURSE-WISE)
   // ===============================
   useEffect(() => {
