@@ -175,63 +175,66 @@ export default function MyLearning() {
     <main className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-950 to-indigo-950">
 
       {/* HEADER */}
-      <div className="max-w-7xl mx-auto px-6 py-6">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+<div className="max-w-7xl mx-auto px-6 py-6">
+  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
 
-          <div>
-            <p className="text-sm text-blue-300">My Learning</p>
-            <h1 className="text-3xl font-extrabold text-white">
-              {COURSE_ID} Course
-            </h1>
-            <p className="text-sm text-blue-400">
-              Odia IT Training Hub • Student Portal
-            </p>
-          </div>
+    {/* LEFT */}
+    <div>
+      <p className="text-sm text-blue-300">My Learning</p>
+      <h1 className="text-3xl font-extrabold text-white">
+        {COURSE_ID} Course
+      </h1>
+      <p className="text-sm text-blue-400">
+        Odia IT Training Hub • Student Portal
+      </p>
+    </div>
 
-          {/* COURSE SELECT */}
-          <select
-            value={activeCourse}
-            onChange={(e) => {
-              setActiveCourse(e.target.value);
-              setSelectedVideo(null);
-            }}
-            className="bg-slate-800 border border-slate-600 text-white px-4 py-2 rounded-lg"
-          >
-            <option value="PL-SQL">PL/SQL</option>
-            <option value="DEVOPS">Devops AWS</option>
-            <option value="LINUX">Linux</option>
-            <option value="SHELL SCRIPTING">Shell Scripting</option>
-            <option value="JENKINS">Jenkins</option>
-            <option value="GIT & GITHUB">Git & Github</option>
-            <option value="SPLUNK">Splunk</option>
-            <option value="AUTOSYS-CONTROL-M">Job Scheduling Tools</option>
-            <option value="ITIL">ITIL Process</option>
-            <option value="PROJECT">Project Class</option>
-          </select>
+    {/* RIGHT (Course + Logout) */}
+    <div className="flex items-center gap-4">
+      <select
+        value={activeCourse}
+        onChange={(e) => {
+          setActiveCourse(e.target.value);
+          setSelectedVideo(null);
+        }}
+        className="bg-slate-800 border border-slate-600 text-white px-4 py-2 rounded-lg"
+      >
+        <option value="PL-SQL">PL/SQL</option>
+        <option value="DEVOPS">Devops AWS</option>
+        <option value="LINUX">Linux</option>
+        <option value="SHELL SCRIPTING">Shell Scripting</option>
+        <option value="JENKINS">Jenkins</option>
+        <option value="GIT & GITHUB">Git & Github</option>
+        <option value="SPLUNK">Splunk</option>
+        <option value="AUTOSYS-CONTROL-M">Job Scheduling Tools</option>
+        <option value="ITIL">ITIL Process</option>
+        <option value="PROJECT">Project Class</option>
+      </select>
 
-              {/* LOGOUT BUTTON */}
-            <button
-              onClick={logout}
-              className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold"
-            >
-              Logout
-            </button>
-          </div>
+      {/* LOGOUT BUTTON */}
+      <button
+        onClick={logout}
+        className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold"
+      >
+        Logout
+      </button>
+    </div>
 
-          {/* PROGRESS */}
-          <div className="w-full md:w-64">
-            <p className="text-sm text-blue-300 mb-1">
-              Progress — {progress}%
-            </p>
-            <div className="w-full h-2 bg-slate-800 rounded">
-              <div
-                className="h-2 bg-blue-500 rounded"
-                style={{ width: `${progress}%` }}
-              />
-            </div>
-          </div>
-        </div>
+    {/* PROGRESS */}
+    <div className="w-full md:w-64">
+      <p className="text-sm text-blue-300 mb-1">
+        Progress — {progress}%
+      </p>
+      <div className="w-full h-2 bg-slate-800 rounded">
+        <div
+          className="h-2 bg-blue-500 rounded"
+          style={{ width: `${progress}%` }}
+        />
       </div>
+    </div>
+
+  </div>
+</div>
 
       {/* CONTENT */}
       <div className="max-w-7xl mx-auto px-6 pb-10 grid grid-cols-1 lg:grid-cols-4 gap-6">
