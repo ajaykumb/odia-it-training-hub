@@ -165,7 +165,7 @@ export default function AdminUploadAndDoubts() {
           <option value="LINUX">Linux</option>
           <option value="DEVOPS">DevOps AWS</option>
           <option value="PROJECT">Project Class</option>
-          <option value="Shell Scripting">Project Class</option>
+          <option value="JENKINS">Jenkins Class</option>
           <option value="BASH SHELL SCRIPTING">Shell Scripting</option>
         </select>
 
