@@ -161,10 +161,12 @@ export default function AdminUploadAndDoubts() {
           className="w-full mb-3 bg-slate-900 border border-slate-600 rounded p-2"
         >
           <option value="PL-SQL">PL/SQL</option>
-          <option value="SQL">SQL</option>
+          <option value="ITIL Course">ITIL Process</option>
           <option value="LINUX">Linux</option>
           <option value="DEVOPS">DevOps AWS</option>
           <option value="PROJECT">Project Class</option>
+          <option value="Shell Scripting">Project Class</option>
+          <option value="BASH SHELL SCRIPTING">Shell Scripting</option>
         </select>
 
         <label className="text-sm">Video Title</label>
