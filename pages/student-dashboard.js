@@ -12,16 +12,13 @@ import {
 } from "@heroicons/react/24/outline";
 
 import { db } from "../utils/firebaseConfig";
-
 import {
   doc,
   onSnapshot,
   collection,
   query,
   orderBy,
-  getDocs,
-  getDoc,
-  deleteDoc
+  getDocs
 } from "firebase/firestore";
 
 export default function StudentDashboard() {
@@ -40,50 +37,10 @@ export default function StudentDashboard() {
   const [countdown, setCountdown] = useState("");
 
   // LOGIN CHECK
-useEffect(() => {
-
-  const checkDevice = async () => {
-
+  useEffect(() => {
     const token = localStorage.getItem("studentToken");
-    const studentId = localStorage.getItem("studentUID");
-    const deviceId = localStorage.getItem("deviceId");
-
-    if (!token || !studentId) {
-
-      router.push("/login");
-      return;
-
-    }
-
-    const sessionRef = doc(db, "activeSessions", studentId);
-    const snap = await getDoc(sessionRef);
-
-    // if session not found
-    if (!snap.exists()) {
-
-      router.push("/login");
-      return;
-
-    }
-
-    const savedDeviceId = snap.data().deviceId;
-
-    // if login from another device
-    if (savedDeviceId !== deviceId) {
-
-      alert("Your ID already logged in another device");
-
-      localStorage.clear();
-
-      router.push("/login");
-
-    }
-
-  };
-
-  checkDevice();
-
-}, []);
+    if (!token) router.push("/login");
+  }, []);
 
   // ===============================
 // REAL COURSE PROGRESS (SAME AS MY-LEARNING)
@@ -184,21 +141,10 @@ useEffect(() => {
     return () => clearInterval(interval);
   }, [upcomingClass]);
 
-const logout = async () => {
-
-  const studentId = localStorage.getItem("studentUID");
-
-  if (studentId) {
-
-    await deleteDoc(doc(db, "activeSessions", studentId));
-
-  }
-
-  localStorage.clear();
-
-  router.push("/login");
-
-};
+  const logout = () => {
+    localStorage.removeItem("studentToken");
+    router.push("/login");
+  };
 
   const joinLiveClass = () => {
     const url =
