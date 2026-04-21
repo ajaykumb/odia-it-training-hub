@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
 import { signInWithEmailAndPassword, sendPasswordResetEmail } from "firebase/auth";
-import { doc, getDoc, collection, query, where, getDocs, setDoc, serverTimestamp } from "firebase/firestore";
+import { doc, getDoc, collection, query, where, getDocs } from "firebase/firestore";
 import { auth, db } from "../utils/firebaseConfig";
 
 export default function Login() {
@@ -27,15 +27,13 @@ export default function Login() {
     }
   };
 
-  // LOGIN HANDLER (UPDATED LOGIC ONLY)
+  // LOGIN HANDLER
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
     setLoading(true);
 
     try {
-
-      // firebase auth login
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
@@ -51,64 +49,28 @@ export default function Login() {
       const studentData = studentDoc.data();
       const studentId = studentDoc.id;
 
-      // approval check
       if (!studentData.isApproved) {
         router.push("/pending-approval");
         return;
       }
 
-      // create device id (unique per device)
-      let deviceId = localStorage.getItem("deviceId");
-
-      if (!deviceId) {
-        deviceId = Date.now().toString();
-        localStorage.setItem("deviceId", deviceId);
-      }
-
-      // check existing session
-      const sessionRef = doc(db, "activeSessions", studentId);
-      const sessionSnap = await getDoc(sessionRef);
-
-      if (sessionSnap.exists()) {
-
-        const savedDeviceId = sessionSnap.data().deviceId;
-
-        // block login from another device
-        if (savedDeviceId !== deviceId) {
-          setError("This ID already logged in another device.");
-          setLoading(false);
-          return;
-        }
-      }
-
-      // save session for this device
-      await setDoc(sessionRef, {
-        deviceId: deviceId,
-        loginTime: serverTimestamp()
-      });
-
-      // normal login storage
       localStorage.setItem("studentToken", "VALID_USER");
       localStorage.setItem("studentUID", studentId);
 
       router.push("/student-dashboard");
 
     } catch (err) {
-
       let errorMessage = "Invalid Student ID or Password.";
 
       if (["auth/user-not-found", "auth/wrong-password", "auth/invalid-credential"].includes(err.code)) {
         errorMessage = "Invalid Student ID or Password.";
-      }
-      else if (err.code === "auth/invalid-email") {
+      } else if (err.code === "auth/invalid-email") {
         errorMessage = "Please enter a valid email address.";
-      }
-      else if (err.message.includes("Student record not found")) {
+      } else if (err.message.includes("Student record not found")) {
         errorMessage = "No matching student record found. Contact support.";
       }
 
       setError(errorMessage);
-
     } finally {
       setLoading(false);
     }
@@ -157,9 +119,7 @@ export default function Login() {
 
         {/* FORM */}
         <form onSubmit={handleLogin}>
-
           <label className="text-gray-700 font-medium text-sm">Student ID (Email)</label>
-
           <input
             type="email"
             placeholder="Enter your registered email address"
@@ -171,8 +131,8 @@ export default function Login() {
 
           <label className="text-gray-700 font-medium text-sm">Password</label>
 
+          {/* PASSWORD FIELD */}
           <div className="relative mb-4">
-
             <input
               type={showPassword ? "text" : "password"}
               placeholder="Enter your Password"
@@ -188,13 +148,12 @@ export default function Login() {
             >
               {showPassword ? "🙈" : "👁️"}
             </span>
-
           </div>
 
           {error && <p className="text-red-600 mb-3">{error}</p>}
-
           {resetMessage && <p className="text-green-600 text-sm mb-3">{resetMessage}</p>}
 
+          {/* LOGIN BUTTON */}
           <button
             className={`w-full text-white py-3 rounded transition text-lg font-semibold ${
               loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
@@ -203,7 +162,6 @@ export default function Login() {
           >
             {loading ? 'Logging In...' : 'Login'}
           </button>
-
         </form>
 
         {/* RESET PASSWORD */}
@@ -227,7 +185,6 @@ export default function Login() {
           © 2022–2025 Odia IT Training Hub • All Rights Reserved<br />
           📞 +91 9437401378
         </p>
-
       </div>
     </div>
   );
