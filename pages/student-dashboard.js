@@ -1,13 +1,3 @@
-import {
-  doc,
-  onSnapshot,
-  collection,
-  query,
-  orderBy,
-  getDocs,
-  getDoc,
-  deleteDoc
-} from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import {
@@ -22,13 +12,16 @@ import {
 } from "@heroicons/react/24/outline";
 
 import { db } from "../utils/firebaseConfig";
+
 import {
   doc,
   onSnapshot,
   collection,
   query,
   orderBy,
-  getDocs
+  getDocs,
+  getDoc,
+  deleteDoc
 } from "firebase/firestore";
 
 export default function StudentDashboard() {
