@@ -1,4 +1,3 @@
-import { deleteDoc, doc } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import {
@@ -142,16 +141,10 @@ useEffect(() => {
     return () => clearInterval(interval);
   }, [upcomingClass]);
 
-const logout = async () => {
-  const studentId = localStorage.getItem("studentUID");
-  if (studentId) {
-    await deleteDoc(doc(db, "activeSessions", studentId));
-  }
-  localStorage.removeItem("studentToken");
-  localStorage.removeItem("studentUID");
-  localStorage.removeItem("deviceId");
-  router.push("/login");
-};
+  const logout = () => {
+    localStorage.removeItem("studentToken");
+    router.push("/login");
+  };
 
   const joinLiveClass = () => {
     const url =
