@@ -207,7 +207,7 @@ export default function MyLearning() {
         <option value="JENKINS">Jenkins</option>
         <option value="GIT & GITHUB">Git & Github</option>
         <option value="SPLUNK">Splunk</option>
-        <option value="AUTOSYS-CONTROL-M">Job Scheduling Tools</option>
+        <option value="BATCH">Job Scheduling Tools</option>
         <option value="ITIL Course">ITIL Process</option>
         <option value="PROJECT">Project Class</option>
       </select>
