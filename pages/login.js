@@ -13,6 +13,7 @@ export default function Login() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // PASSWORD RESET
   const handlePasswordReset = async () => {
     if (!email) {
       setResetMessage("Please enter your email first.");
@@ -26,6 +27,7 @@ export default function Login() {
     }
   };
 
+  // LOGIN HANDLER
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
@@ -35,6 +37,7 @@ export default function Login() {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
+      // FIRESTORE CHECK
       const q = query(collection(db, "students"), where("email", "==", email));
       const snap = await getDocs(q);
 
@@ -50,10 +53,6 @@ export default function Login() {
         router.push("/pending-approval");
         return;
       }
-
-      // 🔥 NEW: generate session key
-      const sessionKey = Date.now().toString();
-      localStorage.setItem("ACTIVE_USER_SESSION", sessionKey);
 
       localStorage.setItem("studentToken", "VALID_USER");
       localStorage.setItem("studentUID", studentId);
@@ -78,36 +77,114 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-cover bg-center"
+    <div
+      className="min-h-screen flex items-center justify-center bg-cover bg-center"
       style={{ backgroundImage: "url('/images/background.jpg')" }}
     >
-      <div className="bg-white bg-opacity-90 backdrop-blur-xl shadow-2xl rounded-2xl p-10 w-full max-w-md">
+      <div className="bg-white bg-opacity-90 backdrop-blur-xl shadow-2xl rounded-2xl p-10 w-full max-w-md 
+                      transition-all hover:shadow-blue-300 hover:scale-[1.01]">
 
-        <h2 className="text-2xl font-bold text-center mb-6">Student Login</h2>
+        {/* BACK BUTTON */}
+        <a href="/" className="text-blue-700 text-sm mb-4 inline-block hover:underline">
+          ← Back to Main Site
+        </a>
 
+        {/* LOGO */}
+        <div className="relative flex justify-center mb-4">
+          <div className="absolute w-28 h-28 bg-blue-200 blur-3xl opacity-40 rounded-full"></div>
+          <img 
+            src="/images/logo.png"
+            alt="Odia IT Training Hub Logo"
+            className="relative h-20 w-20 rounded-full shadow-lg border border-gray-300"
+          />
+        </div>
+
+        {/* WELCOME BANNER */}
+        <div className="text-center mb-4">
+          <h2 className="text-3xl font-bold text-blue-700">Odia IT Training Hub</h2>
+          <p className="text-gray-700 text-sm mt-1">
+            Personal Training • Real-Time Projects • Career Growth
+          </p>
+        </div>
+
+        {/* TITLE WITH LINE */}
+        <div className="text-center mb-6">
+          <h3 className="text-xl font-semibold text-gray-700">Student Login</h3>
+          <div className="w-16 h-1 bg-blue-600 mx-auto mt-2 rounded-full"></div>
+        </div>
+
+        <p className="text-center text-gray-600 mb-8 text-sm">
+          Access your class notes & study materials
+        </p>
+
+        {/* FORM */}
         <form onSubmit={handleLogin}>
+          <label className="text-gray-700 font-medium text-sm">Student ID (Email)</label>
           <input
             type="email"
-            placeholder="Enter email"
+            placeholder="Enter your registered email address"
             className="w-full p-3 border rounded mb-4"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            required
           />
 
-          <input
-            type="password"
-            placeholder="Enter password"
-            className="w-full p-3 border rounded mb-4"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
+          <label className="text-gray-700 font-medium text-sm">Password</label>
 
-          {error && <p className="text-red-500">{error}</p>}
+          {/* PASSWORD FIELD */}
+          <div className="relative mb-4">
+            <input
+              type={showPassword ? "text" : "password"}
+              placeholder="Enter your Password"
+              className="w-full p-3 border rounded"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
 
-          <button className="w-full bg-blue-600 text-white py-3 rounded">
-            Login
+            <span
+              className="absolute right-3 top-3 cursor-pointer text-gray-600"
+              onClick={() => setShowPassword(!showPassword)}
+            >
+              {showPassword ? "🙈" : "👁️"}
+            </span>
+          </div>
+
+          {error && <p className="text-red-600 mb-3">{error}</p>}
+          {resetMessage && <p className="text-green-600 text-sm mb-3">{resetMessage}</p>}
+
+          {/* LOGIN BUTTON */}
+          <button
+            className={`w-full text-white py-3 rounded transition text-lg font-semibold ${
+              loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
+            }`}
+            disabled={loading}
+          >
+            {loading ? 'Logging In...' : 'Login'}
           </button>
         </form>
+
+        {/* RESET PASSWORD */}
+        <p
+          className="text-center text-blue-700 mt-3 text-sm cursor-pointer hover:underline"
+          onClick={handlePasswordReset}
+        >
+          Forgot Password?
+        </p>
+
+        {/* SIGNUP */}
+        <p className="text-center text-gray-600 mt-4 text-sm">
+          Don't have an account?
+          <a href="/signup" className="text-blue-700 font-semibold ml-1 hover:underline">
+            Sign Up Now
+          </a>
+        </p>
+
+        {/* FOOTER */}
+        <p className="text-center text-gray-500 text-xs mt-6">
+          © 2022–2025 Odia IT Training Hub • All Rights Reserved<br />
+          📞 +91 9437401378
+        </p>
       </div>
     </div>
   );
