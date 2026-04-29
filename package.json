@@ -18,9 +18,7 @@
 
     "jspdf": "^2.5.1",
     "html2canvas": "^1.4.1"
-  },
-  "dependencies": {
-  "framer-motion": "^11.x.x"
+    "framer-motion": "^11.0.0"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.18",
