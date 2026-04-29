@@ -6,10 +6,26 @@ import {
   doc,
   updateDoc
 } from "firebase/firestore";
+import { useRouter } from "next/router";
 
 export default function AdminPayment() {
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
+
+  // 🔐 SIMPLE ADMIN CHECK (Hardcoded)
+  useEffect(() => {
+    const email = localStorage.getItem("adminEmail");
+    const password = localStorage.getItem("adminPassword");
+
+    if (
+      email !== "oracle.ajaykr@gmail.com" ||
+      password !== "juli143"
+    ) {
+      alert("Access Denied");
+      router.push("/login");
+    }
+  }, []);
 
   // 🔥 Load students who requested payment
   const loadStudents = async () => {
