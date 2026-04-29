@@ -42,6 +42,65 @@ export default function StudentDashboard() {
     if (!token) router.push("/login");
   }, []);
 
+  // LOGIN CHECK
+useEffect(() => {
+  const token = localStorage.getItem("studentToken");
+  if (!token) router.push("/login");
+}, []);
+
+
+// 🔐 AUTO LOGOUT AFTER 2 HOURS (ADD EXACTLY HERE)
+useEffect(() => {
+  const updateActivity = () => {
+    localStorage.setItem("lastActivityTime", Date.now());
+  };
+
+  // Track activity
+  window.addEventListener("click", updateActivity);
+  window.addEventListener("keydown", updateActivity);
+  window.addEventListener("mousemove", updateActivity);
+
+  const checkSession = () => {
+    const loginTime = localStorage.getItem("loginTime");
+    const lastActivity = localStorage.getItem("lastActivityTime");
+
+    if (!loginTime) {
+      router.push("/login");
+      return;
+    }
+
+    const now = Date.now();
+
+    const TWO_HOURS = 2 * 60 * 60 * 1000;
+
+    // 🔥 STRICT 2-hour logout
+    if (now - parseInt(loginTime) > TWO_HOURS) {
+      alert("Session expired. Please login again.");
+
+      localStorage.removeItem("studentToken");
+      localStorage.removeItem("studentUID");
+      localStorage.removeItem("loginTime");
+      localStorage.removeItem("lastActivityTime");
+
+      router.push("/login");
+      return;
+    }
+  };
+
+  // Run immediately
+  checkSession();
+
+  // Check every 1 min
+  const interval = setInterval(checkSession, 60000);
+
+  return () => {
+    clearInterval(interval);
+    window.removeEventListener("click", updateActivity);
+    window.removeEventListener("keydown", updateActivity);
+    window.removeEventListener("mousemove", updateActivity);
+  };
+}, []);
+
   // ===============================
 // REAL COURSE PROGRESS (SAME AS MY-LEARNING)
 // ===============================
