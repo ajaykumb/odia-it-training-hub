@@ -64,9 +64,24 @@ export default function Login() {
       localStorage.setItem("loginTime", Date.now());
       localStorage.setItem("lastActivityTime", Date.now());
 
-// 🔥 Payment check
+// 🔥 Payment check + EMAIL SEND
 if (!studentData.paymentDone) {
+
+  // 🔥 SEND PAYMENT DUE EMAIL
+  await fetch("/api/sendPaymentDueMail", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      toEmail: email,
+      name: studentData.name || "Student",
+    }),
+  });
+
   router.push("/payment");
+  return;
+
 } else {
   router.push("/student-dashboard");
 }
