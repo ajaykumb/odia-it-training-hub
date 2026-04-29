@@ -58,7 +58,11 @@ export default function Login() {
       localStorage.setItem("studentUID", studentId);
 
       localStorage.setItem("studentToken", "VALID_USER");
-localStorage.setItem("studentUID", studentId);
+      localStorage.setItem("studentUID", studentId);
+
+      // 🔥 ADD THESE TWO LINES HERE (IMPORTANT)
+      localStorage.setItem("loginTime", Date.now());
+      localStorage.setItem("lastActivityTime", Date.now());
 
 // 🔥 Payment check
 if (!studentData.paymentDone) {
