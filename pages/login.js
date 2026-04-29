@@ -57,7 +57,15 @@ export default function Login() {
       localStorage.setItem("studentToken", "VALID_USER");
       localStorage.setItem("studentUID", studentId);
 
-      router.push("/student-dashboard");
+      localStorage.setItem("studentToken", "VALID_USER");
+localStorage.setItem("studentUID", studentId);
+
+// 🔥 Payment check
+if (!studentData.paymentDone) {
+  router.push("/payment");
+} else {
+  router.push("/student-dashboard");
+}
 
     } catch (err) {
       let errorMessage = "Invalid Student ID or Password.";
