@@ -1,6 +1,7 @@
 import { useRouter } from "next/router";
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "../utils/firebaseConfig";
+import { motion } from "framer-motion";
 
 export default function Payment() {
   const router = useRouter();
@@ -28,71 +29,89 @@ export default function Payment() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 to-blue-200 p-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-700 via-blue-500 to-indigo-600 flex items-center justify-center px-4">
 
-      <div className="bg-white shadow-2xl rounded-2xl p-8 w-full max-w-md text-center">
+      {/* MAIN CARD */}
+      <motion.div
+        initial={{ opacity: 0, y: 40 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden"
+      >
 
-        {/* LOGO */}
-        <div className="flex justify-center mb-4">
-          <img src="/images/logo.png" className="h-20 w-20 rounded-full shadow" />
-        </div>
-
-        {/* TITLE */}
-        <h2 className="text-2xl font-bold text-blue-700">
-          Odia IT Training Hub
-        </h2>
-
-        <p className="text-gray-600 text-sm mt-1">
-          Complete Your Course Payment
-        </p>
-
-        {/* PAYMENT NOTE */}
-        <div className="bg-yellow-100 border border-yellow-300 rounded-lg p-4 mt-5 text-sm text-gray-800">
-          <p className="font-semibold text-yellow-700 mb-2">
-            📢 Payment Instructions
-          </p>
-
-          <p>👉 Please pay your <b>First Installment</b> to continue the course.</p>
-
-          <p className="mt-2">
-            💰 You can choose:
-          </p>
-
-          <ul className="text-left mt-2 list-disc list-inside">
-            <li>Pay in <b>3 Installments</b></li>
-            <li>
-              Pay <b>Full Amount</b> and get <span className="text-green-600 font-semibold">₹1000 Discount</span>
-            </li>
-          </ul>
-        </div>
-
-        {/* QR CODE */}
-        <div className="mt-6">
+        {/* HEADER */}
+        <div className="bg-blue-600 text-white p-6 text-center">
           <img
-            src="/images/upi-qr.png"
-            className="w-56 h-56 mx-auto border rounded-lg shadow"
+            src="/images/logo.png"
+            className="h-14 w-14 mx-auto mb-2 rounded-full"
           />
+          <h2 className="text-xl font-bold">Odia IT Training Hub</h2>
+          <p className="text-sm opacity-90">Secure Payment Portal</p>
         </div>
 
-        {/* UPI NOTE */}
-        <p className="mt-4 text-gray-600 text-sm">
-          Scan using Google Pay / PhonePe / Paytm
-        </p>
+        {/* CONTENT */}
+        <div className="p-6">
 
-        {/* BUTTON */}
-        <button
-          onClick={handlePaymentRequest}
-          className="mt-6 bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition"
-        >
-          I Have Paid
-        </button>
+          {/* COURSE INFO */}
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm">
+            <p className="font-semibold text-blue-700 mb-2">
+              🎓 Course Payment
+            </p>
 
-        {/* FOOTER NOTE */}
-        <p className="text-xs text-gray-500 mt-4">
-          After payment, click the button above and wait for admin approval.
-        </p>
+            <p>👉 Please pay your <b>First Installment</b></p>
 
-      </div>
+            <ul className="mt-2 list-disc list-inside text-gray-700">
+              <li>3 Installments available</li>
+              <li>
+                Full Payment →{" "}
+                <span className="text-green-600 font-semibold">
+                  ₹1000 Discount
+                </span>
+              </li>
+            </ul>
+          </div>
+
+          {/* QR SECTION */}
+          <div className="mt-6 text-center">
+            <p className="text-gray-600 text-sm mb-2">
+              Scan to Pay via UPI
+            </p>
+
+            <motion.img
+              whileHover={{ scale: 1.05 }}
+              src="/images/upi-qr.png"
+              className="w-56 h-56 mx-auto border rounded-xl shadow-md"
+            />
+          </div>
+
+          {/* PAYMENT METHODS */}
+          <p className="text-center text-xs text-gray-500 mt-3">
+            Google Pay • PhonePe • Paytm • Any UPI App
+          </p>
+
+          {/* BUTTON */}
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={handlePaymentRequest}
+            className="mt-6 w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition shadow-md"
+          >
+            I Have Paid
+          </motion.button>
+
+          {/* FOOTER NOTE */}
+          <p className="text-xs text-gray-500 mt-4 text-center">
+            After payment, click above and wait for admin approval.
+          </p>
+
+        </div>
+
+        {/* FOOTER */}
+        <div className="bg-gray-50 text-center p-3 text-xs text-gray-500">
+          Need help? Contact: +91 9437401378
+        </div>
+
+      </motion.div>
     </div>
   );
 }
