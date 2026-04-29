@@ -35,14 +35,30 @@ export default function AdminPayment() {
     loadStudents();
   }, []);
 
-  // ✅ Approve payment
-  const approvePayment = async (id) => {
+  // ✅ Approve payment + send email
+  const approvePayment = async (id, student) => {
     try {
       await updateDoc(doc(db, "students", id), {
         paymentDone: true
       });
 
-      alert("✅ Payment Approved");
+      // 🔥 SEND SUCCESS EMAIL
+      try {
+        await fetch("/api/sendPaymentSuccessMail", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            toEmail: student.email,
+            name: student.name || "Student",
+          }),
+        });
+      } catch (err) {
+        console.error("Mail error:", err);
+      }
+
+      alert("✅ Payment Approved & Email Sent");
 
       loadStudents(); // refresh list
     } catch (err) {
@@ -88,7 +104,7 @@ export default function AdminPayment() {
 
             {!s.paymentDone && (
               <button
-                onClick={() => approvePayment(s.id)}
+                onClick={() => approvePayment(s.id, s)}
                 className="mt-3 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
               >
                 Approve Payment
