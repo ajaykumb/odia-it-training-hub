@@ -64,22 +64,29 @@ export default function Login() {
       localStorage.setItem("loginTime", Date.now());
       localStorage.setItem("lastActivityTime", Date.now());
 
-// 🔥 Payment check + EMAIL SEND
+// 🔥 Payment check + EMAIL SEND (FIXED)
 if (!studentData.paymentDone) {
 
-  // 🔥 SEND PAYMENT DUE EMAIL
-  await fetch("/api/sendPaymentDueMail", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      toEmail: email,
-      name: studentData.name || "Student",
-    }),
-  });
+  try {
+    await fetch("/api/sendPaymentDueMail", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        toEmail: email,
+        name: studentData.name || "Student",
+      }),
+    });
+  } catch (err) {
+    console.error("Mail error:", err);
+  }
 
-  router.push("/payment");
+  // 🔥 SMALL DELAY (IMPORTANT FIX)
+  setTimeout(() => {
+    router.push("/payment");
+  }, 800);
+
   return;
 
 } else {
