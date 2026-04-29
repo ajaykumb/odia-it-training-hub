@@ -48,6 +48,33 @@ useEffect(() => {
   if (!token) router.push("/login");
 }, []);
 
+  // 🔐 REAL-TIME PAYMENT CHECK (FORCE LOGOUT IF FALSE)
+useEffect(() => {
+  const uid = localStorage.getItem("studentUID");
+
+  if (!uid) return;
+
+  const unsub = onSnapshot(doc(db, "students", uid), (snap) => {
+    if (snap.exists()) {
+      const data = snap.data();
+
+      // 🔥 If payment revoked → force logout
+      if (!data.paymentDone) {
+        alert("Payment required. Please complete payment.");
+
+        localStorage.removeItem("studentToken");
+        localStorage.removeItem("studentUID");
+        localStorage.removeItem("loginTime");
+        localStorage.removeItem("lastActivityTime");
+
+        router.push("/login");
+      }
+    }
+  });
+
+  return () => unsub();
+}, []);
+
 
 // 🔐 AUTO LOGOUT AFTER 2 HOURS (ADD EXACTLY HERE)
 useEffect(() => {
